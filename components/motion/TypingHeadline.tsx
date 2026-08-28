@@ -2,12 +2,12 @@
 
 import { useState, useEffect, useRef } from 'react'
 
-interface Phrase {
+export interface TypingHeadlinePhrase {
   text: string
   bold: string
 }
 
-const PHRASES: Phrase[] = [
+const DEFAULT_PHRASES: TypingHeadlinePhrase[] = [
   { text: 'Build Your Agentic Enterprise.', bold: 'Agentic' },
   { text: 'Scale Your AI Operations.', bold: 'AI' },
   { text: 'Ship Production-Grade Intelligence.', bold: 'Production-Grade' },
@@ -20,13 +20,27 @@ const PAUSE_AFTER_DELETE = 600
 
 type Phase = 'typing' | 'paused' | 'deleting' | 'waiting'
 
-export default function TypingHeadline({ className = '' }: { className?: string }) {
+export default function TypingHeadline({
+  className = '',
+  phrases = DEFAULT_PHRASES,
+}: {
+  className?: string
+  phrases?: TypingHeadlinePhrase[]
+}) {
   const [phraseIndex, setPhraseIndex] = useState(0)
   const [charCount, setCharCount] = useState(0)
   const [phase, setPhase] = useState<Phase>('typing')
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>()
 
-  const fullText = PHRASES[phraseIndex].text
+  const safePhrases = phrases.length > 0 ? phrases : DEFAULT_PHRASES
+  const normalizedPhraseIndex = phraseIndex % safePhrases.length
+  const fullText = safePhrases[normalizedPhraseIndex].text
+
+  useEffect(() => {
+    setPhraseIndex(0)
+    setCharCount(0)
+    setPhase('typing')
+  }, [phrases])
 
   useEffect(() => {
     clearTimeout(timeoutRef.current)
@@ -54,19 +68,19 @@ export default function TypingHeadline({ className = '' }: { className?: string 
 
       case 'waiting':
         timeoutRef.current = setTimeout(() => {
-          setPhraseIndex(prev => (prev + 1) % PHRASES.length)
+          setPhraseIndex(prev => (prev + 1) % safePhrases.length)
           setPhase('typing')
         }, PAUSE_AFTER_DELETE)
         break
     }
 
     return () => clearTimeout(timeoutRef.current)
-  }, [phase, charCount, fullText.length])
+  }, [phase, charCount, fullText.length, safePhrases.length])
 
-  const currentPhrase = PHRASES[phraseIndex]
+  const currentPhrase = safePhrases[normalizedPhraseIndex]
   const displayed = fullText.slice(0, charCount)
 
-  const renderPhrase = (phrase: Phrase, textToRender: string) => {
+  const renderPhrase = (phrase: TypingHeadlinePhrase, textToRender: string) => {
     const boldStart = phrase.text.indexOf(phrase.bold)
     const boldEnd = boldStart + phrase.bold.length
 
@@ -94,7 +108,7 @@ export default function TypingHeadline({ className = '' }: { className?: string 
   return (
     <h1 className={className}>
       <span className="relative grid">
-        {PHRASES.map((phrase) => (
+        {safePhrases.map((phrase) => (
           <span
             key={phrase.text}
             aria-hidden="true"

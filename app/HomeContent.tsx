@@ -7,6 +7,8 @@ import {
   Sparkles,
   Quote,
   CheckCircle,
+  Layers3,
+  RotateCcw,
 } from 'lucide-react'
 import Container from '@/components/ui/Container'
 import Button from '@/components/ui/Button'
@@ -21,6 +23,9 @@ import TypingBlock from '@/components/motion/TypingBlock'
 import ToolCallAnimation from '@/components/motion/ToolCallAnimation'
 import type { ToolCallItem } from '@/components/motion/ToolCallAnimation'
 import { resolveIcon } from '@/lib/icons'
+import { ARCHITECTURES, DEFAULT_SECTION_ORDER } from '@/lib/personalization/catalog'
+import type { HomepageSectionId } from '@/lib/personalization/types'
+import { useWebMCPPersonalization } from '@/components/personalization/useWebMCPPersonalization'
 
 interface HomeData {
   title: string
@@ -208,6 +213,37 @@ function SectionWithSidebar({
 
 export default function HomeContent({ data, caseStudies }: { data: HomeData; caseStudies: CaseStudySummary[] }) {
   const { hero, paths, clientLogos, partnerEcosystem, manifesto, accelerators, testimonials, faq, cta } = data
+  const { manifest, resetManifest } = useWebMCPPersonalization()
+  const effectiveHero = manifest
+    ? {
+        ...hero,
+        badge: manifest.narrative.badge,
+        description: manifest.narrative.description,
+      }
+    : hero
+  const effectiveCta = manifest
+    ? {
+        title: manifest.cta.title,
+        titleBold: '',
+        description: manifest.cta.description,
+        buttonText: manifest.cta.label,
+        href: manifest.cta.href,
+      }
+    : { ...cta, href: '/contactus' }
+  const effectiveCaseStudies = manifest
+    ? manifest.caseStudySlugs
+        .map(slug => caseStudies.find(study => study.slug === slug))
+        .filter((study): study is CaseStudySummary => Boolean(study))
+    : caseStudies
+  const effectiveAccelerators = manifest
+    ? manifest.demoIds
+        .map(id => accelerators.items.find(item => item.name.toLowerCase() === id))
+        .filter((item): item is HomeData['accelerators']['items'][number] => Boolean(item))
+    : accelerators.items
+  const architectureExamples = manifest?.architectureExamples
+    ?? ARCHITECTURES.slice(0, 3).map(({ id, title, description, layers }) => ({ id, title, description, layers }))
+  const sectionOrder = manifest?.sectionOrder ?? DEFAULT_SECTION_ORDER
+  const sectionStyle = (id: HomepageSectionId) => ({ order: Math.max(sectionOrder.indexOf(id), 0) })
   const caseStudyGrid = data.caseStudyGrid ?? {
     title: "Work we've",
     titleAccent: 'done.',
@@ -237,9 +273,13 @@ export default function HomeContent({ data, caseStudies }: { data: HomeData; cas
   const [activeTestimonial, setActiveTestimonial] = useState<TestimonialItem | null>(testimonials.items[0] ?? null)
 
   return (
-    <>
+    <div className="flex flex-col">
       {/* ── Hero ── */}
-      <section className="relative overflow-hidden min-h-screen flex items-center py-24 md:py-32 bg-gradient-hero">
+      <section
+        className="relative overflow-hidden min-h-screen flex items-center py-24 md:py-32 bg-gradient-hero"
+        style={sectionStyle('hero')}
+        data-personalized-section="hero"
+      >
         <div className="absolute inset-0 bg-grid" />
         <div className="relative z-10 w-full">
           <SectionWithSidebar tools={heroTools} title="AI Activity">
@@ -247,26 +287,46 @@ export default function HomeContent({ data, caseStudies }: { data: HomeData; cas
               <FadeIn direction="none">
                 <span className="inline-flex items-center gap-2 rounded-full bg-cobalt-50 px-4 py-1.5 text-sm font-medium text-cobalt-900 mb-8">
                   <Sparkles className="w-4 h-4" />
-                  {hero.badge}
+                  {effectiveHero.badge}
                 </span>
               </FadeIn>
+              {manifest && (
+                <FadeIn delay={0.05} direction="none">
+                  <div className="mb-6 flex flex-wrap items-center justify-center gap-3 text-sm text-gray-600 lg:justify-start">
+                    <span className="rounded-full border border-cobalt-200 bg-white/80 px-3 py-1">
+                      Personalized for {manifest.audienceSummary}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={resetManifest}
+                      className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-cobalt-800 transition-colors hover:bg-cobalt-50"
+                    >
+                      <RotateCcw className="h-3.5 w-3.5" />
+                      Use standard site
+                    </button>
+                  </div>
+                </FadeIn>
+              )}
               <FadeIn delay={0.1} direction="none">
-                <TypingHeadline className="text-5xl md:text-6xl lg:text-7xl leading-[1.05] tracking-tight text-gray-900 mb-8 min-h-[2.2em] lg:min-h-[1.1em]" />
+                <TypingHeadline
+                  className="text-5xl md:text-6xl lg:text-7xl leading-[1.05] tracking-tight text-gray-900 mb-8 min-h-[2.2em] lg:min-h-[1.1em]"
+                  phrases={manifest?.narrative.headlines}
+                />
               </FadeIn>
               <FadeIn delay={0.2} direction="none">
                 <p className="text-lg md:text-xl text-gray-600 font-light leading-relaxed lg:max-w-xl mb-12">
-                  {hero.description}
+                  {effectiveHero.description}
                 </p>
               </FadeIn>
               <FadeIn delay={0.3} direction="none">
                 <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                   <Button
-                    href="/contactus"
+                    href={effectiveCta.href}
                     size="lg"
                     className="bg-cobalt-900 hover:shadow-premium-lg"
                     fillClassName="bg-cobalt-800"
                   >
-                    {cta.buttonText}
+                    {effectiveCta.buttonText}
                   </Button>
                   <Button href="/genai-accelerators" variant="outline" size="lg">
                     Explore Accelerators
@@ -279,7 +339,11 @@ export default function HomeContent({ data, caseStudies }: { data: HomeData; cas
       </section>
 
       {/* ── Manifesto — dark section ── */}
-      <section className="min-h-screen flex items-center py-24 md:py-32 bg-gray-950 relative overflow-hidden">
+      <section
+        className="min-h-screen flex items-center py-24 md:py-32 bg-gray-950 relative overflow-hidden"
+        style={sectionStyle('manifesto')}
+        data-personalized-section="manifesto"
+      >
         <div className="absolute inset-0 bg-grid-dark" />
         <div className="relative z-10 w-full">
           <SectionWithSidebar tools={manifestoTools} title="Intelligence" dark>
@@ -312,7 +376,7 @@ export default function HomeContent({ data, caseStudies }: { data: HomeData; cas
       </section>
 
       {/* ── Two Paths — shopping-style cards ── */}
-      <section className="py-20 md:py-28">
+      <section className="py-20 md:py-28" style={sectionStyle('paths')} data-personalized-section="paths">
         <SectionWithSidebar tools={pathsTools} title="Build Planning" sidebarMode="centered">
           <Container>
             <h2 className="text-3xl md:text-4xl text-gray-900 mb-16 text-center lg:text-left font-light">
@@ -389,7 +453,11 @@ export default function HomeContent({ data, caseStudies }: { data: HomeData; cas
       </section>
 
       {/* ── Case Study Grid ── */}
-      <section className="py-20 md:py-28 bg-gray-50 overflow-hidden">
+      <section
+        className="py-20 md:py-28 bg-gray-50 overflow-hidden"
+        style={sectionStyle('case_studies')}
+        data-personalized-section="case_studies"
+      >
         <SectionWithSidebar tools={caseStudyTools} title="Deployments" sidebarMode="centered" sidebarVariant="panel">
           <Container>
             <div className="max-w-3xl mx-auto lg:mx-0 text-center lg:text-left mb-16">
@@ -412,10 +480,10 @@ export default function HomeContent({ data, caseStudies }: { data: HomeData; cas
                 className="flex items-stretch gap-6 animate-scroll-cards group-hover/marquee:[animation-play-state:paused]"
                 style={{ width: 'max-content' }}
               >
-                {caseStudies.map((study) => (
+                {effectiveCaseStudies.map((study) => (
                   <CaseStudyCard key={study.slug} study={study} />
                 ))}
-                {caseStudies.map((study) => (
+                {effectiveCaseStudies.map((study) => (
                   <CaseStudyCard key={`dup-${study.slug}`} study={study} />
                 ))}
               </div>
@@ -425,13 +493,21 @@ export default function HomeContent({ data, caseStudies }: { data: HomeData; cas
       </section>
 
       {/* ── Client Logos ── */}
-      <ClientLogos title={clientLogos.title} clients={clientLogos.items} />
+      <div style={sectionStyle('client_logos')} data-personalized-section="client_logos">
+        <ClientLogos title={clientLogos.title} clients={clientLogos.items} />
+      </div>
 
       {/* ── Partner Ecosystem ── */}
-      <PartnerEcosystem groups={partnerEcosystem.groups} />
+      <div style={sectionStyle('partners')} data-personalized-section="partners">
+        <PartnerEcosystem groups={partnerEcosystem.groups} />
+      </div>
 
       {/* ── Testimonials — vertical dual carousel ── */}
-      <section className="relative overflow-hidden py-20 md:py-28 bg-gradient-to-b from-gray-50 via-white to-gray-50">
+      <section
+        className="relative overflow-hidden py-20 md:py-28 bg-gradient-to-b from-gray-50 via-white to-gray-50"
+        style={sectionStyle('testimonials')}
+        data-personalized-section="testimonials"
+      >
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(90%_60%_at_50%_0%,rgba(0,71,171,0.06),transparent_70%)]" />
         <Container className="relative z-10">
           <TypingBlock
@@ -502,7 +578,11 @@ export default function HomeContent({ data, caseStudies }: { data: HomeData; cas
       </section>
 
       {/* ── GenAI Accelerators ── */}
-      <section className="relative overflow-hidden py-20 md:py-28 bg-gradient-to-b from-white via-cobalt-50/20 to-white">
+      <section
+        className="relative overflow-hidden py-20 md:py-28 bg-gradient-to-b from-white via-cobalt-50/20 to-white"
+        style={sectionStyle('accelerators')}
+        data-personalized-section="accelerators"
+      >
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(80%_60%_at_20%_0%,rgba(0,71,171,0.07),transparent_70%),radial-gradient(70%_60%_at_90%_100%,rgba(0,184,217,0.09),transparent_70%)]" />
         <SectionWithSidebar tools={acceleratorTools} title="Platform" sidebarMode="centered">
           <Container className="relative z-10">
@@ -517,7 +597,7 @@ export default function HomeContent({ data, caseStudies }: { data: HomeData; cas
               warpSpeed
             />
             <StaggerChildren className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-7 items-stretch">
-              {accelerators.items.map((acc, i) => {
+              {effectiveAccelerators.map((acc, i) => {
                 const AccIcon = resolveIcon(acc.icon)
                 const isDialogtuple = acc.name.toLowerCase() === 'dialogtuple'
                 const bgClass = [
@@ -595,8 +675,57 @@ export default function HomeContent({ data, caseStudies }: { data: HomeData; cas
         </SectionWithSidebar>
       </section>
 
+      {/* ── Architecture examples ── */}
+      <section
+        className="relative overflow-hidden border-y border-gray-200 bg-gray-950 py-20 md:py-28"
+        style={sectionStyle('architecture')}
+        data-personalized-section="architecture"
+      >
+        <div className="absolute inset-0 bg-grid-dark" />
+        <Container className="relative z-10">
+          <div className="mb-14 max-w-3xl">
+            <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-cobalt-400/30 bg-cobalt-400/10 px-3 py-1 text-sm font-medium text-cyan-300">
+              <Layers3 className="h-4 w-4" />
+              Architecture examples
+            </span>
+            <h2 className="text-3xl font-bold text-white md:text-4xl">
+              A practical path from use case to production
+            </h2>
+            <p className="mt-4 text-lg font-light leading-relaxed text-gray-400">
+              {manifest
+                ? `Selected for ${manifest.audienceSummary}.`
+                : 'Reference patterns for secure, measurable, and maintainable AI systems.'}
+            </p>
+          </div>
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            {architectureExamples.map((example, index) => (
+              <FadeIn key={example.id} delay={index * 0.1}>
+                <article className="h-full rounded-3xl border border-gray-800 bg-gray-900/80 p-6 shadow-[0_22px_50px_-30px_rgba(0,184,217,0.4)] md:p-8">
+                  <h3 className="text-2xl font-bold text-white">{example.title}</h3>
+                  <p className="mt-3 font-light leading-relaxed text-gray-400">{example.description}</p>
+                  <ol className="mt-7 space-y-3">
+                    {example.layers.map((layer, layerIndex) => (
+                      <li key={layer} className="flex items-center gap-3 rounded-xl border border-gray-800 bg-gray-950/70 px-4 py-3 text-sm text-gray-200">
+                        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cobalt-900 text-xs font-semibold text-white">
+                          {layerIndex + 1}
+                        </span>
+                        {layer}
+                      </li>
+                    ))}
+                  </ol>
+                </article>
+              </FadeIn>
+            ))}
+          </div>
+        </Container>
+      </section>
+
       {/* ── FAQ ── */}
-      <section className="py-20 md:py-28 bg-gray-950">
+      <section
+        className="py-20 md:py-28 bg-gray-950"
+        style={sectionStyle('faq')}
+        data-personalized-section="faq"
+      >
         <SectionWithSidebar tools={faqTools} title="Knowledge" dark>
           <Container>
             <TypingBlock
@@ -611,10 +740,14 @@ export default function HomeContent({ data, caseStudies }: { data: HomeData; cas
       </section>
 
       {/* ── Dramatic Final CTA ── */}
-      <section className="py-20 md:py-24 bg-white border-t border-gray-200">
+      <section
+        className="py-20 md:py-24 bg-white border-t border-gray-200"
+        style={sectionStyle('cta')}
+        data-personalized-section="cta"
+      >
         <Container className="text-center">
           <TypingBlock
-            lines={[`${cta.title} ${cta.titleBold}`, cta.description]}
+            lines={[`${effectiveCta.title} ${effectiveCta.titleBold}`.trim(), effectiveCta.description]}
             lineDelay={200}
             lineClassName={(i) =>
               i === 0
@@ -625,20 +758,20 @@ export default function HomeContent({ data, caseStudies }: { data: HomeData; cas
           />
           <FadeIn delay={0.2}>
             <Button
-              href="/contactus"
+              href={effectiveCta.href}
               size="lg"
               className="bg-gray-950 text-white hover:text-white shadow-premium hover:shadow-premium-lg"
               fillClassName="bg-cobalt-900"
             >
               <span className="inline-flex items-center gap-2">
-                {cta.buttonText}
+                {effectiveCta.buttonText}
                 <ArrowRight className="w-5 h-5" />
               </span>
             </Button>
           </FadeIn>
         </Container>
       </section>
-    </>
+    </div>
   )
 }
 
