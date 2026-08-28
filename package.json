@@ -1,0 +1,48 @@
+{
+  "name": "newtuple-website",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "migrate:wix-blog": "node scripts/migrate-wix-blog.js",
+    "normalize:blog-tags": "node scripts/normalize-blog-tags.js",
+    "audit:blog": "node scripts/audit-blog-markdown.js"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.12",
+    "fast-xml-parser": "^4.5.0",
+    "framer-motion": "^11.15.0",
+    "geist": "^1.7.0",
+    "gray-matter": "^4.0.3",
+    "gsap": "^3.14.2",
+    "lucide-react": "^0.468.0",
+    "next": "^14.2.21",
+    "puppeteer": "^22.15.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
+    "split-type": "^0.3.4",
+    "turndown": "^7.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "^14.2.21",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.3",
+    "vitest": "^4.1.0"
+  },
+  "overrides": {
+    "glob": "^13.0.0"
+  }
+}

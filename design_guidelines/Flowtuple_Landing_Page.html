@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flowtuple · Humans and agents. One system of work.</title>
+<meta name="description" content="Flowtuple models your workflows as living state machines, then staffs each step with people or specialist AI agents. One slot at a time, on your terms. By Newtuple Technologies.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cobalt:#0047AB; --cyan:#00B8D9; --ink:#111827; --g600:#4B5563; --g400:#9CA3AF;
+    --g200:#D3D9E3; --g100:#E8ECF3; --g50:#F3F5FA; --dark:#0B0D12; --green:#10B981;
+    --grad:linear-gradient(90deg,#0047AB 0%,#00B8D9 100%);
+    --font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--font);color:var(--ink);background:#fff;-webkit-font-smoothing:antialiased}
+  a{text-decoration:none;color:inherit}
+  button{font-family:var(--font);cursor:pointer}
+  section{padding:110px 7vw}
+  .inner{max-width:1180px;margin:0 auto}
+
+  /* reveal on scroll */
+  .rv{opacity:0;transform:translateY(26px);transition:opacity .8s ease,transform .8s ease}
+  .rv.vis{opacity:1;transform:none}
+
+  .label{font-size:12px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--g400)}
+  .label.cb{color:var(--cobalt)}
+  .tick{display:block;width:34px;height:2px;background:var(--cobalt);margin:20px 0 26px;border-radius:2px}
+  h2.sec{font-size:clamp(30px,3.6vw,52px);font-weight:200;line-height:1.18;letter-spacing:-0.02em;max-width:18em}
+  p.lead{font-size:clamp(16px,1.45vw,20px);font-weight:300;color:var(--g600);line-height:1.65;max-width:38em;margin-top:22px}
+  .grad{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:400}
+  .cob{color:var(--cobalt);font-weight:400}
+
+  .btn{display:inline-flex;align-items:center;gap:10px;background:var(--cobalt);color:#fff;border:1px solid var(--cobalt);
+    padding:.9em 1.9em;border-radius:999px;font-size:15px;font-weight:500;letter-spacing:.02em;transition:all .2s ease}
+  .btn:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(0,71,171,.3)}
+  .btn.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.4)}
+  .btn.ghost:hover{border-color:#fff;box-shadow:none}
+  .btn.inv{background:#fff;color:var(--cobalt);border-color:#fff}
+
+  /* ---------- nav ---------- */
+  nav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;gap:30px;
+    padding:0 7vw;height:66px;background:rgba(11,13,18,.82);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.08);transition:background .3s}
+  nav .brand{display:flex;align-items:center;gap:10px;color:#fff;font-size:16px;font-weight:600}
+  nav .brand .dot{width:11px;height:11px;border-radius:50%;background:var(--grad)}
+  nav .links{margin-left:auto;display:flex;gap:28px}
+  nav .links a{font-size:13.5px;font-weight:500;color:rgba(255,255,255,.72);transition:color .2s}
+  nav .links a:hover{color:#fff}
+  nav .btn{padding:.55em 1.3em;font-size:13px}
+  @media (max-width:860px){ nav .links{display:none} }
+
+  /* ---------- hero ---------- */
+  #hero{background:var(--dark);color:#fff;padding:170px 7vw 90px;position:relative;overflow:hidden}
+  #hero::after{content:'';position:absolute;top:-30%;right:-15%;width:60%;height:80%;border-radius:50%;
+    background:radial-gradient(closest-side,rgba(0,71,171,.28),transparent 70%);pointer-events:none}
+  #hero .inner{position:relative;z-index:1}
+  #hero h1{font-size:clamp(38px,5.4vw,78px);font-weight:200;line-height:1.12;letter-spacing:-0.02em;max-width:14em}
+  #hero p.sub{font-size:clamp(16px,1.55vw,21px);font-weight:300;color:rgba(255,255,255,.72);line-height:1.6;max-width:36em;margin:26px 0 38px}
+  #hero .ctas{display:flex;gap:14px;flex-wrap:wrap}
+  #hero .note{margin-top:16px;font-size:12px;color:rgba(255,255,255,.45);letter-spacing:.08em}
+
+  /* hero machine */
+  #machine{margin-top:70px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.09);border-radius:20px;padding:28px 26px 16px}
+  #machine .mlab{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+  #machine .mlab b{font-size:11px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.55)}
+  #machine .mlab span{font-size:11px;color:rgba(255,255,255,.35)}
+  #machine svg{width:100%;height:auto;display:block}
+  .node-rect{fill:rgba(255,255,255,.05);stroke:rgba(255,255,255,.25);stroke-width:1.3}
+  .node-lab{font-family:var(--font);font-size:14px;font-weight:500;letter-spacing:.14em;fill:rgba(255,255,255,.85)}
+  .edge{stroke:rgba(255,255,255,.3);stroke-width:1.5;fill:none}
+  .arrow{fill:rgba(255,255,255,.3)}
+  .railbox{fill:rgba(255,255,255,.04);stroke:rgba(255,255,255,.14);stroke-width:1}
+  .rail-lab{font-family:var(--font);font-size:12px;font-weight:500;letter-spacing:.2em;fill:rgba(255,255,255,.5)}
+  .avatar{transition:transform 1.2s cubic-bezier(.5,0,.2,1);transform-box:fill-box;transform-origin:center}
+  .avatar .disc{fill:rgba(255,255,255,.1);stroke:rgba(255,255,255,.35);stroke-width:1.3}
+  .avatar .person{fill:rgba(255,255,255,.75)}
+  .avatar.migrate{transform:translate(var(--tx),var(--ty)) scale(.85)}
+  .agent{opacity:0;transform:scale(.3);transform-origin:center;transform-box:fill-box;transition:opacity .5s ease,transform .6s cubic-bezier(.34,1.4,.5,1)}
+  .agent.on{opacity:1;transform:scale(1)}
+  .agent .chip{fill:var(--cobalt)}
+  .agent .spark{fill:#fff}
+  .ping{opacity:0;transform:translateY(8px);transition:opacity .5s ease,transform .5s ease}
+  .ping.on{opacity:1;transform:none}
+  .ping rect{fill:rgba(255,255,255,.06);stroke:rgba(255,255,255,.18);stroke-width:1}
+  .ping text{font-family:var(--font);font-size:12.5px;fill:rgba(255,255,255,.65)}
+  .ping .chk{fill:#34D399;font-weight:600}
+  .appr{opacity:0;transition:opacity .4s ease}
+  .appr.on{opacity:1}
+  .appr rect{fill:rgba(255,255,255,.06);stroke:rgba(255,255,255,.18);stroke-width:1}
+  .appr text{font-family:var(--font);font-size:12.5px;font-weight:500}
+  .appr .waiting{fill:#FBBF24}
+  .appr .done{fill:#34D399}
+
+  /* ---------- vignettes ---------- */
+  #why{background:var(--dark);color:#fff;padding-top:40px}
+  #why h2.sec{color:#fff}
+  #why p.lead{color:rgba(255,255,255,.62)}
+  #why .tick{background:var(--cyan)}
+  #why .label{color:rgba(255,255,255,.45)}
+  .vgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:54px}
+  .vcard{border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);border-radius:16px;padding:26px 24px}
+  .vcard .vl{font-size:10.5px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--cyan);margin-bottom:16px}
+  .vcard p{font-size:14.5px;font-weight:300;color:rgba(255,255,255,.8);line-height:1.6}
+  .vcard p b{font-weight:600;color:#fff;display:block;margin-top:12px}
+
+  /* ---------- thesis ---------- */
+  #thesis{text-align:center;padding:130px 7vw}
+  #thesis h2{font-size:clamp(32px,4.4vw,64px);font-weight:200;line-height:1.16;letter-spacing:-0.02em;max-width:16em;margin:0 auto}
+  #thesis p{font-size:clamp(16px,1.5vw,21px);font-weight:300;color:var(--g600);line-height:1.6;max-width:34em;margin:28px auto 0}
+
+  /* ---------- how ---------- */
+  #how{background:var(--g50)}
+  .steps3{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;margin-top:56px}
+  .scard{background:#fff;border:1px solid var(--g200);border-radius:18px;padding:32px 28px}
+  .scard .num{font-size:13px;font-weight:600;color:var(--cobalt);letter-spacing:.1em}
+  .scard h3{font-size:20px;font-weight:600;margin:14px 0 10px}
+  .scard p{font-size:14px;font-weight:300;color:var(--g600);line-height:1.65}
+  .prims{margin-top:44px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+  .prims span.pl{font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--g400);margin-right:6px}
+  .prim{font-size:12.5px;font-weight:500;color:var(--cobalt);border:1px solid rgba(0,71,171,.3);background:rgba(0,71,171,.05);border-radius:999px;padding:6px 15px}
+
+  /* ---------- experience ---------- */
+  #experience .split{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;margin-top:10px}
+  @media (max-width:960px){ #experience .split{grid-template-columns:1fr} }
+  .feat{margin-top:30px;display:flex;flex-direction:column;gap:18px}
+  .feat .f{display:flex;gap:14px;align-items:flex-start}
+  .feat .fd{width:8px;height:8px;border-radius:50%;background:var(--cobalt);flex:none;margin-top:7px}
+  .feat b{font-size:15px;font-weight:600;display:block}
+  .feat p{font-size:13.5px;font-weight:300;color:var(--g600);line-height:1.6;margin-top:3px}
+
+  /* mini app mock */
+  .mock{border:1px solid var(--g200);border-radius:18px;overflow:hidden;box-shadow:0 30px 70px rgba(17,24,39,.12);background:#fff}
+  .mock .mtop{display:flex;align-items:center;gap:8px;padding:11px 16px;border-bottom:1px solid var(--g100)}
+  .mock .mtop .dot{width:9px;height:9px;border-radius:50%;background:var(--cobalt)}
+  .mock .mtop b{font-size:12.5px;font-weight:600}
+  .mock .mtop span{margin-left:auto;font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--cobalt);border:1px solid rgba(0,71,171,.3);border-radius:999px;padding:3px 10px}
+  .mock .mbody{display:grid;grid-template-columns:46% 54%}
+  .mchat{border-right:1px solid var(--g100);padding:14px;display:flex;flex-direction:column;gap:10px;background:#fff}
+  .mbub{font-size:11.5px;line-height:1.5;padding:8px 11px;border-radius:12px 12px 3px 12px;background:var(--g100);align-self:flex-end;max-width:88%}
+  .mai{display:flex;gap:8px;font-size:11.5px;line-height:1.5;color:var(--ink)}
+  .mai .d{width:18px;height:18px;border-radius:50%;background:var(--cobalt);flex:none;position:relative}
+  .mai .d::after{content:'';position:absolute;inset:0;margin:auto;width:8px;height:8px;background:#fff;
+    clip-path:polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%)}
+  .mchips{display:flex;gap:6px;flex-wrap:wrap;margin-top:auto}
+  .mchips span{font-size:10px;font-weight:500;color:var(--cobalt);border:1px solid rgba(0,71,171,.3);background:rgba(0,71,171,.05);border-radius:999px;padding:4px 9px}
+  .mcv{background:var(--g50);padding:14px;display:flex;flex-direction:column;gap:10px}
+  .mcard{background:#fff;border:1px solid var(--g200);border-radius:11px;padding:11px 13px}
+  .mcard .ml{font-size:8.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--cobalt);margin-bottom:8px}
+  .mk{display:flex;gap:18px}
+  .mk div b{display:block;font-size:15px;font-weight:600}
+  .mk div span{font-size:9px;color:var(--g600)}
+  .mrow{display:flex;align-items:center;gap:8px;font-size:11px;padding:5px 0;border-top:1px solid var(--g100)}
+  .mrow:first-of-type{border-top:none;padding-top:0}
+  .mrow .grow{flex:1}
+  .mst{font-size:8px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:2px 7px}
+  .mst.w{color:#B45309;border:1px solid #FDE68A;background:#FFFBEB}
+  .mst.g{color:#047857;border:1px solid #A7F3D0;background:#ECFDF5}
+  .mbtn{font-size:9.5px;font-weight:600;color:#fff;background:var(--cobalt);border:none;border-radius:999px;padding:3px 10px}
+
+  /* ---------- live ---------- */
+  .ugrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;margin-top:56px}
+  .ucard{border:1px solid var(--g200);border-radius:18px;padding:28px;transition:box-shadow .25s ease,transform .25s ease;background:#fff}
+  .ucard:hover{box-shadow:0 18px 44px rgba(17,24,39,.09);transform:translateY(-3px)}
+  .ucard .uh{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+  .ucard h3{font-size:17px;font-weight:600}
+  .ust{font-size:9.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;border-radius:999px;padding:4px 11px;white-space:nowrap}
+  .ust.live{color:#047857;border:1px solid #A7F3D0;background:#ECFDF5}
+  .ust.roll{color:var(--cobalt);border:1px solid #BFDBFE;background:#EFF6FF}
+  .ust.impl{color:#B45309;border:1px solid #FDE68A;background:#FFFBEB}
+  .ust.next{color:var(--g600);border:1px solid var(--g200);background:var(--g50)}
+  .ucard p{font-size:13.5px;font-weight:300;color:var(--g600);line-height:1.65}
+  .ucard .metric{margin-top:16px;font-size:13px;font-weight:600;color:var(--cobalt)}
+
+  /* ---------- principles ---------- */
+  #principles{background:var(--g50)}
+  .pgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px;margin-top:56px}
+  .pcard{background:#fff;border:1px solid var(--g200);border-radius:18px;padding:28px}
+  .pcard b{font-size:15.5px;font-weight:600;display:block;margin-bottom:9px}
+  .pcard p{font-size:13px;font-weight:300;color:var(--g600);line-height:1.65}
+
+  /* ---------- claim band ---------- */
+  #access{background:var(--cobalt);color:#fff;text-align:center;padding:120px 7vw}
+  #access h2{font-size:clamp(30px,4.2vw,60px);font-weight:200;line-height:1.18;letter-spacing:-0.02em}
+  #access h2 b{font-weight:500}
+  #access p{font-size:clamp(15px,1.4vw,19px);font-weight:300;color:rgba(255,255,255,.78);max-width:34em;margin:24px auto 40px;line-height:1.6}
+  #access form{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  #access input{width:min(340px,80vw);border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.08);border-radius:999px;
+    padding:.95em 1.4em;font-family:var(--font);font-size:14.5px;color:#fff;outline:none}
+  #access input::placeholder{color:rgba(255,255,255,.55)}
+  #access input:focus{border-color:#fff}
+  #access .ok{font-size:16px;font-weight:400}
+  #access .fine{margin-top:26px;font-size:12px;color:rgba(255,255,255,.5)}
+  #access .fine a{text-decoration:underline}
+
+  /* ---------- footer ---------- */
+  footer{padding:56px 7vw;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+  footer img{height:16px}
+  footer .tag{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--g400);font-weight:500}
+  footer .right{margin-left:auto;display:flex;gap:24px;align-items:center;font-size:12.5px;color:var(--g600)}
+  footer .right a:hover{color:var(--cobalt)}
+</style>
+</head>
+<body>
+
+<nav id="topnav">
+  <a class="brand" href="#hero"><span class="dot"></span>Flowtuple</a>
+  <div class="links">
+    <a href="#why">Why</a>
+    <a href="#how">How it works</a>
+    <a href="#experience">The experience</a>
+    <a href="#live">Where it&rsquo;s live</a>
+  </div>
+  <a class="btn" href="#access">Request early access</a>
+</nav>
+
+<!-- ================= HERO ================= -->
+<section id="hero">
+  <div class="inner">
+    <div class="label" style="color:rgba(255,255,255,.5)">Flowtuple · by Newtuple · now in beta</div>
+    <span class="tick"></span>
+    <h1 class="rv vis">Humans and agents.<br><span class="grad">One system of work.</span></h1>
+    <p class="sub rv vis">Flowtuple models your workflows as living state machines, then staffs each step with people or specialist AI agents. One slot at a time, on your terms, with every action audited and every system of record kept current.</p>
+    <div class="ctas rv vis">
+      <a class="btn" href="#access">Request early access</a>
+      <a class="btn ghost" href="#why">See why it matters</a>
+    </div>
+
+    <div id="machine" class="rv vis">
+      <div class="mlab"><b>A live workflow · tenant complaints</b><span>agents fill the slots · people keep judgment</span></div>
+      <svg viewBox="0 0 1200 400" xmlns="http://www.w3.org/2000/svg" aria-label="Flowtuple workflow: agents replace humans one slot at a time">
+        <rect class="railbox" x="330" y="22" width="540" height="64" rx="32"/>
+        <text class="rail-lab" x="600" y="14" text-anchor="middle">PEOPLE · VERIFY · APPROVE · HANDLE EXCEPTIONS</text>
+
+        <g>
+          <line class="edge" x1="207" y1="266" x2="271" y2="266"/><polygon class="arrow" points="271,260 283,266 271,272"/>
+          <line class="edge" x1="447" y1="266" x2="511" y2="266"/><polygon class="arrow" points="511,260 523,266 511,272"/>
+          <line class="edge" x1="687" y1="266" x2="751" y2="266"/><polygon class="arrow" points="751,260 763,266 751,272"/>
+          <line class="edge" x1="927" y1="266" x2="991" y2="266"/><polygon class="arrow" points="991,260 1003,266 991,272"/>
+        </g>
+
+        <g><rect class="node-rect" x="35" y="238" width="170" height="56" rx="13"/><text class="node-lab" x="120" y="272" text-anchor="middle">RAISED</text></g>
+        <g><rect class="node-rect" x="275" y="238" width="170" height="56" rx="13"/><text class="node-lab" x="360" y="272" text-anchor="middle">TRIAGED</text></g>
+        <g><rect class="node-rect" x="515" y="238" width="170" height="56" rx="13"/><text class="node-lab" x="600" y="272" text-anchor="middle">ASSIGNED</text></g>
+        <g><rect class="node-rect" x="755" y="238" width="170" height="56" rx="13"/><text class="node-lab" x="840" y="272" text-anchor="middle">VENDOR SOURCED</text></g>
+        <g><rect class="node-rect" x="995" y="238" width="170" height="56" rx="13"/><text class="node-lab" x="1080" y="272" text-anchor="middle">RESOLVED</text></g>
+
+        <g class="agent" id="a2"><rect class="chip" x="340" y="196" width="40" height="40" rx="11"/><path class="spark" d="M360 203 l4 9 9 4 -9 4 -4 9 -4 -9 -9 -4 9 -4 z"/></g>
+        <g class="agent" id="a3"><rect class="chip" x="580" y="196" width="40" height="40" rx="11"/><path class="spark" d="M600 203 l4 9 9 4 -9 4 -4 9 -4 -9 -9 -4 9 -4 z"/></g>
+        <g class="agent" id="a4"><rect class="chip" x="820" y="196" width="40" height="40" rx="11"/><path class="spark" d="M840 203 l4 9 9 4 -9 4 -4 9 -4 -9 -9 -4 9 -4 z"/></g>
+        <g class="agent" id="a1"><rect class="chip" x="100" y="196" width="40" height="40" rx="11"/><path class="spark" d="M120 203 l4 9 9 4 -9 4 -4 9 -4 -9 -9 -4 9 -4 z"/></g>
+
+        <g class="avatar" id="h1" style="--tx:345px;--ty:-162px"><circle class="disc" cx="120" cy="216" r="22"/><path class="person" d="M120 205 a6.5 6.5 0 1 1 0 13 a6.5 6.5 0 1 1 0 -13 M107 229 q13 -11 26 0 v2 h-26 z"/></g>
+        <g class="avatar" id="h2" style="--tx:195px;--ty:-162px"><circle class="disc" cx="360" cy="216" r="22"/><path class="person" d="M360 205 a6.5 6.5 0 1 1 0 13 a6.5 6.5 0 1 1 0 -13 M347 229 q13 -11 26 0 v2 h-26 z"/></g>
+        <g class="avatar" id="h3" style="--tx:45px;--ty:-162px"><circle class="disc" cx="600" cy="216" r="22"/><path class="person" d="M600 205 a6.5 6.5 0 1 1 0 13 a6.5 6.5 0 1 1 0 -13 M587 229 q13 -11 26 0 v2 h-26 z"/></g>
+        <g class="avatar" id="h4" style="--tx:-105px;--ty:-162px"><circle class="disc" cx="840" cy="216" r="22"/><path class="person" d="M840 205 a6.5 6.5 0 1 1 0 13 a6.5 6.5 0 1 1 0 -13 M827 229 q13 -11 26 0 v2 h-26 z"/></g>
+        <g class="avatar" id="h5"><circle class="disc" cx="1080" cy="216" r="22"/><path class="person" d="M1080 205 a6.5 6.5 0 1 1 0 13 a6.5 6.5 0 1 1 0 -13 M1067 229 q13 -11 26 0 v2 h-26 z"/></g>
+
+        <g class="ping" id="p1"><rect x="512" y="322" width="176" height="34" rx="17"/><text x="530" y="344">Ticketing updated <tspan class="chk">✓</tspan></text></g>
+        <g class="ping" id="p2"><rect x="756" y="322" width="164" height="34" rx="17"/><text x="774" y="344">Vendor emailed <tspan class="chk">✓</tspan></text></g>
+        <g class="ping" id="p3"><rect x="1000" y="322" width="140" height="34" rx="17"/><text x="1018" y="344">CRM synced <tspan class="chk">✓</tspan></text></g>
+
+        <g class="appr" id="apw"><rect x="762" y="134" width="172" height="34" rx="17"/><text class="waiting" x="782" y="156">Awaiting approval…</text></g>
+        <g class="appr" id="apd"><rect x="778" y="134" width="132" height="34" rx="17"/><text class="done" x="798" y="156">Approved ✓</text></g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ================= WHY ================= -->
+<section id="why">
+  <div class="inner">
+    <div class="label rv">The problem</div>
+    <span class="tick rv"></span>
+    <h2 class="sec rv">None of these are edge cases.<br>This is what knowledge work mostly is.</h2>
+    <p class="lead rv">Small, repeatable, error-prone steps, strung into long workflows nobody owns end to end. They have been digitized: the spreadsheets are online, the emails are searchable. They have never been modeled.</p>
+    <div class="vgrid">
+      <div class="vcard rv"><div class="vl">Property management · 9:04 PM</div><p>A tenant reports a leaking ceiling.<b>Five touchpoints. Six people. Three days.</b></p></div>
+      <div class="vcard rv"><div class="vl">Retail · store floor</div><p>A shirt with no price tag. A photo, an email to IT.<b>Three days later: &ldquo;Which SKU is it?&rdquo;</b></p></div>
+      <div class="vcard rv"><div class="vl">Recruiting · 6:40 PM</div><p>Thirty resumes. Four interviews. One offer to draft.<b>Again tomorrow.</b></p></div>
+      <div class="vcard rv"><div class="vl">Compliance · filing week</div><p>The same form. Twelve jurisdictions. Twelve deadlines.<b>Miss one: a fine. File it wrong: a worse one.</b></p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= THESIS ================= -->
+<section id="thesis">
+  <h2 class="rv">Your workflows have been digitized.<br>They have never been <span class="grad">modeled</span>.</h2>
+  <p class="rv">Until the workflow itself is modeled, AI can only make individual steps slightly faster. Model it, and every step becomes a slot where a person or a specialist agent can stand, and swap, without rebuilding anything.</p>
+</section>
+
+<!-- ================= HOW ================= -->
+<section id="how">
+  <div class="inner">
+    <div class="label cb rv">How it works</div>
+    <span class="tick rv"></span>
+    <h2 class="sec rv">Model once. Staff each slot.<br>Dial the autonomy.</h2>
+    <div class="steps3">
+      <div class="scard rv">
+        <div class="num">01</div>
+        <h3>Model the workflow</h3>
+        <p>Your process becomes an explicit, versioned state machine: states, transitions, guards, triggers, actions, and a complete audit trail. Nothing stays buried in email or tribal knowledge. Our team models it with you; you see your work the way it actually runs.</p>
+      </div>
+      <div class="scard rv">
+        <div class="num">02</div>
+        <h3>Deploy specialist agents into the slots</h3>
+        <p>Narrow agents with defined jobs: extraction, triage, matching, drafting, scheduling, filing prep. Each agent works one state, calls governed tools, and updates your systems of record. Take any agent back the moment it underperforms; the workflow does not change.</p>
+      </div>
+      <div class="scard rv">
+        <div class="num">03</div>
+        <h3>People keep judgment</h3>
+        <p>Approvals, exceptions, and customer contact stay human. Each step moves along the autonomy curve at your pace: approval loop, then delegate-and-notify, then standing rules, and back again with one setting. Some steps, like a filing submission, never leave the loop.</p>
+      </div>
+    </div>
+    <div class="prims rv">
+      <span class="pl">Built on seven primitives</span>
+      <span class="prim">Entities</span><span class="prim">States</span><span class="prim">Transitions</span>
+      <span class="prim">Events</span><span class="prim">Triggers</span><span class="prim">Interventions</span><span class="prim">Actions</span>
+    </div>
+  </div>
+</section>
+
+<!-- ================= EXPERIENCE ================= -->
+<section id="experience">
+  <div class="inner">
+    <div class="label cb rv">The experience</div>
+    <span class="tick rv"></span>
+    <div class="split">
+      <div>
+        <h2 class="sec rv">One login. One chat window.<br>An interface that <span class="cob">composes itself</span>.</h2>
+        <div class="feat">
+          <div class="f rv"><span class="fd"></span><div><b>Generated around the person and the task</b><p>A VP sees onboarding analytics. A recruiter sees the candidate file with the resume and comment chain. A consultant sees the filing report, line by line. Same window, different composition.</p></div></div>
+          <div class="f rv"><span class="fd"></span><div><b>Predictable components, rendered via MCP UI</b><p>Task lists, kanban boards, comment threads, SLAs, audit history, analytics. The parts are always familiar; the arrangement is generated on demand.</p></div></div>
+          <div class="f rv"><span class="fd"></span><div><b>Chat is one way in, not the only way</b><p>Quick actions, pinned views, and standard screens work without a single message. And what renders is live: approve, resolve, escalate, and comment right in place.</p></div></div>
+        </div>
+      </div>
+      <div class="mock rv" aria-label="Flowtuple workspace preview">
+        <div class="mtop"><span class="dot"></span><b>Flowtuple</b><span>VP · Retail Ops</span></div>
+        <div class="mbody">
+          <div class="mchat">
+            <div class="mbub">Pull up supplier onboarding.</div>
+            <div class="mai"><span class="d"></span><span>Nine suppliers in motion, three waiting on you, one at risk in Review. Actions on the right are live.</span></div>
+            <div class="mchips"><span>Supplier onboarding</span><span>Store incidents</span><span>SLA watch</span></div>
+          </div>
+          <div class="mcv">
+            <div class="mcard"><div class="ml">Analytics · at a glance</div>
+              <div class="mk"><div><b>9</b><span>in flight</span></div><div><b>3</b><span>on your desk</span></div><div><b>11.2d</b><span>avg. cycle</span></div></div>
+            </div>
+            <div class="mcard"><div class="ml">Task list · waiting on you</div>
+              <div class="mrow"><span class="grow">Meridian Polymers · review</span><span class="mst w">6h to SLA</span><button class="mbtn">Approve</button></div>
+              <div class="mrow"><span class="grow">Cascade Packaging · exception</span><span class="mst w">Pending</span><button class="mbtn">Approve</button></div>
+              <div class="mrow"><span class="grow">Prairie Foods · onboarding</span><span class="mst g">Approved ✓</span></div>
+            </div>
+            <div class="mcard"><div class="ml">Assignment &amp; audit history</div>
+              <div class="mrow"><span class="grow">Docs-check agent verified certificates</span></div>
+              <div class="mrow"><span class="grow">S. Patel reassigned review to you</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= LIVE ================= -->
+<section id="live">
+  <div class="inner">
+    <div class="label cb rv">Where it&rsquo;s working</div>
+    <span class="tick rv"></span>
+    <h2 class="sec rv">Different workflows on the surface.<br>The same platform underneath.</h2>
+    <div class="ugrid">
+      <div class="ucard rv">
+        <div class="uh"><h3>Tenant complaints</h3><span class="ust live">In production</span></div>
+        <p>The first agent takes the incoming call and creates the case. Others triage, assign, source vendors, and propose resolutions. Humans verify and approve.</p>
+        <div class="metric">Three days to reach a vendor → under an hour</div>
+      </div>
+      <div class="ucard rv">
+        <div class="uh"><h3>Retail missing tickets</h3><span class="ust roll">Rolling out</span></div>
+        <p>A store associate&rsquo;s photo runs through image-to-metadata and an MDM lookup. Agents match the SKU; people confirm the edge cases and fix the floor.</p>
+      </div>
+      <div class="ucard rv">
+        <div class="uh"><h3>Regulatory filings</h3><span class="ust impl">In implementation</span></div>
+        <p>Agents prepare drafts in exact submission formats, gather evidence, and flag inconsistencies. Review and submission never leave human hands.</p>
+        <div class="metric">Twelve deadlines → twelve drafts to review</div>
+      </div>
+      <div class="ucard rv">
+        <div class="uh"><h3>Recruiting</h3><span class="ust live">In daily use</span></div>
+        <p>Resume extraction and interview analysis run on agents today; screening, scheduling, and offer drafting are next. We run our own hiring on it.</p>
+      </div>
+      <div class="ucard rv">
+        <div class="uh"><h3>Distribution-center QC</h3><span class="ust impl">In implementation</span></div>
+        <p>Inspection events create entities, agents classify defects from photos, and routing rules send each item to the right downstream handler. High volume, sensor-triggered.</p>
+      </div>
+      <div class="ucard rv">
+        <div class="uh"><h3>CRM &amp; sales content</h3><span class="ust next">Coming next</span></div>
+        <p>Long-running deals with external system sync, agent-driven enrichment and follow-up drafting, and generative work behind approval gates.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PRINCIPLES ================= -->
+<section id="principles">
+  <div class="inner">
+    <div class="label cb rv">Built to be trusted</div>
+    <span class="tick rv"></span>
+    <h2 class="sec rv">Strong beliefs, held in production.</h2>
+    <div class="pgrid">
+      <div class="pcard rv"><b>Specialists, not generalists</b><p>A fleet of narrow agents is improvable, debuggable, and replaceable one at a time. The workflow is the conductor; the agents are the orchestra.</p></div>
+      <div class="pcard rv"><b>Audit is a precondition</b><p>Every transition, agent action, and human decision is logged with idempotency and correlation. Trustworthy enough for a compliance officer to defend.</p></div>
+      <div class="pcard rv"><b>Humans migrate, they don&rsquo;t disappear</b><p>Month one, people do most of the work. A year in, agents do, and people hold verification, judgment, and exceptions. We sell leverage, not the fantasy of full autonomy.</p></div>
+      <div class="pcard rv"><b>You buy outcomes</b><p>Delivered as agents-as-a-service: we model the workflow and introduce the agents; you see the work get done. Self-configuration is a destination, not a prerequisite.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ACCESS ================= -->
+<section id="access">
+  <h2 class="rv">The workflow stays the same.<br><b>The executors change.</b></h2>
+  <p class="rv">Flowtuple is in beta with early adopters across property management, retail, compliance, and recruiting. Tell us about a workflow that deserves a spine.</p>
+  <form class="rv" onsubmit="event.preventDefault(); this.innerHTML='<p class=&quot;ok&quot;>Thank you. We will be in touch within two business days.</p>';">
+    <input type="email" required placeholder="Work email">
+    <button class="btn inv" type="submit">Request early access</button>
+  </form>
+  <div class="fine rv">Prefer email? Write to <a href="mailto:hello@newtuple.com">hello@newtuple.com</a></div>
+</section>
+
+<footer>
+  <img src="data:image/png;base64,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" alt="Newtuple Technologies">
+  <span class="tag">Build Your Agentic Enterprise</span>
+  <div class="right">
+    <a href="https://newtuple.com">newtuple.com</a>
+    <span>© 2026 Newtuple Technologies</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  /* reveal on scroll */
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting){ e.target.classList.add('vis'); io.unobserve(e.target); } }), { threshold: .15 });
+  document.querySelectorAll('.rv').forEach(el => io.observe(el));
+
+  /* hero machine loop */
+  const $ = id => document.getElementById(id);
+  const swaps = [['h2','a2'],['h3','a3'],['h4','a4'],['h1','a1']];
+  const pings = ['p1','p2','p3'];
+  let timers = [];
+  function at(ms, fn){ timers.push(setTimeout(fn, ms)); }
+  function cycle(){
+    timers.forEach(clearTimeout); timers = [];
+    swaps.forEach(([h,a])=>{ $(h).classList.remove('migrate'); $(a).classList.remove('on'); });
+    pings.forEach(p=>$(p).classList.remove('on'));
+    $('apw').classList.remove('on'); $('apd').classList.remove('on');
+    swaps.forEach(([h,a],i)=> at(900 + i*1100, ()=>{ $(h).classList.add('migrate'); $(a).classList.add('on'); }));
+    pings.forEach((p,i)=> at(5400 + i*700, ()=>$(p).classList.add('on')));
+    at(6200, ()=>$('apw').classList.add('on'));
+    at(8300, ()=>{ $('apw').classList.remove('on'); $('apd').classList.add('on'); });
+    at(12000, cycle);
+  }
+  cycle();
+
+  /* nav: solid over light sections */
+  const nav = document.getElementById('topnav');
+  const hero = document.getElementById('hero'), why = document.getElementById('why');
+  function navTone(){
+    const dark = window.scrollY < (why.offsetTop + why.offsetHeight - 66);
+    nav.style.background = dark ? 'rgba(11,13,18,.82)' : 'rgba(255,255,255,.85)';
+    nav.style.borderBottomColor = dark ? 'rgba(255,255,255,.08)' : 'var(--g200)';
+    nav.querySelector('.brand').style.color = dark ? '#fff' : 'var(--ink)';
+    nav.querySelectorAll('.links a').forEach(a => a.style.color = dark ? 'rgba(255,255,255,.72)' : 'var(--g600)');
+  }
+  navTone();
+  window.addEventListener('scroll', navTone, { passive: true });
+})();
+</script>
+</body>
+</html>

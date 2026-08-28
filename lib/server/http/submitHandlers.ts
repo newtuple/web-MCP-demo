@@ -1,0 +1,197 @@
+import { applyRateLimit } from '../../rateLimit'
+import { sendLeadEmail } from '../email/mailer'
+import { buildCareersLeadEmail, buildContactLeadEmail } from '../forms/emailBuilders'
+import { validateCareersSubmitPayload, validateContactSubmitPayload } from '../forms/validation'
+import { verifyTurnstileToken } from '../turnstile'
+
+type RuntimeEnv = Record<string, string | undefined>
+
+const MIN_SUBMIT_TIME_MS = 3000
+
+function getEnvValue(name: string, env?: RuntimeEnv): string | undefined {
+  const value = env?.[name] ?? process.env[name]
+  return typeof value === 'string' ? value.trim() : undefined
+}
+
+function jsonResponse(status: number, body: Record<string, unknown>, extraHeaders?: HeadersInit) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(extraHeaders ?? {}),
+    },
+  })
+}
+
+function getClientIp(request: Request) {
+  const cfIp = request.headers.get('cf-connecting-ip')?.trim()
+  if (cfIp) return cfIp
+
+  const forwardedFor = request.headers.get('x-forwarded-for') ?? ''
+  const ip = forwardedFor.split(',')[0]?.trim()
+  return ip || 'unknown'
+}
+
+function isSpamPayload(payload: Record<string, unknown>): boolean {
+  // Honeypot: bots fill hidden fields that real users never see
+  if (typeof payload._hp === 'string' && payload._hp.length > 0) return true
+
+  // Time check: reject if form was submitted in under 3 seconds
+  if (typeof payload._t === 'number') {
+    const elapsed = Date.now() - payload._t
+    if (elapsed < MIN_SUBMIT_TIME_MS) return true
+  }
+
+  return false
+}
+
+async function verifyTurnstile(
+  payload: Record<string, unknown>,
+  ip: string,
+  env?: RuntimeEnv,
+): Promise<boolean> {
+  const secretKey = getEnvValue('TURNSTILE_SECRET_KEY', env)
+  if (!secretKey) return true // skip in dev when not configured
+
+  const token = typeof payload._cf_turnstile === 'string' ? payload._cf_turnstile : ''
+  if (!token) return false
+
+  const result = await verifyTurnstileToken(token, secretKey, ip)
+  return result.success
+}
+
+async function sendLeadWithOptionalEnv(
+  payload: Parameters<typeof sendLeadEmail>[0],
+  env?: RuntimeEnv,
+) {
+  if (env) {
+    await sendLeadEmail(payload, { env })
+    return
+  }
+  await sendLeadEmail(payload)
+}
+
+async function safeParseJson(request: Request) {
+  try {
+    return await request.json()
+  } catch {
+    return null
+  }
+}
+
+export async function handleContactSubmitRequest(request: Request, env?: RuntimeEnv) {
+  const clientIp = getClientIp(request)
+  const identifier = `${clientIp}:contact-submit`
+  const result = applyRateLimit(identifier)
+
+  if (!result.ok) {
+    return jsonResponse(
+      429,
+      { error: 'Too many requests. Please try again later.' },
+      result.retryAfterSeconds ? { 'Retry-After': String(result.retryAfterSeconds) } : undefined,
+    )
+  }
+
+  const payload = await safeParseJson(request)
+  if (payload === null) {
+    return jsonResponse(400, { error: 'Invalid JSON payload.' })
+  }
+
+  // Silent discard for honeypot/timing spam
+  if (isSpamPayload(payload)) {
+    return jsonResponse(200, { ok: true })
+  }
+
+  // Turnstile verification
+  const turnstileOk = await verifyTurnstile(payload, clientIp, env)
+  if (!turnstileOk) {
+    return jsonResponse(400, { error: 'Bot verification failed. Please try again.' })
+  }
+
+  const validated = validateContactSubmitPayload(payload)
+  if (!validated.ok) {
+    return jsonResponse(400, { error: validated.error })
+  }
+
+  const to = getEnvValue('CONTACT_LEADS_EMAIL', env)
+  if (!to) {
+    return jsonResponse(500, { error: 'Email not configured.' })
+  }
+
+  const email = buildContactLeadEmail(validated.data)
+
+  try {
+    await sendLeadWithOptionalEnv(
+      {
+        to,
+        subject: email.subject,
+        text: email.text,
+        replyTo: validated.data.email,
+      },
+      env,
+    )
+
+    return jsonResponse(200, { ok: true })
+  } catch (err) {
+    console.error('Contact email error:', err)
+    return jsonResponse(500, { error: 'Failed to send lead email.' })
+  }
+}
+
+export async function handleCareersSubmitRequest(request: Request, env?: RuntimeEnv) {
+  const clientIp = getClientIp(request)
+  const identifier = `${clientIp}:careers-submit`
+  const result = applyRateLimit(identifier)
+
+  if (!result.ok) {
+    return jsonResponse(
+      429,
+      { error: 'Too many requests. Please try again later.' },
+      result.retryAfterSeconds ? { 'Retry-After': String(result.retryAfterSeconds) } : undefined,
+    )
+  }
+
+  const payload = await safeParseJson(request)
+  if (payload === null) {
+    return jsonResponse(400, { error: 'Invalid JSON payload.' })
+  }
+
+  // Silent discard for honeypot/timing spam
+  if (isSpamPayload(payload)) {
+    return jsonResponse(200, { ok: true })
+  }
+
+  // Turnstile verification
+  const turnstileOk = await verifyTurnstile(payload, clientIp, env)
+  if (!turnstileOk) {
+    return jsonResponse(400, { error: 'Bot verification failed. Please try again.' })
+  }
+
+  const validated = validateCareersSubmitPayload(payload)
+  if (!validated.ok) {
+    return jsonResponse(400, { error: validated.error })
+  }
+
+  const to = getEnvValue('CAREERS_LEADS_EMAIL', env)
+  if (!to) {
+    return jsonResponse(500, { error: 'Email not configured.' })
+  }
+
+  const email = buildCareersLeadEmail(validated.data)
+
+  try {
+    await sendLeadWithOptionalEnv(
+      {
+        to,
+        subject: email.subject,
+        text: email.text,
+        replyTo: validated.data.email,
+      },
+      env,
+    )
+
+    return jsonResponse(200, { ok: true })
+  } catch {
+    return jsonResponse(500, { error: 'Failed to send lead email.' })
+  }
+}

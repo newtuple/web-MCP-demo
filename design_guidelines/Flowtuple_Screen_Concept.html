@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flowtuple · Screen Concept</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cobalt:#0047AB; --cobalt-dark:#003380; --cyan:#0EA5E9; --ink:#1f2024; --g600:#52525b; --g400:#a1a1aa;
+    --g200:#e6e7ea; --g100:#eef0f2; --g50:#f7f8fa; --green:#10B981; --violet:#7C3AED; --amber:#B45309; --red:#e11d48;
+    --font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{font-family:var(--font);background:#fff;color:var(--ink);-webkit-font-smoothing:antialiased;overflow:hidden}
+  button{font-family:var(--font);cursor:pointer}
+
+  /* ---------- app frame ---------- */
+  #app{display:flex;flex-direction:column;height:100vh}
+  header{display:flex;align-items:center;gap:14px;height:56px;padding:0 20px;border-bottom:1px solid var(--g200);flex:none}
+  .brand{display:flex;align-items:center;gap:9px}
+  .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--cobalt)}
+  .brand b{font-size:15px;font-weight:600}
+  .concept-pill{font-size:10.5px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--g400);
+    border:1px solid var(--g200);border-radius:999px;padding:4px 11px}
+  .personas{margin-left:auto;display:flex;gap:4px;background:var(--g100);border-radius:999px;padding:4px}
+  .personas button{border:none;background:transparent;border-radius:999px;padding:7px 16px;font-size:12.5px;font-weight:500;color:var(--g600);transition:all .2s ease}
+  .personas button.active{background:var(--cobalt);color:#fff}
+  .me{width:32px;height:32px;border-radius:50%;background:var(--g100);border:1px solid var(--g200);
+    display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;color:var(--cobalt)}
+
+  main{display:flex;flex:1;min-height:0}
+
+  /* ---------- left rail ---------- */
+  nav{width:228px;flex:none;border-right:1px solid var(--g200);padding:18px 12px 14px;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
+  nav .sec{font-size:10px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--g400);padding:0 10px;margin:14px 0 7px}
+  nav .sec:first-child{margin-top:0}
+  .nvi{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;font-size:13px;color:var(--ink);background:none;border:none;text-align:left;width:100%}
+  .nvi svg{width:16px;height:16px;stroke:var(--g600);stroke-width:1.6;fill:none;flex:none}
+  .nvi:hover{background:rgba(0,71,171,.05)}
+  .nvi .badge{margin-left:auto;font-size:10.5px;font-weight:600;color:#fff;background:var(--cobalt);border-radius:999px;padding:2px 7px}
+  .nvi.pin{color:var(--g600)}
+  .nvi.pin:hover{color:var(--cobalt)}
+  .nvi.pin .pdot{width:6px;height:6px;border-radius:50%;background:var(--g400);flex:none;margin:0 5px}
+  .nvi.pin:hover .pdot{background:var(--cobalt)}
+  nav .foot{margin-top:auto;padding:14px 10px 2px;display:flex;flex-direction:column;gap:6px}
+  nav .foot img{height:13px;width:auto;align-self:flex-start;opacity:.9}
+  nav .foot span{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--g400)}
+
+  /* ---------- chat column ---------- */
+  #chatcol{width:400px;flex:none;border-right:1px solid var(--g200);display:flex;flex-direction:column;min-height:0}
+  #thread{flex:1;overflow-y:auto;padding:22px 20px 12px;display:flex;flex-direction:column;gap:14px}
+  .msg{display:flex;gap:10px;align-items:flex-start;animation:rise .4s ease both}
+  @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .msg .adot{width:26px;height:26px;border-radius:50%;background:var(--cobalt);flex:none;position:relative;margin-top:2px}
+  .msg .adot::after{content:'';position:absolute;inset:0;margin:auto;width:10px;height:10px;
+    background:#fff;clip-path:polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%)}
+  .msg .txt{font-size:13.5px;line-height:1.55;color:var(--ink);padding-top:4px}
+  .msg .txt .src{display:block;margin-top:4px;font-size:11px;color:var(--g400)}
+  .msg.user{justify-content:flex-end}
+  .msg.user .txt{background:var(--g100);border-radius:15px 15px 4px 15px;padding:9px 14px;max-width:84%}
+  .typing{display:inline-flex;gap:4px;padding:12px 2px 0}
+  .typing i{width:6px;height:6px;border-radius:50%;background:var(--g400);animation:blink 1.2s infinite}
+  .typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}
+  @keyframes blink{0%,60%,100%{opacity:.25}30%{opacity:1}}
+
+  #inputzone{flex:none;padding:12px 18px 16px;border-top:1px solid var(--g200)}
+  #chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:11px}
+  .chip{font-size:12px;font-weight:500;color:var(--cobalt);background:rgba(0,71,171,.05);border:1px solid rgba(0,71,171,.28);border-radius:999px;padding:6px 13px;transition:all .15s ease}
+  .chip:hover{border-color:var(--cobalt);background:rgba(0,71,171,.1)}
+  .chip.back{color:var(--g600);background:#fff;border-color:var(--g200)}
+  .chip.back:hover{color:var(--ink);border-color:var(--g400);background:var(--g50)}
+  #inbar{display:flex;align-items:center;gap:10px;border:1px solid var(--g200);border-radius:999px;padding:6px 6px 6px 17px;transition:border-color .2s}
+  #inbar:focus-within{border-color:var(--cobalt)}
+  #inbar input{flex:1;border:none;outline:none;font-family:var(--font);font-size:13.5px;color:var(--ink);background:none}
+  #inbar input::placeholder{color:var(--g400)}
+  #send{width:32px;height:32px;border-radius:50%;background:var(--cobalt);border:none;position:relative;flex:none}
+  #send::after{content:'';position:absolute;left:12px;top:10px;width:8px;height:8px;border-top:2px solid #fff;border-right:2px solid #fff;transform:rotate(45deg)}
+  #belowbar{margin-top:9px;font-size:11px;color:var(--g400);text-align:center}
+
+  /* ---------- generative canvas ---------- */
+  #canvas{flex:1;background:var(--g50);display:flex;flex-direction:column;min-width:0}
+  #cv-head{flex:none;display:flex;align-items:center;gap:12px;padding:15px 26px 14px;background:var(--g50);border-bottom:1px solid var(--g200);opacity:0;transition:opacity .5s;z-index:5}
+  #cv-head.show{opacity:1}
+  #cv-head b{font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--cobalt)}
+  #cv-head span{font-size:11px;color:var(--g400)}
+  #cv-body{flex:1;overflow-y:auto;padding:20px 26px 26px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-content:start}
+  @media (max-width:1240px){ #cv-body{grid-template-columns:1fr} }
+
+  #empty{grid-column:1/-1;margin:auto;max-width:400px;text-align:center;padding:60px 20px}
+  #empty .spark{width:44px;height:44px;margin:0 auto 18px;background:var(--cobalt);opacity:.9;
+    clip-path:polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%)}
+  #empty h3{font-size:16px;font-weight:600;margin-bottom:8px}
+  #empty p{font-size:12.5px;color:var(--g600);line-height:1.6}
+
+  .card{background:#fff;border:1px solid var(--g200);border-radius:14px;padding:16px 18px;box-shadow:0 1px 2px rgba(16,24,40,.04);
+    opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .5s ease}
+  .card.in{opacity:1;transform:none}
+  .card.wide{grid-column:1/-1}
+  .clab{display:flex;align-items:center;gap:7px;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--cobalt);margin-bottom:13px}
+  .clab::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--cobalt);flex:none}
+
+  /* analytics */
+  .kpis{display:flex;gap:34px;flex-wrap:wrap}
+  .kpi b{display:block;font-size:24px;font-weight:600}
+  .kpi span{font-size:11px;color:var(--g600)}
+  .bars{display:flex;align-items:flex-end;gap:14px;height:96px;margin-top:6px}
+  .barcol{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:5px;flex:1;height:100%}
+  .barcol b{font-size:10.5px;font-weight:600;color:var(--g600)}
+  .bar{width:100%;max-width:44px;background:var(--cobalt);border-radius:4px 4px 0 0;height:3px;transition:height .8s ease .15s}
+  .card.in .bar{height:var(--h)}
+  .bar.warn{background:#F59E0B}
+  .barcol span{font-size:9.5px;color:var(--g600)}
+
+  /* rows / task lists / audit */
+  .rows{display:flex;flex-direction:column}
+  .row{display:flex;align-items:flex-start;gap:11px;padding:10px 0;border-top:1px solid var(--g100)}
+  .row:first-of-type{border-top:none;padding-top:2px}
+  .row .ini{width:26px;height:26px;border-radius:50%;background:var(--g50);border:1px solid var(--g200);flex:none;
+    display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:600;color:var(--cobalt)}
+  .row .bd{flex:1;min-width:0}
+  .row .bd b{display:block;font-size:12.5px;font-weight:600}
+  .row .bd b em{font-style:normal;font-weight:400;font-size:10.5px;color:var(--g400);margin-left:5px}
+  .row .bd p{font-size:12px;color:var(--g600);line-height:1.45}
+  .st{display:inline-flex;align-items:center;gap:5px;font-size:9.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;border-radius:999px;padding:3px 9px 3px 8px;white-space:nowrap;flex:none;margin-top:2px}
+  .st::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;flex:none}
+  .st.ok{color:#047857;border:1px solid #A7F3D0;background:#ECFDF5}
+  .st.warn{color:#B45309;border:1px solid #FDE68A;background:#FFFBEB}
+  .st.bad{color:#BE123C;border:1px solid #FECDD3;background:#FFF1F2}
+  .st.info{color:var(--cobalt);border:1px solid #BFDBFE;background:#EFF6FF}
+  .st.mut{color:var(--g600);border:1px solid var(--g200);background:var(--g50)}
+
+  /* action buttons */
+  .acts{display:flex;gap:8px;margin-top:7px;flex-wrap:wrap}
+  .abtn{font-size:11.5px;font-weight:600;color:#fff;border:1px solid var(--cobalt);background:var(--cobalt);border-radius:8px;padding:6px 13px;transition:background .15s,box-shadow .15s}
+  .abtn:hover{background:var(--cobalt-dark);box-shadow:0 2px 8px rgba(0,71,171,.22)}
+  .abtn.ghost{color:#3f3f46;border-color:var(--g200);background:#fff}
+  .abtn.ghost:hover{background:var(--g50);border-color:#d7d7dd}
+
+  /* kanban */
+  .kb{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px}
+  .kcol{flex:1;min-width:172px;background:#fff;border:1px solid var(--g200);border-radius:12px;padding:0;display:flex;flex-direction:column;align-self:flex-start}
+  .kh{display:flex;align-items:center;gap:7px;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink);padding:11px 12px 10px;border-bottom:1px solid var(--g100)}
+  .kh::before{content:'';width:8px;height:8px;border-radius:50%;flex:none;background:var(--cobalt)}
+  .kcol:nth-of-type(2) .kh::before{background:var(--cyan)}
+  .kcol:nth-of-type(3) .kh::before{background:var(--violet)}
+  .kcol:nth-of-type(4) .kh::before{background:var(--green)}
+  .kcol:nth-of-type(5) .kh::before{background:var(--amber)}
+  .kh i{font-style:normal;margin-left:auto;color:var(--g600);font-weight:600;font-size:10px;background:var(--g50);border:1px solid var(--g100);border-radius:6px;padding:1px 7px;min-width:20px;text-align:center}
+  .kcard{background:#fff;border:1px solid var(--g200);border-radius:10px;padding:10px 12px;margin:9px 10px 0;cursor:pointer;box-shadow:0 1px 2px rgba(16,24,40,.05);transition:box-shadow .15s,transform .15s,border-color .15s}
+  .kcol .kcard:last-child{margin-bottom:11px}
+  .kcard:hover{box-shadow:0 8px 20px rgba(16,24,40,.10);border-color:#d7d7dd;transform:translateY(-1px)}
+  .kcard b{display:block;font-size:12.5px;font-weight:700}
+  .kcard span{display:block;color:var(--g600);font-size:11px;margin-top:3px;line-height:1.45}
+  .kcard .st{display:inline-flex;margin-top:9px}
+
+  /* tables */
+  .tblwrap{overflow-x:auto}
+  .tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+  .tbl th{text-align:left;font-size:9.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--g400);padding:0 12px 8px 0;border-bottom:1px solid var(--g200);white-space:nowrap}
+  .tbl td{padding:10px 12px 10px 0;border-bottom:1px solid var(--g100);vertical-align:top}
+  .tbl td b{font-size:12.5px;font-weight:600}
+  .tbl td .sub{display:block;font-size:10.5px;color:var(--g400);margin-top:2px}
+  .tbl td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+  .tbl tr.flag td{background:#FFFBEB}
+  .tbl tr.flag td:first-child{border-left:3px solid #F59E0B;padding-left:9px}
+
+  /* task view / resume */
+  .att{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--cobalt);font-weight:500;margin-bottom:4px}
+  .att svg{width:14px;height:14px;stroke:var(--cobalt);stroke-width:1.7;fill:none}
+  .att span{color:var(--g400);font-weight:400;font-size:11px}
+  .resume{margin-top:10px;border:1px solid var(--g200);border-radius:11px;padding:16px 18px;background:#fff}
+  .r-name{font-size:15px;font-weight:700}
+  .r-sub{font-size:11px;color:var(--g600);margin:2px 0 4px}
+  .r-sec{font-size:9.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--cobalt);margin:12px 0 6px;border-top:1px solid var(--g100);padding-top:10px}
+  .r-role b{font-size:12px;font-weight:600}
+  .r-role span{font-size:10.5px;color:var(--g400);margin-left:6px}
+  .resume ul{margin:4px 0 8px 16px}
+  .resume li{font-size:11.5px;color:var(--g600);line-height:1.5}
+  .r-skills{display:flex;gap:6px;flex-wrap:wrap}
+  .r-skills span{font-size:10.5px;border:1px solid var(--g200);border-radius:999px;padding:3px 10px;color:var(--g600)}
+
+  /* candidate header */
+  .cand{display:flex;align-items:center;gap:13px;margin-bottom:13px}
+  .cava{width:44px;height:44px;border-radius:50%;background:var(--g50);border:1px solid var(--g200);
+    display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:var(--cobalt)}
+  .cand b{display:block;font-size:15px;font-weight:600}
+  .cand span{font-size:12px;color:var(--g600)}
+  .pills{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}
+  .pill{font-size:11px;border:1px solid var(--g200);border-radius:999px;padding:4px 11px;color:var(--g600)}
+  .pill i{font-style:normal;color:var(--green)}
+  .pill.next{border-color:var(--cobalt);color:var(--cobalt);font-weight:500}
+  .synth{font-size:12.5px;line-height:1.55}
+
+  /* agent steps */
+  .steps{display:flex;flex-direction:column}
+  .step{display:flex;gap:11px;padding:8px 0;align-items:flex-start}
+  .step .sdot{width:18px;height:18px;border-radius:50%;flex:none;margin-top:1px;border:1.6px solid var(--g200);position:relative}
+  .step.done .sdot{background:var(--green);border-color:var(--green)}
+  .step.done .sdot::after{content:'';position:absolute;left:5px;top:3px;width:4px;height:8px;border-right:1.7px solid #fff;border-bottom:1.7px solid #fff;transform:rotate(40deg)}
+  .step.run .sdot{border-color:var(--cobalt)}
+  .step.run .sdot::after{content:'';position:absolute;inset:3px;border-radius:50%;background:var(--cobalt);animation:blink 1.1s infinite}
+  .step.warn .sdot{border-color:#F59E0B}
+  .step.warn .sdot::after{content:'!';position:absolute;inset:0;text-align:center;font-size:11px;line-height:15px;font-weight:700;color:var(--amber)}
+  .step .bd b{display:block;font-size:12.5px;font-weight:500}
+  .step .bd span{font-size:11px;color:var(--g600)}
+
+  /* comment reply */
+  .rbar{display:flex;gap:8px;margin-top:10px}
+  .rin{flex:1;border:1px solid var(--g200);border-radius:999px;padding:7px 14px;font-size:12px;font-family:var(--font);outline:none;color:var(--ink)}
+  .rin:focus{border-color:var(--cobalt)}
+  .rin::placeholder{color:var(--g400)}
+
+  /* toast */
+  #toast{position:fixed;right:22px;bottom:22px;background:var(--ink);color:#fff;font-size:12.5px;padding:11px 17px;border-radius:11px;
+    opacity:0;transform:translateY(10px);transition:all .3s ease;z-index:99;max-width:340px;pointer-events:none}
+  #toast.show{opacity:1;transform:none}
+  #toast b{color:#6EE7B7;margin-right:6px}
+
+  /* ---------- liveness / premium polish ---------- */
+  #cv-head{align-items:center}
+  .live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:7px;position:relative;vertical-align:middle}
+  .live-dot::after{content:'';position:absolute;inset:0;border-radius:50%;background:var(--green);animation:ping 1.7s cubic-bezier(0,0,.2,1) infinite}
+  @keyframes ping{0%{transform:scale(1);opacity:.7}80%,100%{transform:scale(2.8);opacity:0}}
+  .spin{display:inline-block;width:13px;height:13px;border:2px solid var(--g200);border-top-color:var(--cobalt);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  #cv-head .gen{color:var(--g600);font-weight:600;letter-spacing:.02em;text-transform:none;font-size:12px}
+
+  .card:hover{border-color:#d7d7dd;box-shadow:0 12px 32px rgba(16,24,40,.10)}
+  .card,.kcard{transition:opacity .5s ease,transform .5s cubic-bezier(.2,.7,.2,1),box-shadow .2s ease,border-color .2s ease}
+  .kpi b{font-variant-numeric:tabular-nums;letter-spacing:-.015em}
+  .bar{background:linear-gradient(180deg,#0a5bd0 0%,var(--cobalt) 100%)}
+  .bar.warn{background:linear-gradient(180deg,#fbbf24 0%,#f59e0b 100%)}
+
+  /* skeleton shimmer (the "composing" phase) */
+  .skel{border:1px solid var(--g100);background:#fff;opacity:1 !important;transform:none !important;box-shadow:0 1px 2px rgba(16,24,40,.04)}
+  .sk{background:linear-gradient(90deg,#eef0f2 25%,#f6f8fb 37%,#eef0f2 63%);background-size:400% 100%;animation:shimmer 1.3s ease infinite;border-radius:7px}
+  @keyframes shimmer{0%{background-position:100% 0}100%{background-position:-100% 0}}
+  .sk-lab{width:38%;height:10px;margin-bottom:18px}
+  .sk-line{height:12px;margin-bottom:11px}.sk-line.s2{width:82%}.sk-line.s3{width:56%}
+  .sk-tiles{display:flex;gap:11px;margin-top:16px}
+  .sk-tiles span{flex:1;height:60px;border-radius:10px;background:linear-gradient(90deg,#eef0f2 25%,#f6f8fb 37%,#eef0f2 63%);background-size:400% 100%;animation:shimmer 1.3s ease infinite}
+
+  /* live status pills pulse (agents working, SLA ticking) */
+  .st.live::before{animation:pulseDot 1.3s ease-in-out infinite}
+  @keyframes pulseDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(1.6)}}
+
+  /* running agent step: indeterminate progress bar */
+  .step.run .bd::after{content:'';display:block;height:3px;margin-top:9px;border-radius:3px;width:40%;
+    background:linear-gradient(90deg,var(--cobalt),var(--cyan));animation:progGrow 1.8s ease-in-out infinite}
+  @keyframes progGrow{0%{width:12%}50%{width:78%}100%{width:12%}}
+
+  /* rail collapses when the experience launches, giving the canvas full width */
+  nav{transition:width .34s cubic-bezier(.4,0,.2,1),opacity .22s ease,padding .34s ease,border-color .3s}
+  body.rail-collapsed nav{width:0;padding-left:0;padding-right:0;opacity:0;overflow:hidden;border-right-color:transparent;pointer-events:none}
+
+  /* animated flow board */
+  .fb{position:relative}
+  .fbscroll{display:flex;gap:11px;overflow-x:auto;padding:2px 2px 10px;scroll-behavior:smooth}
+  .fbcol{flex:1 1 152px;min-width:152px;background:var(--g50);border:1px solid var(--g100);border-radius:12px;display:flex;flex-direction:column;transition:box-shadow .2s,border-color .2s,background .3s}
+  .fbcol.current{border-color:#BFDBFE;box-shadow:0 0 0 3px rgba(0,71,171,.10);background:#fff}
+  .fbcol.deny{border-color:#FDA4AF;box-shadow:0 0 0 3px rgba(244,63,94,.16);animation:denyFlash .55s ease}
+  @keyframes denyFlash{0%,100%{background:var(--g50)}45%{background:#FFF1F2}}
+  .fbhead{display:flex;align-items:center;gap:7px;padding:10px 11px;border-bottom:1px solid var(--g100);font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ink)}
+  .fbdot{width:8px;height:8px;border-radius:50%;flex:none}
+  .fbnm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .fbcount{margin-left:auto;font-style:normal;font-size:10px;color:var(--g600);background:#fff;border:1px solid var(--g100);border-radius:6px;padding:1px 7px;min-width:20px;text-align:center}
+  .fbslot{flex:1;min-height:118px;padding:10px;display:flex;flex-direction:column;gap:8px}
+  .flowcard{background:#fff;border:1px solid var(--g200);border-radius:9px;padding:9px 11px;box-shadow:0 1px 2px rgba(16,24,40,.05)}
+  .flowcard b{display:block;font-size:12px;font-weight:700;line-height:1.25}
+  .flowcard span{display:block;font-size:10px;color:var(--g600);margin-top:2px;line-height:1.35}
+  .flowcard.assigned{border-left:3px solid var(--cobalt)}
+  .flowcard.focal{border-color:var(--cobalt);box-shadow:0 8px 20px rgba(0,71,171,.20);position:relative;z-index:3;cursor:default}
+  .flowcard.focal b{color:var(--cobalt)}
+  .flowcard.focal.act{border-color:var(--green)}
+  .flowcard.focal.act b{color:#047857}
+  .flowcard.focal.act{box-shadow:0 8px 20px rgba(16,185,129,.22)}
+  .flowcard.focal.rej{border-color:var(--red)}
+  .flowcard.focal.rej b{color:#be123c}
+  .flowcard.focal.rej{box-shadow:0 8px 20px rgba(244,63,94,.20)}
+  .tl-empty{font-size:12px;color:var(--g400);padding:14px 2px;text-align:center;line-height:1.5}
+  .flowcard.landed{animation:landPulse .9s ease}
+  @keyframes landPulse{0%{box-shadow:0 0 0 6px rgba(0,71,171,.16)}100%{box-shadow:0 8px 20px rgba(0,71,171,.20)}}
+  .flowcard.bump{animation:bumpX .55s ease}
+  @keyframes bumpX{0%,100%{transform:translateX(0)}28%{transform:translateX(12px)}55%{transform:translateX(-4px)}80%{transform:translateX(2px)}}
+  .flowcard.ping{animation:pingC .9s ease}
+  @keyframes pingC{0%{box-shadow:0 0 0 6px rgba(16,185,129,.35)}100%{box-shadow:0 8px 20px rgba(0,71,171,.20)}}
+  .fbnote{max-height:0;overflow:hidden;opacity:0;transition:max-height .28s ease,opacity .28s ease,padding .28s ease;font-size:11.5px;font-weight:600;border-radius:10px;display:flex;align-items:flex-start;gap:8px;line-height:1.45}
+  .fbnote.show{max-height:120px;opacity:1;padding:11px 14px;margin-top:9px}
+  .fbnote::before{margin-top:5px}
+  .fbnote.block{background:#FFF1F2;color:#BE123C;border:1px solid #FECDD3}
+  .fbnote.edit{background:#EFF6FF;color:var(--cobalt);border:1px solid #BFDBFE}
+  .fbnote::before{content:'';width:7px;height:7px;border-radius:50%;background:currentColor;flex:none}
+
+  /* activity timeline · stages as they happen */
+  .tl{display:flex;flex-direction:column}
+  .tlrow{display:flex;gap:12px;padding:12px 2px;border-top:1px solid var(--g100);align-items:flex-start}
+  .tlrow:first-child{border-top:none;padding-top:3px}
+  .tlico{width:27px;height:27px;border-radius:8px;flex:none;display:flex;align-items:center;justify-content:center;margin-top:1px}
+  .tlico svg{width:15px;height:15px;stroke-width:1.8;fill:none}
+  .tlico.move{background:rgba(0,71,171,.08)}.tlico.move svg{stroke:var(--cobalt)}
+  .tlico.block{background:#FFF7ED}.tlico.block svg{stroke:#B45309}
+  .tlico.edit{background:var(--g50);border:1px solid var(--g100)}.tlico.edit svg{stroke:var(--g600)}
+  .tlbd{flex:1;min-width:0}
+  .tlbd .tt{font-size:12.5px;font-weight:600;color:var(--ink);line-height:1.35}
+  .tlbd .tt b{color:var(--cobalt);font-weight:700}
+  .tlsub{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:5px;font-size:11px;color:var(--g600)}
+  .tlsub .grd{color:#B45309;font-weight:500}
+  .spill2{font-size:9px;font-weight:700;letter-spacing:.03em;border-radius:5px;padding:2px 6px;background:var(--g50);border:1px solid var(--g100);color:var(--g600)}
+  .spill2.to{color:var(--cobalt);border-color:#BFDBFE;background:#EFF6FF}
+  .tlarrow{color:var(--g400);font-weight:600}
+  .tltime{font-size:10.5px;color:var(--g400);white-space:nowrap;margin-left:auto;padding-left:10px}
+
+  /* ---- document intelligence panel ---- */
+  .di{display:flex;flex-direction:column;gap:10px}
+  .di-row{display:flex;align-items:center;gap:12px;border:1px solid var(--g200);border-radius:11px;padding:11px 13px;position:relative;overflow:hidden;transition:border-color .2s,box-shadow .2s,background .2s}
+  .di-row.scanning{border-color:#BFDBFE;box-shadow:0 0 0 3px rgba(0,71,171,.08)}
+  .di-row.ok{border-color:#A7F3D0}
+  .di-row.miss{border-color:#FECDD3;background:#FFF7F8}
+  .di-ic{width:32px;height:40px;border-radius:6px;flex:none;background:#fff;border:1px solid var(--g200);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:#be123c;letter-spacing:.04em}
+  .di-ic::before{content:'PDF'}
+  .di-main{flex:1;min-width:0}
+  .di-nm{font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .di-type{font-size:10px;font-weight:500;color:var(--g600);background:var(--g50);border:1px solid var(--g100);border-radius:5px;padding:2px 7px}
+  .di-fields{display:none;margin-top:9px;flex-wrap:wrap;gap:7px 20px}
+  .di-row.ok .di-fields{display:flex}
+  .di-fld{font-size:11px;color:var(--g600);min-width:42%}
+  .di-fld b{color:var(--ink);font-weight:600}
+  .di-status{font-size:9.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-radius:999px;padding:4px 10px;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
+  .di-status.pending{color:var(--g600);background:var(--g50);border:1px solid var(--g200)}
+  .di-status.scan{color:var(--cobalt);background:#EFF6FF;border:1px solid #BFDBFE}
+  .di-status.scan::before{content:'';width:9px;height:9px;border:2px solid #BFDBFE;border-top-color:var(--cobalt);border-radius:50%;animation:spin .7s linear infinite}
+  .di-status.ok{color:#047857;background:#ECFDF5;border:1px solid #A7F3D0}
+  .di-status.ok::before{content:'✓'}
+  .di-status.miss{color:#be123c;background:#FFF1F2;border:1px solid #FECDD3}
+  .di-status.miss::before{content:'!';font-weight:800}
+  .di-view{font-size:11px;font-weight:600;color:var(--cobalt);background:#fff;border:1px solid var(--g200);border-radius:8px;padding:6px 11px}
+  .di-view:hover{border-color:var(--cobalt);background:#EFF6FF}
+  .di-row.scanning::after{content:'';position:absolute;left:0;top:0;bottom:0;width:38%;background:linear-gradient(90deg,transparent,rgba(0,71,171,.12),transparent);animation:scanx 1.1s ease-in-out infinite;pointer-events:none}
+  @keyframes scanx{0%{transform:translateX(-120%)}100%{transform:translateX(340%)}}
+
+  /* ---- modals (doc preview + approval) ---- */
+  .modal{position:fixed;inset:0;background:rgba(17,24,39,.45);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;z-index:120;opacity:0;pointer-events:none;transition:opacity .22s ease}
+  .modal.show{opacity:1;pointer-events:auto}
+  .modal .sheet{background:#fff;border-radius:16px;box-shadow:0 30px 80px rgba(16,24,40,.35);width:min(680px,92vw);max-height:88vh;overflow:hidden;transform:translateY(12px) scale(.98);transition:transform .22s ease;display:flex;flex-direction:column}
+  .modal.show .sheet{transform:none}
+  .mhead{display:flex;align-items:center;gap:11px;padding:14px 18px;border-bottom:1px solid var(--g100)}
+  .mhead .di-ic{width:26px;height:32px}
+  .mhead b{font-size:14.5px;font-weight:700}
+  .mhead .mtype{font-size:11px;color:var(--g600);display:block;margin-top:1px}
+  .mhead .mx{margin-left:auto;border:none;background:none;color:var(--g400);font-size:22px;line-height:1;cursor:pointer;padding:0 4px}
+  .mhead .mx:hover{color:var(--ink)}
+  .mbody iframe{width:100%;height:58vh;border:0;display:block;background:var(--g50)}
+  .mcap{padding:11px 18px;border-top:1px solid var(--g100);font-size:12px;color:var(--cobalt);font-weight:600;display:flex;align-items:center;gap:9px}
+
+  .appr .sheet{width:min(520px,92vw)}
+  .appr-body{padding:20px}
+  .appr-top{display:flex;align-items:flex-start;gap:13px;margin-bottom:16px}
+  .appr-ic{width:46px;height:46px;border-radius:13px;background:rgba(0,71,171,.09);display:flex;align-items:center;justify-content:center;flex:none}
+  .appr-ic svg{width:24px;height:24px;stroke:var(--cobalt);fill:none;stroke-width:1.8}
+  .appr-top h4{font-size:17px;font-weight:800}
+  .appr-top .sub{font-size:12.5px;color:var(--g600);margin-top:2px;line-height:1.5}
+  .appr-check{display:flex;flex-direction:column;gap:9px;margin:2px 0 18px;padding:14px;background:var(--g50);border:1px solid var(--g100);border-radius:12px}
+  .appr-check .ck{display:flex;align-items:center;gap:10px;font-size:12.5px;color:#3f3f46}
+  .appr-check .ck i{width:18px;height:18px;border-radius:50%;background:#ECFDF5;border:1px solid #A7F3D0;color:#047857;display:flex;align-items:center;justify-content:center;font-size:10px;font-style:normal;flex:none}
+  .appr-actions{display:flex;gap:10px}
+  .appr-actions button{flex:1;border-radius:10px;padding:12px;font-size:14px;font-weight:700;border:1px solid;cursor:pointer}
+  .btn-approve{background:var(--green);color:#fff;border-color:var(--green)}
+  .btn-approve:hover{background:#0e9f6e}
+  .btn-reject{background:#fff;color:#be123c;border-color:#FECDD3}
+  .btn-reject:hover{background:#FFF1F2}
+
+  /* audit verified pulse on a column */
+  .fbcol.verified{border-color:#A7F3D0;box-shadow:0 0 0 3px rgba(16,185,129,.16)}
+  .fbcol.verified .fbhead{color:#047857}
+
+  ::-webkit-scrollbar{width:8px;height:8px}
+  ::-webkit-scrollbar-thumb{background:var(--g200);border-radius:4px}
+  ::-webkit-scrollbar-track{background:transparent}
+
+  @media (max-width:1080px){ nav{display:none} }
+  @media (max-width:860px){
+    main{flex-direction:column}
+    #chatcol{width:100%;flex:1;border-right:none;border-bottom:1px solid var(--g200)}
+    #canvas{flex:1}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="brand"><span class="dot"></span><b>Flowtuple</b></div>
+    <span class="concept-pill">Concept · sample data</span>
+    <div class="personas" id="personaBar"></div>
+    <div class="me" id="meAva">RM</div>
+  </header>
+  <main>
+    <nav id="rail"></nav>
+
+    <div id="chatcol">
+      <div id="thread"></div>
+      <div id="inputzone">
+        <div id="chips"></div>
+        <div id="inbar">
+          <input id="inp" type="text" placeholder="Ask Flowtuple anything…" autocomplete="off">
+          <button id="send" aria-label="Send"></button>
+        </div>
+        <div id="belowbar">Chat is one way in. Quick actions, pinned views, and standard screens work without it.</div>
+      </div>
+    </div>
+
+    <div id="canvas">
+      <div id="cv-head"><b>Generated for this task</b><span>Predictable components · rendered via MCP UI · composed on demand · live actions</span></div>
+      <div id="cv-body"></div>
+    </div>
+  </main>
+</div>
+<div id="toast"></div>
+
+<!-- document preview modal -->
+<div class="modal" id="docModal">
+  <div class="sheet">
+    <div class="mhead">
+      <div class="di-ic"></div>
+      <div><b id="docModalName">Document</b><span class="mtype" id="docModalType"></span></div>
+      <button class="mx" id="docModalClose" aria-label="Close">&times;</button>
+    </div>
+    <div class="mbody" id="docModalBody"></div>
+    <div class="mcap" id="docModalCap"><span class="spin"></span><span>Document Intelligence agent is reading this document…</span></div>
+  </div>
+</div>
+
+<!-- human approval modal -->
+<div class="modal appr" id="apprModal">
+  <div class="sheet">
+    <div class="appr-body">
+      <div class="appr-top">
+        <div class="appr-ic"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-5"/><circle cx="12" cy="12" r="9"/></svg></div>
+        <div><h4>Human approval required</h4><div class="sub" id="apprSub">Final onboarding gate. The workflow will only activate the supplier when you approve.</div></div>
+      </div>
+      <div class="appr-check" id="apprCheck"></div>
+      <div class="appr-actions">
+        <button class="btn-reject" id="apprReject">Reject onboarding</button>
+        <button class="btn-approve" id="apprApprove">Approve &amp; activate</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  /* ================= component builders ================= */
+  const card = (lab, inner, wide) => `<div class="card${wide?' wide':''}">${lab?`<div class="clab">${lab}</div>`:''}${inner}</div>`;
+  const kpis = items => card('Analytics · at a glance',
+    `<div class="kpis">${items.map(i=>`<div class="kpi"><b>${i[0]}</b><span>${i[1]}</span></div>`).join('')}</div>`, true);
+  const bars = (lab, items, wide) => card(lab,
+    `<div class="bars">${items.map(i=>`<div class="barcol"><b>${i.v}</b><div class="bar${i.warn?' warn':''}" style="--h:${i.h}px"></div><span>${i.l}</span></div>`).join('')}</div>`, wide);
+  const actBtns = acts => acts && acts.length ? `<div class="acts">${acts.map(a=>
+    `<button class="abtn${a.ghost?' ghost':''}" data-act="${a.act}"${a.done?` data-done="${a.done}"`:''}${a.cls?` data-cls="${a.cls}"`:''} data-toast="${a.toast||''}"${a.audit?` data-audit="${a.audit}"`:''}${a.chat?` data-chat="${a.chat}"`:''}>${a.label}</button>`).join('')}</div>` : '';
+  const rowHtml = r => `<div class="row">${r.ini?`<div class="ini">${r.ini}</div>`:''}<div class="bd"><b>${r.t}${r.time?`<em>${r.time}</em>`:''}</b>${r.p?`<p>${r.p}</p>`:''}${actBtns(r.acts)}</div>${r.st?`<span class="st ${r.stc}">${r.st}</span>`:''}</div>`;
+  const list = (lab, rows, opt={}) => card(lab,
+    `<div class="rows${opt.audit?' audit-rows':''}${opt.thread?' thread-rows':''}">${rows.map(rowHtml).join('')}</div>${opt.reply?`<div class="rbar"><input class="rin" type="text" placeholder="Add a comment…"></div>`:''}`, opt.wide);
+  const kanban = (lab, cols) => card(lab,
+    `<div class="kb">${cols.map(c=>`<div class="kcol"><div class="kh">${c.name}<i>${c.cards.length}</i></div>${
+      c.cards.map(k=>`<div class="kcard" data-act="peek" data-toast="${k.toast||'In the product this opens the full task view'}"><b>${k.t}</b><span>${k.p}</span>${k.st?`<span class="st ${k.stc}">${k.st}</span>`:''}</div>`).join('')}</div>`).join('')}</div>`, true);
+  const table = (lab, cols, rows, wide=true) => card(lab,
+    `<div class="tblwrap"><table class="tbl"><thead><tr>${cols.map(c=>`<th>${c}</th>`).join('')}</tr></thead><tbody>${
+      rows.map(r=>`<tr${r.flag?' class="flag"':''}>${r.cells.map((c,i)=>`<td${/^[\$\d\+\-]/.test(String(c))?' class="num"':''}>${c}</td>`).join('')}${
+        r.st||r.acts?`<td>${r.st?`<span class="st ${r.stc}">${r.st}</span>`:''}${actBtns(r.acts)}</td>`:''}</tr>`).join('')}</tbody></table></div>`, wide);
+  const steps = (lab, items) => card(lab,
+    `<div class="steps">${items.map(s=>`<div class="step ${s.state}"><div class="sdot"></div><div class="bd"><b>${s.t}</b>${s.sub?`<span>${s.sub}</span>`:''}</div></div>`).join('')}</div>`);
+
+  const clip = `<svg viewBox="0 0 24 24"><path d="M21 12.5l-8.5 8.5a6 6 0 0 1-8.5-8.5L12.5 4a4 4 0 0 1 5.7 5.7L9.7 18.2a2 2 0 0 1-2.9-2.9L15 7"/></svg>`;
+
+  /* ---- activity timeline: state-machine transitions rendered like the real tool ---- */
+  const tlIco = {
+    move:`<svg viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6"/></svg>`,
+    block:`<svg viewBox="0 0 24 24"><path d="M12 3l8 4v5c0 4.4-3 7.6-8 9-5-1.4-8-4.6-8-9V7l8-4z"/><path d="M9.5 12l1.8 1.8L15 10"/></svg>`,
+    edit:`<svg viewBox="0 0 24 24"><path d="M4 20h4L18 10l-4-4L4 16v4z"/><path d="M13 7l4 4"/></svg>`
+  };
+  const tlRow = e => {
+    const time = e.time || 'just now';
+    if (e.audit)   return `<div class="tlrow"><div class="tlico ok" style="background:#ECFDF5"><svg viewBox="0 0 24 24" style="stroke:#047857"><path d="M9 12l2 2 4-5"/><circle cx="12" cy="12" r="9"/></svg></div><div class="tlbd"><div class="tt">Audit trail verified: <b style="color:#047857">${e.state}</b></div><div class="tlsub">Audit agent</div></div><span class="tltime">${time}</span></div>`;
+    if (e.blocked) return `<div class="tlrow"><div class="tlico block">${tlIco.block}</div><div class="tlbd"><div class="tt">Move blocked: ${e.from} → ${e.to}</div><div class="tlsub">${e.who} · <span class="grd">${e.reason}</span></div></div><span class="tltime">${time}</span></div>`;
+    if (e.edit)    return `<div class="tlrow"><div class="tlico edit">${tlIco.edit}</div><div class="tlbd"><div class="tt">${e.title}</div><div class="tlsub">${e.who}</div></div><span class="tltime">${time}</span></div>`;
+    return `<div class="tlrow"><div class="tlico move">${tlIco.move}</div><div class="tlbd"><div class="tt">Moved to <b>${e.to}</b></div><div class="tlsub">${e.who} <span class="spill2">${e.from}</span><span class="tlarrow">→</span><span class="spill2 to">${e.to}</span></div></div><span class="tltime">${time}</span></div>`;
+  };
+  const timeline = (lab, rows) => card(lab, `<div class="tl tl-live">${rows.length?rows.map(tlRow).join(''):'<div class="tl-empty">Activity appears here as you advance the supplier, one step per click.</div>'}</div>`, true);
+
+  /* ---- animated flow board: the focal supplier physically advances stage → stage ---- */
+  const FB_STAGES = [
+    {k:'INVITED', s:'Invited', c:'#0047ab'},
+    {k:'INTAKE_SUBMITTED', s:'Intake', c:'#0ea5e9'},
+    {k:'UNDER_VETTING', s:'Vetting', c:'#7c3aed'},
+    {k:'DOCS_VALIDATION', s:'Docs', c:'#7c3aed'},
+    {k:'PENDING_APPROVALS', s:'Approvals', c:'#7c3aed'},
+    {k:'BANKING_VERIFICATION', s:'Banking', c:'#7c3aed'},
+    {k:'READY_FOR_HANDOFF', s:'Handoff', c:'#7c3aed'},
+    {k:'ACTIVE', s:'Active', c:'#10b981'},
+    {k:'REJECTED', s:'Rejected', c:'#e11d48'}
+  ];
+  const FB_ASSIGNED = ['Meridian Polymers','Cascade Packaging','Harvest Foods Co.'];
+  const FB_CONTEXT = {
+    PENDING_APPROVALS:['Summit Fixtures'], BANKING_VERIFICATION:['Ironwood Displays'],
+    READY_FOR_HANDOFF:['Prairie Foods'], ACTIVE:['Beacon Supply']
+  };
+  const fbCard = (name, assigned) => `<div class="flowcard${assigned?' assigned':''}"><b>${name}</b><span>supplier${assigned?' · assigned to Rachel':''}</span></div>`;
+  const flowBoard = () => card('Board · Supplier onboarding · assigned to Rachel', `
+    <div class="fb"><div class="fbscroll">${FB_STAGES.map(st=>{
+      const cards = (st.k==='INVITED'?FB_ASSIGNED.map(n=>fbCard(n,true)):[]).concat((FB_CONTEXT[st.k]||[]).map(n=>fbCard(n,false)));
+      return `<div class="fbcol" data-k="${st.k}"><div class="fbhead"><span class="fbdot" style="background:${st.c}"></span><span class="fbnm">${st.s}</span><i class="fbcount">${cards.length}</i></div><div class="fbslot">${cards.join('')}</div></div>`;
+    }).join('')}</div><div class="fbnote"></div></div>`, true);
+
+  /* ---- document intelligence: real supplier docs, extracted fields (PDFs embedded as window.DOC_PDF) ---- */
+  const DOC_META = {
+    w9:  {file:'W9_Cascade_Harvest_Foods.pdf',        type:'W-9 · Taxpayer ID',            fields:[['Legal name','Cascade Harvest Foods LLC'],['Classification','LLC (C corporation)'],['EIN','87-3456219'],['Address','2140 NW Quimby St, Portland OR']]},
+    coi: {file:'COI_Cascade_Harvest_Foods.pdf',       type:'Certificate of Insurance',      fields:[['Insurer','Travelers Property Casualty'],['Policy','TRV-8842190'],['Gen. liability','$2,000,000 / occurrence'],['Valid','07/01/2026 to 07/01/2027']]},
+    sqf: {file:'SQF_Certificate_Cascade_Harvest.pdf', type:'SQF Food-Safety Certificate',   fields:[['Certificate','SQF-2024-11847'],['Scope','Granola, trail mixes, baked crisps'],['Body','NSF Certification LLC'],['Expiry','Mar 11, 2027']]},
+    bank:{file:'Bank_Letter_Cascade_Harvest.pdf',     type:'Bank Verification Letter',      fields:[['Bank','Wells Fargo Bank, N.A.'],['Account','4831009274'],['ACH routing','121000248'],['Standing','Good · open since Apr 2016']]}
+  };
+  const DOC_ORDER = ['w9','coi','sqf','bank'];
+  const docIntel = () => card('Document Intelligence agent', `
+    <div class="di">${DOC_ORDER.map(id=>{
+      const m = DOC_META[id];
+      const fields = m.fields.map(f=>`<span class="di-fld"><b>${f[1]}</b><br>${f[0]}</span>`).join('');
+      return `<div class="di-row" data-doc="${id}">
+        <div class="di-ic"></div>
+        <div class="di-main"><div class="di-nm">${m.file}<span class="di-type">${m.type}</span></div><div class="di-fields">${fields}</div></div>
+        <span class="di-status pending">Awaiting</span>
+        <button class="di-view" data-doc="${id}">View</button>
+      </div>`;
+    }).join('')}</div>`, true);
+
+  /* ================= scenarios ================= */
+  const SC = {
+    /* ---------- VP · Retail Operations ---------- */
+    vp1: {
+      prompt: "Pull up supplier onboarding.",
+      reply: "Here’s the full onboarding picture for Retail Northeast: nine suppliers in motion, three waiting on you, one at risk in Review. The approve and send-back actions on the right are live.",
+      comps: [
+        kpis([["9","suppliers in flight"],["3","waiting on your approval"],["11.2 days","avg. cycle · down 2.1"],["96.4%","SLA · last 30 days"]]),
+        flowBoard(),
+        docIntel(),
+        list('Task list · waiting on you', [
+          {ini:'MP', t:'Meridian Polymers · compliance review', p:'All checks passed · margin terms within policy · 6h to SLA', st:'Pending', stc:'warn',
+            acts:[{act:'approve', label:'Approve', done:'Approved ✓', toast:'Approved · transition logged · ERP sync queued', audit:'You approved Meridian Polymers · compliance review', chat:'Meridian Polymers approved. The transition is logged, the ERP vendor record is queued, and the SLA timer is cleared.'},
+                  {act:'back', label:'Send back', ghost:true, toast:'Sent back to Docs with a note · owner notified', audit:'You sent Meridian Polymers back to Docs'}]},
+          {ini:'CP', t:'Cascade Packaging · credit exception', p:'Requested limit is 2.1% over policy threshold · agent attached rationale', st:'Pending', stc:'warn',
+            acts:[{act:'approve', label:'Approve exception', done:'Approved ✓', toast:'Exception approved · audit logged', audit:'You approved the Cascade Packaging credit exception'},
+                  {act:'back', label:'Send back', ghost:true, toast:'Sent back with a note · assignee notified', audit:'You declined the Cascade Packaging credit exception'}]},
+          {ini:'SF', t:'Summit Fixtures · final onboarding approval', p:'Compliance passed · contract executed · ready to go live', st:'Pending', stc:'warn',
+            acts:[{act:'approve', label:'Approve', done:'Approved ✓', toast:'Approved · Summit Fixtures moving to Live', audit:'You gave final approval · Summit Fixtures'}]}
+        ]),
+        list('Workflow SLAs · by stage', [
+          {t:'Invited → Docs', p:'Target 3 days · running 1.8', st:'Healthy', stc:'ok'},
+          {t:'Docs → Review', p:'Target 5 days · running 4.1', st:'Healthy', stc:'ok'},
+          {t:'Review → Approved', p:'Target 2 days · running 2.6', st:'Watch', stc:'warn'},
+          {t:'Approved → Live', p:'Target 4 days · running 2.9', st:'Healthy', stc:'ok'}
+        ]),
+        bars('Analytics · cycle time by stage (days)', [
+          {l:'Invited',v:'1.8',h:26},{l:'Docs',v:'4.1',h:58},{l:'Review',v:'2.6',h:38,warn:true},{l:'Approved',v:'2.9',h:42},{l:'Live',v:'-',h:8}], true),
+        timeline('Activity log', [])
+      ]
+    },
+    vp2: {
+      prompt: "What’s happening with store incidents?",
+      reply: "Forty-one open, mostly untagged items. The photo-to-SKU agent resolved 28 this week on its own; three need your call, and the actions are live.",
+      comps: [
+        kpis([["41","open incidents"],["28","agent-resolved this week"],["3.1h","median resolution"],["6","stores above baseline"]]),
+        list('Task list · needs a human decision', [
+          {ini:'114', t:'Store 114 · untagged denim jacket', p:'Photo-to-SKU agent matched SKU 88213 · 94% confidence · price $79.50', st:'Pending', stc:'warn',
+            acts:[{act:'approve', label:'Approve match', done:'Matched ✓', toast:'SKU match approved · price tag queued for print', audit:'You approved SKU 88213 · Store 114', chat:'Store 114 is done. The tag prints at the store, and the MDM record is updated.'},
+                  {act:'back', label:'Reject', ghost:true, toast:'Rejected · routed to merchandising queue', audit:'You rejected the SKU match · Store 114'}]},
+          {ini:'207', t:'Store 207 · unlabeled cookware set', p:'Two candidate SKUs at 61% and 58% · agent requests human pick', st:'Pending', stc:'warn',
+            acts:[{act:'approve', label:'Pick SKU 90411', done:'Matched ✓', toast:'SKU 90411 selected · agent learns from your pick', audit:'You selected SKU 90411 · Store 207'}]},
+          {ini:'052', t:'Store 052 · register price mismatch', p:'Shelf $24.99 vs. system $27.99 · recurring at this store', st:'Open', stc:'bad',
+            acts:[{act:'escalate', label:'Escalate', toast:'Escalated to pricing ops · SLA timer started', audit:'You escalated the Store 052 price mismatch'}]}
+        ], {wide:true}),
+        bars('Analytics · incidents by type', [
+          {l:'Untagged',v:22,h:78},{l:'Price',v:9,h:34,warn:true},{l:'Damaged',v:6,h:22},{l:'Other',v:4,h:15}]),
+        list('Assignment & audit history', [
+          {t:'10:02 AM', p:'Photo-to-SKU agent resolved 4 incidents · Stores 88, 114, 190, 233'},
+          {t:'9:31 AM', p:'Store 052 mismatch auto-flagged as recurring · 3rd time in 30 days'},
+          {t:'Yesterday', p:'You approved 6 SKU matches in one pass'}
+        ], {audit:true})
+      ]
+    },
+    vp3: {
+      prompt: "Any SLA breaches this week?",
+      reply: "One breach, two at risk. The breach auto-escalated an hour ago; you can escalate the other two from the right if you want them moving now.",
+      comps: [
+        kpis([["1","breached"],["2","at risk"],["96.4%","on time · 30 days"],["14m","avg. time to escalate"]]),
+        list('Task list · SLA watch', [
+          {ini:'MP', t:'Meridian Polymers · Review', p:'6 hours to SLA · assigned to you', st:'At risk', stc:'warn',
+            acts:[{act:'approve', label:'Review now', done:'In review', cls:'info', toast:'Opened for review · timer paused', audit:'You started the Meridian Polymers review'}]},
+          {ini:'CP', t:'Cascade Packaging · Docs', p:'22 hours to SLA · waiting on supplier upload', st:'At risk', stc:'warn',
+            acts:[{act:'escalate', label:'Nudge supplier', toast:'Reminder sent · third follow-up scheduled', audit:'You triggered a supplier nudge · Cascade Packaging'}]},
+          {ini:'052', t:'Store 052 · price mismatch', p:'Breached by 3h · auto-escalated to pricing ops', st:'Breached', stc:'bad'}
+        ], {wide:true}),
+        list('Workflow SLAs · this workflow', [
+          {t:'Docs stage', p:'Target 5 days · supplier-side wait excluded', st:'Healthy', stc:'ok'},
+          {t:'Review stage', p:'Target 2 days · trending up 0.4 this month', st:'Watch', stc:'warn'},
+          {t:'Escalation rule', p:'Breach → auto-assign to stage owner’s manager', st:'Active', stc:'info'}
+        ])
+      ]
+    },
+
+    /* ---------- Recruiter ---------- */
+    rec1: {
+      prompt: "Pull up Meera Krishnan’s file before the final round.",
+      reply: "Here’s her full file: resume, the comment chain from all three rounds, and prepared next steps. She’s in at 3:00 PM. You can reply to the thread or open the offer draft from the right.",
+      comps: [
+        card('Candidate', `
+          <div class="cand"><div class="cava">MK</div><div><b>Meera Krishnan</b><span>Senior Backend Engineer · final round today, 3:00 PM</span></div></div>
+          <div class="pills"><span class="pill">Screen <i>✓</i></span><span class="pill">Technical <i>✓</i></span><span class="pill">Panel <i>✓</i></span><span class="pill next">Final · 3:00 PM</span></div>
+          <p class="synth">Strong system design across all three rounds. Panel flagged stakeholder communication: worth probing today.</p>
+          <div class="acts">
+            <button class="abtn" data-act="toast" data-toast="Offer draft opened · compensation pre-approved · your sign-off required" data-audit="You opened the offer draft · Meera Krishnan">Open offer draft</button>
+            <button class="abtn ghost" data-act="toast" data-toast="Question set added to your 3:00 PM invite" data-audit="Final-round question set attached to the 3:00 PM interview">Add question set</button>
+          </div>`),
+        card('Task view · attachment', `
+          <div class="att">${clip}Meera_Krishnan_Resume.pdf <span>· 2 pages · parsed by the intake agent</span></div>
+          <div class="resume">
+            <div class="r-name">Meera Krishnan</div>
+            <div class="r-sub">Senior Backend Engineer · Seattle, WA · meera.krishnan@mail.com</div>
+            <div class="r-sec">Experience</div>
+            <div class="r-role"><b>Corewave</b><span>Staff Engineer · 2021 – present</span></div>
+            <ul><li>Led event-driven rebuild of the payments platform; settlement failures down 38%</li>
+                <li>Designed idempotent transaction pipeline handling 12M events/day</li></ul>
+            <div class="r-role"><b>Northbeam</b><span>Senior Engineer · 2017 – 2021</span></div>
+            <ul><li>Built order-routing services · 40M requests/day at 99.98% availability</li></ul>
+            <div class="r-sec">Skills</div>
+            <div class="r-skills"><span>Go</span><span>Postgres</span><span>Kafka</span><span>Kubernetes</span><span>AWS</span></div>
+            <div class="r-sec">Education</div>
+            <div class="r-role"><b>B.S. Computer Science</b><span>University of Washington</span></div>
+          </div>`),
+        list('Comment thread · 3 rounds', [
+          {ini:'MR', t:'Mark Reynolds · Technical', time:'2d ago', p:'“Designed a clean event-driven rollback path. Senior-level tradeoff reasoning throughout.”'},
+          {ini:'JW', t:'J. Whitfield · Panel', time:'yesterday', p:'“Deep on data modeling. Less crisp when pushed on cross-team alignment; recommend probing in the final.”', st:'Open', stc:'warn',
+            acts:[{act:'resolve', label:'Resolve', ghost:true, toast:'Comment resolved · thread updated for the panel', audit:'You resolved J. Whitfield’s panel comment'}]},
+          {ini:'AG', t:'Notes agent', time:'today, 8:05 AM', p:'Compiled this brief from all three rounds. Offer draft prepared and parked pending your sign-off.', st:'Agent', stc:'info'}
+        ], {thread:true, reply:true}),
+        list('Assignment & audit history', [
+          {t:'8:05 AM', p:'Notes agent compiled the final-round brief'},
+          {t:'Yesterday', p:'Panel scorecards submitted · J. Whitfield, M. Okafor'},
+          {t:'Mon', p:'Interview scheduling agent booked the final round · 2 reschedules handled'},
+          {t:'Last week', p:'Resume screening agent shortlisted Meera · you approved'}
+        ], {audit:true})
+      ]
+    },
+    rec2: {
+      prompt: "What’s on my plate today?",
+      reply: "Three interviews, two evaluations, and one offer sign-off. The agent drafted both evaluation summaries; everything actionable is on the right.",
+      comps: [
+        list('Task list · today', [
+          {t:'10:30 · Technical · Jake Morrison', p:'Backend Lead · question set attached', st:'Interview', stc:'mut'},
+          {t:'3:00 · Final round · Meera Krishnan', p:'Brief ready · tap her pinned view any time', st:'Final', stc:'info'},
+          {t:'4:30 · Screens · two Backend Lead candidates', p:'Agent-shortlisted this morning', st:'Interview', stc:'mut'}
+        ]),
+        list('Task list · waiting on you', [
+          {t:'Assignment evaluation · R. Alvarez', p:'Agent summary attached · your call decides', st:'Pending', stc:'warn',
+            acts:[{act:'approve', label:'Advance', done:'Advanced ✓', toast:'Advanced to panel · candidate notified', audit:'You advanced R. Alvarez to panel'},
+                  {act:'back', label:'Decline', ghost:true, toast:'Declined with feedback · template sent', audit:'You declined R. Alvarez'}]},
+          {t:'Assignment evaluation · T. Nakamura', p:'Agent summary attached · borderline score', st:'Pending', stc:'warn',
+            acts:[{act:'approve', label:'Advance', done:'Advanced ✓', toast:'Advanced to panel · candidate notified', audit:'You advanced T. Nakamura to panel'}]},
+          {t:'Offer · Product Analyst', p:'Compensation approved · needs your sign-off', st:'Sign-off', stc:'warn',
+            acts:[{act:'approve', label:'Sign off', done:'Signed ✓', toast:'Offer released · e-sign sent to candidate', audit:'You signed the Product Analyst offer', chat:'Offer released. The e-sign went out, and the start-date workflow kicks off when it comes back.'}]}
+        ]),
+        list('Assignment & audit history', [
+          {t:'7:58 AM', p:'Screening agent processed 18 overnight resumes · 5 shortlisted'},
+          {t:'Yesterday', p:'You approved 2 shortlists · 9 candidates advanced'},
+          {t:'Yesterday', p:'Scheduling agent rebooked J. Kim’s panel · conflict resolved'}
+        ], {audit:true})
+      ]
+    },
+    rec3: {
+      prompt: "Screen the new resumes for Backend Lead.",
+      reply: "Handed to the Resume Screening agent: 18 resumes against the Backend Lead rubric. The shortlist lands in your review queue; nothing advances without you.",
+      comps: [
+        kpis([["18","resumes queued"],["~9 min","estimated"],["0","auto-advanced"],["92%","precision · last 30 days"]]),
+        steps('Agent run · Resume Screening #142', [
+          {state:'done', t:'Rubric loaded', sub:'Backend Lead v3 · updated by you last week'},
+          {state:'run',  t:'Parsing and scoring 18 resumes', sub:'7 of 18 complete'},
+          {state:'',     t:'Shortlist with reasoning', sub:'Lands in your review queue'},
+          {state:'',     t:'Your review', sub:'Approve, reject, or edit each recommendation'}
+        ]),
+        list('Assignment & audit history', [
+          {t:'Just now', p:'You started Resume Screening run #142 · 18 resumes'},
+          {t:'This week', p:'Runs #139–141 · 41 resumes · 11 shortlisted · all reviewed by you'},
+          {t:'Note', p:'This step runs on approval-loop autonomy; you can dial it up to standing rules any time'}
+        ], {audit:true})
+      ]
+    },
+
+    /* ---------- Regulatory Consultant ---------- */
+    reg1: {
+      prompt: "Open the California Q2 filing.",
+      reply: "CA-2026-Q2 is in review, due July 18. The whole filing is on the right: eight line items against the Q1 baseline, evidence, the comment chain, and the lifecycle. One line is flagged and two comments are open; every action is live, and submission stays with you.",
+      comps: [
+        kpis([["9 days","to deadline · July 18"],["1","flagged line item"],["2","open comments"],["11 / 12","evidence documents"]]),
+        steps('Workflow · filing lifecycle', [
+          {state:'done', t:'Data pull', sub:'Billing, licensing, prior filings · Filing Prep agent'},
+          {state:'done', t:'Draft generated', sub:'v2 · exact CPUC submission format'},
+          {state:'warn', t:'Self-check', sub:'1 flag · Line 4 vs. Q1 baseline'},
+          {state:'run',  t:'Review', sub:'Owner: you · SLA July 15'},
+          {state:'',     t:'Submission', sub:'Human-confirmed, always'}
+        ]),
+        list('Task view · Filing CA-2026-Q2', [
+          {t:'State: REVIEW', p:'CPUC quarterly return · entered review Tuesday, 9:04 AM', st:'On track', stc:'ok'},
+          {t:'Assignment', p:'Owner: you · preparer: Filing Prep agent · reviewer: A. Romero', st:'You', stc:'info'},
+          {t:'Your decision', p:'Approve to queue for submission · the filing itself never leaves your control', st:'Pending', stc:'warn',
+            acts:[{act:'approve', label:'Approve & queue', done:'Queued ✓', toast:'Queued for submission · final confirm stays with you', audit:'You approved CA-2026-Q2 for submission', chat:'CA-2026-Q2 is queued. The submission step never leaves the approval loop: it files only when you confirm.'},
+                  {act:'back', label:'Send back to draft', ghost:true, toast:'Returned to draft · Filing Prep agent notified', audit:'You sent CA-2026-Q2 back to draft'}]}
+        ]),
+        list('Evidence · 12 documents', [
+          {t:'Schedules A–D', p:'Generated and validated by the Filing Prep agent', st:'Validated', stc:'ok'},
+          {t:'Revenue certification', p:'Signed copy attached by S. Patel', st:'Attached', stc:'ok'},
+          {t:'Q1 filed return', p:'Reference copy · baseline for the delta checks', st:'Attached', stc:'ok'},
+          {t:'Bank certificate', p:'Treasury · requested twice · outstanding', st:'Missing', stc:'warn',
+            acts:[{act:'escalate', label:'Request again', toast:'Request sent to treasury · escalates to their lead at T-5', audit:'You re-requested the bank certificate · treasury notified'}]}
+        ]),
+        table('Filing report · CA-2026-Q2 line items', ['Line item','Q2 value','Q1 baseline','Δ',''], [
+          {cells:['<b>Intrastate revenue</b><span class="sub">Line 4 · from billing export</span>','$2.41M','$2.36M','+2.3%'], flag:true, st:'Check', stc:'warn',
+            acts:[{act:'approve', label:'Accept', done:'Accepted ✓', toast:'Delta accepted · June rate change cited in the filing note', audit:'You accepted the Line 4 revenue delta'},
+                  {act:'toast', label:'Comment', ghost:true, toast:'Use the comment thread below · it attaches to Line 4'}]},
+          {cells:['<b>Local exchange revenue</b><span class="sub">Line 5 · from billing export</span>','$1.62M','$1.60M','+1.2%'], st:'Ties', stc:'ok'},
+          {cells:['<b>Toll revenue</b><span class="sub">Line 6 · seasonal dip, see workpaper W-6</span>','$312K','$329K','−5.2%'], st:'Noted', stc:'mut'},
+          {cells:['<b>Access lines</b><span class="sub">Line 7 · from provisioning</span>','18,240','18,105','+0.7%'], st:'Ties', stc:'ok'},
+          {cells:['<b>Interstate allocation</b><span class="sub">Line 9 · computed</span>','$1.13M','$1.10M','+2.7%'], st:'Ties', stc:'ok'},
+          {cells:['<b>USF contribution</b><span class="sub">Line 12 · computed from Line 4</span>','$96,400','$94,200','+2.3%'], st:'Recomputed', stc:'info'},
+          {cells:['<b>Regulatory user fees</b><span class="sub">Line 14 · fixed schedule</span>','$8,120','$8,120','0.0%'], st:'Ties', stc:'ok'},
+          {cells:['<b>Attachments</b><span class="sub">Schedules A-D, certifications</span>','9 of 9','-','-'], st:'Validated', stc:'ok'}
+        ]),
+        list('Comment thread · CA-2026-Q2', [
+          {ini:'AR', t:'A. Romero · Reviewer', time:'2d ago', p:'“Line 4 doesn’t tie to the billing export. Recheck before this goes anywhere.”', st:'Open', stc:'warn',
+            acts:[{act:'resolve', label:'Resolve', ghost:true, toast:'Resolved · A. Romero notified', audit:'You resolved A. Romero’s Line 4 comment'}]},
+          {ini:'SP', t:'S. Patel · Compliance', time:'yesterday', p:'“License references updated to the 2026 format across all schedules.”', st:'Resolved', stc:'ok'},
+          {ini:'MC', t:'M. Chen · Analyst', time:'yesterday', p:'“Toll revenue dip is seasonal; workpaper W-6 documents the pattern for the last three years.”', st:'Resolved', stc:'ok'},
+          {ini:'AG', t:'Filing Prep agent', time:'today, 7:40 AM', p:'Regenerated Line 4 from the billing source. The delta is a June rate change; supporting rows are linked.', st:'Open', stc:'warn',
+            acts:[{act:'resolve', label:'Resolve', ghost:true, toast:'Resolved · noted in the filing record', audit:'You resolved the Filing Prep agent’s note'}]}
+        ], {thread:true, reply:true}),
+        list('Workflow SLAs · this filing', [
+          {t:'Evidence complete', p:'Target July 11 · one document outstanding', st:'Watch', stc:'warn'},
+          {t:'Review complete', p:'Target July 15 · owner: you', st:'You', stc:'info'},
+          {t:'Submission', p:'July 18 · T-3 trigger warms up Wednesday', st:'Locked to human', stc:'info'}
+        ]),
+        list('Assignment & audit history', [
+          {t:'7:40 AM', p:'Filing Prep agent regenerated the draft · v2 · Line 4 corrected'},
+          {t:'Yesterday', p:'S. Patel resolved the license-format comment'},
+          {t:'Yesterday', p:'M. Chen attached workpaper W-6 · toll revenue seasonality'},
+          {t:'Tuesday', p:'Review assigned to you · SLA timer started'},
+          {t:'Monday', p:'Agent pulled source data from billing, licensing, prior filings'}
+        ], {audit:true})
+      ]
+    },
+    reg2: {
+      prompt: "What deadlines are coming up?",
+      reply: "Four in the next three weeks. California is closest at nine days and is already in your review; drafts exist for all four.",
+      comps: [
+        kpis([["4","due in 21 days"],["4","drafts ready"],["0","overdue"],["12","filings tracked"]]),
+        table('Filing calendar · next 21 days', ['Filing','Agency','Due','Owner',''], [
+          {cells:['<b>CA-2026-Q2</b><span class="sub">Quarterly return</span>','California PUC','July 18','You'], st:'In review', stc:'warn',
+            acts:[{act:'toast', label:'Open', toast:'Tap the “CA-2026-Q2 filing” quick action for the full view'}]},
+          {cells:['<b>FCC 499-Q</b><span class="sub">Quarterly worksheet</span>','FCC','July 22','You'], st:'Self-check', stc:'info',
+            acts:[{act:'toast', label:'Open', toast:'Tap the “499-Q draft status” quick action for the agent run'}]},
+          {cells:['<b>NY-2026-Q2</b><span class="sub">Assessment report</span>','New York PSC','July 25','M. Chen'], st:'Drafted', stc:'mut'},
+          {cells:['<b>TX-2026-Q2</b><span class="sub">Quarterly return</span>','Texas PUC','July 29','M. Chen'], st:'Drafted', stc:'mut'}
+        ]),
+        list('Assignment & audit history', [
+          {t:'Overnight', p:'Filing Prep agent generated the TX draft · exact submission format'},
+          {t:'Yesterday', p:'NY assessment reassigned to M. Chen · workload balancing'},
+          {t:'Rule', p:'Every deadline has a T-14 and T-3 trigger · escalates to you on silence'}
+        ], {audit:true})
+      ]
+    },
+    reg3: {
+      prompt: "Where is the FCC 499-Q draft?",
+      reply: "Drafted and self-checked. One inconsistency is flagged against last quarter; accept the fix or send it back, and nothing files without your confirmation.",
+      comps: [
+        steps('Agent run · Filing Prep · FCC 499-Q', [
+          {state:'done', t:'Data pulled from 3 systems', sub:'Billing, licensing, prior filings'},
+          {state:'done', t:'Draft generated', sub:'v2 · exact submission format'},
+          {state:'warn', t:'Self-check: 1 inconsistency flagged', sub:'Line 115 revenue vs. Q1 baseline'},
+          {state:'',     t:'Your review and submission', sub:'This step never leaves the approval loop'}
+        ]),
+        list('Task list · flagged for you', [
+          {t:'Line 115 revenue differs 2.3% from Q1', p:'Agent traced it to a June rate change · source rows linked', st:'Check', stc:'warn',
+            acts:[{act:'approve', label:'Accept fix', done:'Accepted ✓', toast:'Fix accepted · draft finalized for your review', audit:'You accepted the Line 115 correction · FCC 499-Q'},
+                  {act:'back', label:'Send back', ghost:true, toast:'Returned to the agent with your note', audit:'You sent the 499-Q draft back for rework'}]},
+          {t:'Attachments', p:'9 of 9 present and validated', st:'Ready', stc:'ok'}
+        ]),
+        list('Assignment & audit history', [
+          {t:'6:15 AM', p:'Filing Prep agent completed self-check · 1 flag raised'},
+          {t:'Yesterday', p:'Draft v1 discarded · source data refreshed after billing correction'},
+          {t:'Policy', p:'Submission autonomy: approval-loop · unchanged since go-live'}
+        ], {audit:true})
+      ]
+    }
+  };
+
+  /* ================= personas ================= */
+  const P = {
+    vp: {
+      label:"VP · Retail Ops", me:"RM", def:"vp1",
+      welcome:"Good morning, Rachel. Three supplier approvals are waiting on you, Meridian Polymers is six hours from SLA, and stores logged 11 new incidents overnight.",
+      chipRoot:'vp_root',
+      badges:{Approvals:3, Tasks:5},
+      pins:[["Supplier onboarding","vp1"],["Store incidents","vp2"],["SLA watch","vp3"]]
+    },
+    rec: {
+      label:"Recruiter", me:"EC", def:"rec1",
+      welcome:"Hi Emily. Three interviews today, Meera Krishnan’s final round is at 3:00 PM, and 18 new resumes came in for Backend Lead overnight.",
+      chipRoot:'rec_root',
+      badges:{Approvals:1, Tasks:5},
+      pins:[["Meera Krishnan","rec1"],["Today","rec2"],["Backend Lead · screening","rec3"]]
+    },
+    reg: {
+      label:"Regulatory Consultant", me:"DB", def:"reg1",
+      welcome:"Hello Daniel. Twelve filings tracked. CA-2026-Q2 is regenerated and waiting on your review, and the FCC 499-Q is due in thirteen days.",
+      chipRoot:'reg_root',
+      badges:{Approvals:2, Tasks:3},
+      pins:[["Filing CA-2026-Q2","reg1"],["Filing calendar","reg2"],["FCC 499-Q draft","reg3"]]
+    }
+  };
+
+  /* ================= chip storyboard (branching quick-actions) ================= */
+  const CHIP_NODES = {
+    vp_root:[
+      {label:'Supplier onboarding', run:'vp1', to:'sup_choose'},
+      {label:'Store incidents', run:'vp2', to:'vp_incidents'},
+      {label:'SLA watch', run:'vp3', to:'vp_sla'}
+    ],
+    // ---- genuine, click-driven supplier onboarding, one step per click ----
+    sup_choose:[
+      {label:'Start intake · Meridian Polymers', step:{type:'choose', name:'Meridian Polymers', to:'INTAKE_SUBMITTED'}, say:"Intake started for Meridian Polymers. The guided intake form came back complete and validated, ready for vetting.", to:'sup_vet'},
+      {label:'Start intake · Cascade Packaging', step:{type:'choose', name:'Cascade Packaging', to:'INTAKE_SUBMITTED'}, say:"Intake started for Cascade Packaging. The guided intake form came back complete and validated, ready for vetting.", to:'sup_vet'},
+      {label:'← Workflows', to:'vp_root'}
+    ],
+    // one click, the agent runs the whole vetting pass and stops at the block
+    sup_vet:[
+      {label:'Begin vetting', seq:[
+        {type:'move', to:'UNDER_VETTING', who:'Onboarding agent'},
+        {type:'edit', title:'KYB verification: business registration + UBO confirmed', who:'KYB agent'},
+        {type:'edit', title:'Sanctions & adverse-media screening: potential match found', who:'Screening agent'},
+        {type:'block', to:'DOCS_VALIDATION', reason:'Potential OFAC watchlist match on {co} awaiting analyst clearance · guard vetting_passed requires sanctions_status = clear'}
+      ], say:"The vetting agent ran the checks on {co}: KYB verified against the business registration and beneficial owners, but sanctions screening flagged a potential OFAC watchlist match. The vetting_passed gate is blocked until an analyst clears it.", to:'sup_blocked'},
+      {label:'← Workflows', to:'vp_root'}
+    ],
+    sup_blocked:[
+      {label:'Why was it blocked?', say:"Sanctions screening returned a possible match against an OFAC watchlist entry with a similar name. The vetting_passed guard requires sanctions_status = clear, so the move to document validation is physically blocked until an analyst confirms it is a false positive or a true hit. Nothing advances on a maybe.", to:'sup_blocked'},
+      // one click: analyst clears it, agent advances and runs extraction, stops at the next block
+      {label:'Clear sanctions (analyst reviewed)', seq:[
+        {type:'edit', title:'Analyst cleared match as false positive · sanctions_status → clear', who:'Analyst'},
+        {type:'move', to:'DOCS_VALIDATION', who:'Onboarding agent'},
+        {type:'edit', title:'Document Intelligence agent: classifying & extracting uploaded documents', who:'Document Intelligence agent'},
+        {type:'docrun', plan:[{id:'w9',end:'ok'},{id:'coi',end:'ok'},{id:'sqf',end:'miss'}]},
+        {type:'block', to:'PENDING_APPROVALS', reason:'SQF food-safety certificate missing · guard docs_complete requires docs_outstanding = 0'}
+      ], say:"Analyst cleared the match as a false positive, so {co} advances to document validation. The Document Intelligence agent read and validated the W-9 and insurance certificate (you can see the live extraction), but the SQF food-safety certificate is missing, so docs_complete is blocked.", to:'sup_docs2'},
+      {label:'← Workflows', to:'vp_root'}
+    ],
+    // one click: SQF chased and extracted, then agent routes approvals and moves through to banking
+    sup_docs2:[
+      {label:'Request the missing SQF certificate', seq:[
+        {type:'edit', title:'SQF food-safety certificate received', who:'Extraction agent'},
+        {type:'docrun', plan:[{id:'sqf',end:'ok'}]},
+        {type:'move', to:'PENDING_APPROVALS', who:'Onboarding agent'},
+        {type:'edit', title:'Approvals routed by risk tier · 1 approver (standard)', who:'Onboarding agent'},
+        {type:'move', to:'BANKING_VERIFICATION', who:'Onboarding agent'}
+      ], say:"{co} uploaded the SQF certificate; the Document Intelligence agent extracted and validated it (docs_outstanding → 0). The case advanced to approvals, the single standard-tier approval was recorded, and it moved on to banking verification.", to:'sup_bank'},
+      {label:'← Workflows', to:'vp_root'}
+    ],
+    sup_bank:[
+      {label:'Verify banking details', seq:[
+        {type:'docrun', plan:[{id:'bank',end:'ok'}]},
+        {type:'edit', title:'Bank verification: micro-deposit confirmed + fraud checks passed', who:'Bank verification agent'},
+        {type:'move', to:'READY_FOR_HANDOFF', who:'Onboarding agent'}
+      ], say:"The bank verification agent read the bank letter, confirmed {co}'s account by micro-deposit, and passed fraud checks. {co} is ready for the final audit review.", to:'sup_audit'},
+      {label:'← Workflows', to:'vp_root'}
+    ],
+    sup_audit:[
+      {label:'Run the final audit review', seq:[{type:'audit'}], say:"Running the full audit trail for {co}: the agent replays every state, re-verifying KYB, screening, all documents and banking. When the sweep finishes, a human approval gate appears. Nothing activates without you.", to:'sup_wait'},
+      {label:'← Workflows', to:'vp_root'}
+    ],
+    sup_wait:[
+      {label:'← Workflows', to:'vp_root'}
+    ],
+    sup_done:[
+      {label:'Onboard another supplier', run:'vp1', to:'sup_choose'},
+      {label:'← Workflows', to:'vp_root'}
+    ],
+    vp_incidents:[
+      {label:'What needs my decision?', say:"Three incidents need a human call: two SKU matches the photo-to-SKU agent scored below threshold, plus a recurring price mismatch at Store 052. Everything else it resolved on its own.", to:'vp_incidents'},
+      {label:'← Workflows', to:'vp_root'}
+    ],
+    vp_sla:[
+      {label:'Escalate the breach', say:"Escalated to pricing ops. The SLA clock is reset and the stage owner’s manager is now on the thread.", toast:'Store 052 breach escalated · pricing ops notified', to:'vp_sla'},
+      {label:'← Workflows', to:'vp_root'}
+    ],
+    rec_root:[
+      {label:'Meera · final round file', run:'rec1', to:'rec_meera'},
+      {label:'My day', run:'rec2', to:'rec_day'},
+      {label:'Screen new resumes', run:'rec3', to:'rec_screen'}
+    ],
+    rec_meera:[
+      {label:'Open the offer draft', say:"Offer draft opened. Compensation is pre-approved and parked pending your sign-off. Nothing reaches the candidate until you release it.", toast:'Offer draft opened · your sign-off required', to:'rec_meera'},
+      {label:'← Workflows', to:'rec_root'}
+    ],
+    rec_day:[
+      {label:'What needs sign-off?', say:"One offer for the Product Analyst role is waiting on your sign-off, and two assignment evaluations are ready to advance.", to:'rec_day'},
+      {label:'← Workflows', to:'rec_root'}
+    ],
+    rec_screen:[
+      {label:'Review the shortlist', say:"The screening run shortlisted 5 of 18 resumes against the Backend Lead rubric. Nothing advances until you approve each one.", to:'rec_screen'},
+      {label:'← Workflows', to:'rec_root'}
+    ],
+    reg_root:[
+      {label:'CA-2026-Q2 filing', run:'reg1', to:'reg_ca'},
+      {label:'Upcoming deadlines', run:'reg2', to:'reg_deadlines'},
+      {label:'499-Q draft status', run:'reg3', to:'reg_499'}
+    ],
+    reg_ca:[
+      {label:'Approve & queue', say:"Queued for submission. The filing only leaves your hands when you confirm; the submission step never leaves the approval loop.", toast:'CA-2026-Q2 queued · final confirm stays with you', to:'reg_ca'},
+      {label:'Why is Line 4 flagged?', say:"Line 4 intrastate revenue is 2.3% above the Q1 baseline. The Filing Prep agent traced it to a June rate change and linked the supporting billing rows; it’s flagged for your acceptance, not an error.", to:'reg_ca'},
+      {label:'← Workflows', to:'reg_root'}
+    ],
+    reg_deadlines:[
+      {label:'What’s closest?', say:"California Q2 is closest: nine days out and already in your review. Drafts exist for all four upcoming filings.", to:'reg_deadlines'},
+      {label:'← Workflows', to:'reg_root'}
+    ],
+    reg_499:[
+      {label:'Accept the fix', say:"Accepted. The 499-Q draft is finalized for your review; the Line 115 correction is recorded with its source.", toast:'Line 115 correction accepted · draft finalized', to:'reg_499'},
+      {label:'← Workflows', to:'reg_root'}
+    ]
+  };
+
+  function renderChips(nodeId){
+    const node = CHIP_NODES[nodeId] || [];
+    chips.innerHTML = '';
+    node.forEach((def,i)=>{
+      const back = def.label.indexOf('←') === 0;
+      const c = el(`<button class="chip${back?' back':''}">${def.label}</button>`);
+      c.style.animation = `rise .32s ease both ${i*0.05}s`;
+      c.addEventListener('click', ()=> handleChip(def));
+      chips.appendChild(c);
+    });
+  }
+
+  function handleChip(def){
+    if (def.run){
+      if (busy) return;
+      runScenario(def.run, 'type');
+    } else if (def.seq || def.step){
+      const actions = def.seq || [def.step];
+      const dur = runSequence(actions);
+      addMsg('user', def.label);
+      const t = addTyping();
+      const replyAt = Math.min(Math.max(dur - 900, 800), 3200);   // narrate as the agent finishes its run
+      setTimeout(()=>{ t.remove(); if(def.say) addMsg('ai', sub(def.say)); if(def.toast) toast(sub(def.toast)); }, replyAt);
+    } else if (def.say){
+      if (busy) return;
+      busy = true;
+      addMsg('user', def.label);
+      const t = addTyping();
+      setTimeout(()=>{ t.remove(); addMsg('ai', sub(def.say)); if(def.toast) toast(sub(def.toast)); busy = false; }, 720);
+    } else if (def.toast){
+      toast(sub(def.toast));
+    }
+    if (def.to) renderChips(def.to);
+  }
+
+  const icons = {
+    Overview:'<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>',
+    Approvals:'<svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-5"/><circle cx="12" cy="12" r="9"/></svg>',
+    Tasks:'<svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>',
+    Workflows:'<svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="2.5"/><circle cx="19" cy="6" r="2.5"/><circle cx="19" cy="18" r="2.5"/><path d="M7.5 12h5m0 0L16.5 7m-4 5l4 5"/></svg>',
+    Agents:'<svg viewBox="0 0 24 24"><rect x="5" y="7" width="14" height="12" rx="3"/><path d="M12 7V4m-4 9h.01M16 13h.01"/></svg>',
+    "Audit log":'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>'
+  };
+
+  /* ================= runtime ================= */
+  const rail = document.getElementById('rail'), chips = document.getElementById('chips'),
+        thread = document.getElementById('thread'), cvBody = document.getElementById('cv-body'),
+        cvHead = document.getElementById('cv-head'), personaBar = document.getElementById('personaBar'),
+        inp = document.getElementById('inp'), meAva = document.getElementById('meAva'),
+        toastEl = document.getElementById('toast');
+  let cur = 'vp', busy = false, toastTimer = null, liveTimers = [], chosenCo = 'Meridian Polymers';
+
+  function el(html){ const d = document.createElement('div'); d.innerHTML = html.trim(); return d.firstChild; }
+
+  function toast(text){
+    toastEl.innerHTML = `<b>✓</b>${text}`;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=>toastEl.classList.remove('show'), 2800);
+  }
+
+  function addMsg(kind, text, src){
+    const m = el(kind === 'user'
+      ? `<div class="msg user"><div class="txt">${text}</div></div>`
+      : `<div class="msg"><div class="adot"></div><div class="txt">${text}${src?`<span class="src">${src}</span>`:''}</div></div>`);
+    thread.appendChild(m); thread.scrollTop = thread.scrollHeight;
+    return m;
+  }
+  function addTyping(){
+    const t = el(`<div class="msg"><div class="adot"></div><div class="typing"><i></i><i></i><i></i></div></div>`);
+    thread.appendChild(t); thread.scrollTop = thread.scrollHeight;
+    return t;
+  }
+
+  function clearLive(){ liveTimers.forEach(t=>{ clearTimeout(t); clearInterval(t); }); liveTimers=[]; }
+
+  function skeletonHTML(n){
+    const block = wide => `<div class="card${wide?' wide':''} skel">
+        <div class="sk sk-lab"></div>
+        <div class="sk sk-line"></div><div class="sk sk-line s2"></div><div class="sk sk-line s3"></div>
+        <div class="sk-tiles"><span></span><span></span><span></span></div></div>`;
+    let out=''; const count=Math.max(2, Math.min(n,4));
+    for(let i=0;i<count;i++) out += block(i===0);
+    return out;
+  }
+
+  function countUp(node){
+    const m = node.textContent.match(/^\s*([\d.,]+)(.*)$/s); if(!m) return;
+    const clean = m[1].replace(/,/g,''); const target = parseFloat(clean); if(isNaN(target)) return;
+    const dec = (clean.split('.')[1]||'').length, suffix = m[2], t0 = performance.now(), dur = 850;
+    (function step(t){ const p=Math.min(1,(t-t0)/dur), e=1-Math.pow(1-p,3), v=target*e;
+      node.textContent = (dec? v.toFixed(dec) : Math.round(v).toLocaleString()) + suffix;
+      if(p<1) requestAnimationFrame(step); else node.textContent = m[1]+suffix;
+    })(t0);
+  }
+
+  const LIVE_FEED = {
+    vp:['Docs-check agent verified an insurance certificate · Lakeshore Logistics','Vendor master record synced to ERP · Prairie Foods','SLA timers recalculated across Retail Northeast','Compliance screen cleared a new supplier · Summit Fixtures','Onboarding progress recomputed · 9 suppliers in flight'],
+    rec:['Screening agent scored 3 new resumes for Backend Lead','Scheduling agent resolved an interview conflict','Panel scorecard synced to the candidate file','Shortlist re-ranked against the latest rubric'],
+    reg:['Filing Prep agent refreshed source data from billing','Evidence document validated against the Q1 baseline','Deadline monitor re-evaluated every tracked filing','Delta checks recomputed · CA-2026-Q2']
+  };
+
+  /* ---- flow-board movement helpers ---- */
+  function fbCounts(fb){ fb.querySelectorAll('.fbcol').forEach(c=>{ c.querySelector('.fbcount').textContent = c.querySelectorAll('.flowcard').length; }); }
+  function fbNote(fb, text, kind){
+    const n = fb.querySelector('.fbnote'); if(!n) return;
+    n.className = 'fbnote show ' + kind; n.textContent = text;
+    // block reasons persist (stay highlighted) until the next step clears them; agent notes auto-fade
+    if(kind!=='block') liveTimers.push(setTimeout(()=>{ if(n.classList.contains(kind)) n.className='fbnote'; }, 1800));
+  }
+  function fbClearNote(fb){ const n = fb.querySelector('.fbnote'); if(n) n.className='fbnote'; const d = fb.querySelector('.fbcol.deny'); if(d) d.classList.remove('deny'); }
+  function fbScrollTo(col){ if(col && col.scrollIntoView) col.scrollIntoView({behavior:'smooth', inline:'center', block:'nearest'}); }
+  function fbMove(fb, toKey){
+    const focal = fb.querySelector('.flowcard.focal'); const toCol = fb.querySelector('.fbcol[data-k="'+toKey+'"]');
+    if(!focal || !toCol) return;
+    fbScrollTo(toCol);
+    const prev = fb.querySelector('.fbcol.current'); if(prev) prev.classList.remove('current');
+    liveTimers.push(setTimeout(()=>{
+      const slot = toCol.querySelector('.fbslot');
+      const first = focal.getBoundingClientRect();
+      slot.appendChild(focal);                                  // reparent (FLIP)
+      const last = focal.getBoundingClientRect();
+      focal.style.transition = 'none';
+      focal.style.transform = 'translate('+(first.left-last.left)+'px,'+(first.top-last.top)+'px)';
+      focal.getBoundingClientRect();                            // force reflow
+      requestAnimationFrame(()=>{
+        focal.style.transition = 'transform .72s cubic-bezier(.2,.7,.2,1)';
+        focal.style.transform = 'translate(0,0)';
+      });
+      focal.classList.add('landed'); setTimeout(()=>focal.classList.remove('landed'), 950);
+      toCol.classList.add('current'); fbCounts(fb);
+    }, 440));
+  }
+  function fbBlock(fb, toKey, reason){
+    const focal = fb.querySelector('.flowcard.focal'); const toCol = fb.querySelector('.fbcol[data-k="'+toKey+'"]');
+    if(focal){ fbScrollTo(focal.closest('.fbcol')); focal.classList.add('bump'); }
+    if(toCol) toCol.classList.add('deny');
+    fbNote(fb, 'Move blocked · ' + reason, 'block');
+    liveTimers.push(setTimeout(()=>{ if(focal) focal.classList.remove('bump'); if(toCol) toCol.classList.remove('deny'); }, 1600));
+  }
+  function fbEdit(fb, title){
+    fbNote(fb, title, 'edit');
+    const f = fb.querySelector('.flowcard.focal'); if(f){ f.classList.add('ping'); setTimeout(()=>f.classList.remove('ping'), 950); }
+  }
+
+  /* ---- click-driven step engine: each chip advances board + timeline exactly one step ---- */
+  function sub(s){ return (s||'').replace(/\{co\}/g, chosenCo); }
+  function tlPush(ev){
+    const tl = cvBody.querySelector('.tl-live'); if(!tl) return;
+    const em = tl.querySelector('.tl-empty'); if(em) em.remove();
+    const row = el(tlRow(ev)); row.style.animation = 'rise .5s ease both'; tl.prepend(row);
+  }
+  // a single board+timeline action
+  function runOne(a){
+    const fb = cvBody.querySelector('.fb'); if(!fb) return;
+    if(a.type!=='block') fbClearNote(fb);                 // clear a lingering block banner as work resumes
+    if(a.type==='choose'){
+      chosenCo = a.name;
+      const card = [...fb.querySelectorAll('.fbcol[data-k="INVITED"] .flowcard')]
+        .find(c => c.querySelector('b').textContent.trim() === a.name);
+      if(card){ card.classList.add('focal'); const sp=card.querySelector('span'); if(sp) sp.textContent='supplier · assigned to you'; }
+      tlPush({from:'INVITED', to:a.to, who:'Rachel'});
+      fbMove(fb, a.to);
+      return;
+    }
+    const focal = fb.querySelector('.flowcard.focal');
+    const from = focal ? focal.closest('.fbcol').dataset.k : '';
+    if(a.type==='move'){ tlPush({from, to:a.to, who:a.who||'Onboarding agent'}); fbMove(fb, a.to); }
+    else if(a.type==='edit'){ tlPush({edit:true, title:sub(a.title), who:a.who||'Onboarding agent'}); fbEdit(fb, sub(a.title)); }
+    else if(a.type==='block'){ tlPush({blocked:true, from, to:a.to, who:'System guard', reason:sub(a.reason)}); fbBlock(fb, a.to, sub(a.reason)); }
+    else if(a.type==='outcome'){ tlPush({from, to:a.to, who:'Rachel'}); if(focal) focal.classList.add(a.outcome==='reject'?'rej':'act'); fbMove(fb, a.to); }
+    else if(a.type==='docrun'){ animateDocs(a.plan); }
+    else if(a.type==='audit'){ runAudit(); }
+  }
+  function gapFor(a){ return a.type==='block' ? 1800 : a.type==='edit' ? 1350 : a.type==='docrun' ? 3600 : a.type==='audit' ? 400 : 1550; }
+  // an agent can chain several actions in one click; each plays in sequence
+  function runSequence(actions){
+    let t = 0;
+    for(const a of actions){ const at = t; liveTimers.push(setTimeout(()=>runOne(a), at)); t += gapFor(a); }
+    return t;
+  }
+
+  /* ---- document intelligence: live scan, extraction, and a brief look at the real document ---- */
+  function docPreview(id, scanning){
+    const m = DOC_META[id]; if(!m) return;
+    document.getElementById('docModalName').textContent = m.file;
+    document.getElementById('docModalType').textContent = m.type;
+    const b64 = (window.DOC_PDF||{})[id];
+    document.getElementById('docModalBody').innerHTML = b64
+      ? '<iframe title="'+m.file+'" src="data:application/pdf;base64,'+b64+'#toolbar=0&navpanes=0&view=FitH"></iframe>'
+      : '<div style="padding:22px">'+m.fields.map(f=>'<div class="di-fld" style="min-width:100%;margin-bottom:9px"><b>'+f[1]+'</b> : '+f[0]+'</div>').join('')+'</div>';
+    const cap = document.getElementById('docModalCap');
+    cap.innerHTML = scanning
+      ? '<span class="spin"></span><span>Document Intelligence agent is reading the '+m.type+'…</span>'
+      : '<span style="color:#047857;font-weight:800">✓</span><span>Extracted and validated by the Document Intelligence agent.</span>';
+    document.getElementById('docModal').classList.add('show');
+  }
+  function closeDocModal(){ document.getElementById('docModal').classList.remove('show'); }
+  function animateDocs(plan){
+    plan.forEach((d, idx)=>{
+      const base = idx*700;
+      const row = cvBody.querySelector('.di-row[data-doc="'+d.id+'"]'); if(!row) return;
+      const st = row.querySelector('.di-status');
+      liveTimers.push(setTimeout(()=>{ if(row.scrollIntoView) row.scrollIntoView({block:'nearest'}); row.classList.remove('miss','ok'); row.classList.add('scanning'); st.className='di-status scan'; st.textContent='Classifying'; }, base));
+      liveTimers.push(setTimeout(()=>{ st.textContent='Extracting'; }, base+750));
+      liveTimers.push(setTimeout(()=>{ row.classList.remove('scanning');
+        if(d.end==='miss'){ row.classList.add('miss'); st.className='di-status miss'; st.textContent='Missing'; }
+        else { row.classList.add('ok'); st.className='di-status ok'; st.textContent='Validated'; }
+      }, base+1550));
+    });
+    // briefly surface the actual document while the agent reads it
+    const firstOk = plan.find(d=>d.end!=='miss');
+    if(firstOk){ liveTimers.push(setTimeout(()=>docPreview(firstOk.id, true), 500)); liveTimers.push(setTimeout(closeDocModal, 2900)); }
+  }
+
+  /* ---- final audit: sweep the supplier through every state re-verifying the trail, then the approval gate ---- */
+  function fbHop(fb, toKey){
+    const focal = fb.querySelector('.flowcard.focal'), toCol = fb.querySelector('.fbcol[data-k="'+toKey+'"]'); if(!focal||!toCol) return;
+    fbScrollTo(toCol);
+    const slot = toCol.querySelector('.fbslot');
+    const first = focal.getBoundingClientRect(); slot.appendChild(focal); const last = focal.getBoundingClientRect();
+    focal.style.transition='none'; focal.style.transform='translate('+(first.left-last.left)+'px,'+(first.top-last.top)+'px)'; focal.getBoundingClientRect();
+    requestAnimationFrame(()=>{ focal.style.transition='transform .5s cubic-bezier(.2,.7,.2,1)'; focal.style.transform='translate(0,0)'; });
+    fbCounts(fb);
+  }
+  function runAudit(){
+    const fb = cvBody.querySelector('.fb'); if(!fb) return;
+    fbClearNote(fb);
+    fb.querySelectorAll('.fbcol.verified').forEach(c=>c.classList.remove('verified'));
+    const order = ['INVITED','INTAKE_SUBMITTED','UNDER_VETTING','DOCS_VALIDATION','PENDING_APPROVALS','BANKING_VERIFICATION','READY_FOR_HANDOFF'];
+    const focal = fb.querySelector('.flowcard.focal'), inv = fb.querySelector('.fbcol[data-k="INVITED"] .fbslot');
+    if(focal && inv){ focal.style.transition='none'; focal.style.transform='translate(0,0)'; inv.appendChild(focal); }
+    fbCounts(fb); fbScrollTo(fb.querySelector('.fbcol[data-k="INVITED"]'));
+    let i = 0;
+    const hop = () => {
+      if(i >= order.length){ liveTimers.push(setTimeout(openApproval, 750)); return; }
+      const k = order[i];
+      if(i>0) fbHop(fb, k);
+      liveTimers.push(setTimeout(()=>{ const c=fb.querySelector('.fbcol[data-k="'+k+'"]'); if(c) c.classList.add('verified'); tlPush({audit:true, state:k}); }, 280));
+      i++; liveTimers.push(setTimeout(hop, 820));
+    };
+    hop();
+  }
+
+  /* ---- human approval gate ---- */
+  function openApproval(){
+    document.getElementById('apprSub').innerHTML = 'Final onboarding gate for <b>'+chosenCo+'</b>. The workflow activates the supplier only when you approve.';
+    const checks = ['KYB verified','Sanctions screening clear','W-9, registration, KYB questionnaire, insurance and SQF validated','Bank account independently verified','No duplicate found','Audit trail complete'];
+    document.getElementById('apprCheck').innerHTML = checks.map(c=>'<div class="ck"><i>✓</i>'+c+'</div>').join('');
+    document.getElementById('apprModal').classList.add('show');
+  }
+  function closeApproval(){ document.getElementById('apprModal').classList.remove('show'); }
+  function auditOutcome(kind){
+    closeApproval();
+    const fb = cvBody.querySelector('.fb');
+    if(fb){ const focal=fb.querySelector('.flowcard.focal'); const from=focal?focal.closest('.fbcol').dataset.k:'';
+      tlPush({from, to:kind==='reject'?'REJECTED':'ACTIVE', who:'Rachel'});
+      if(focal) focal.classList.add(kind==='reject'?'rej':'act');
+      fbMove(fb, kind==='reject'?'REJECTED':'ACTIVE');
+    }
+    if(kind==='reject'){ toast(chosenCo+' onboarding rejected'); addMsg('ai', chosenCo+"'s onboarding was rejected with the reason recorded. It can't reach ACTIVE; that path is physically closed by the workflow."); }
+    else { toast(chosenCo+' activated · compliant'); addMsg('ai', chosenCo+' is now ACTIVE and compliant. The vendor record syncs to ERP, the first PO can be issued, and it stays under ongoing monitoring.'); }
+    renderChips('sup_done');
+  }
+
+  function runEnhancers(){
+    cvBody.querySelectorAll('.kpi b').forEach(countUp);
+    cvBody.querySelectorAll('.st').forEach(s=>{ const t=s.textContent.toLowerCase();
+      if(/agent|sla|sync|verif|review|processing|live|nudge/.test(t)) s.classList.add('live'); });
+    // the board rests at its starting state; nothing moves until a chip is clicked
+    const fb = cvBody.querySelector('.fb');
+    if(fb){ fbCounts(fb); const inv = fb.querySelector('.fbcol[data-k="INVITED"]'); if(inv){ inv.classList.add('current'); fbScrollTo(inv); } }
+  }
+
+  function renderCanvas(comps){
+    clearLive();
+    closeDocModal(); closeApproval();                 // never carry a modal across a re-render
+    document.body.classList.add('rail-collapsed');   // launcher active → give the canvas full width
+    cvHead.classList.add('show');
+    cvHead.innerHTML = `<span class="gen"><span class="spin"></span>Composing your view…</span>`;
+    cvBody.innerHTML = skeletonHTML(comps.length);
+    liveTimers.push(setTimeout(()=>{
+      cvHead.innerHTML = `<b><span class="live-dot"></span>Generated for this task</b><span>Live · updating in real time · every action is real</span>`;
+      cvBody.innerHTML = comps.join('');
+      const kids = [...cvBody.children];
+      kids.forEach((c,i)=> setTimeout(()=>c.classList.add('in'), 60 + i*130));
+      liveTimers.push(setTimeout(runEnhancers, 120 + kids.length*130));
+    }, 640));
+  }
+
+  function auditLog(text){
+    if (!text) return;
+    const box = cvBody.querySelector('.audit-rows');
+    if (!box) return;
+    const r = el(`<div class="row" style="animation:rise .4s ease both"><div class="bd"><b>Just now</b><p>${text}</p></div></div>`);
+    box.prepend(r);
+  }
+
+  /* canvas interactivity: actions + kanban peeks */
+  cvBody.addEventListener('click', e=>{
+    const b = e.target.closest('[data-act]');
+    if (!b) return;
+    const act = b.dataset.act;
+    if (act === 'peek' || act === 'toast'){ toast(b.dataset.toast); if (b.dataset.audit) auditLog(b.dataset.audit); return; }
+    const row = b.closest('.row') || b.closest('tr');
+    if (row){
+      const chipEl = row.querySelector('.st');
+      const done = b.dataset.done || (act==='back' ? 'Sent back' : act==='resolve' ? 'Resolved' : act==='escalate' ? 'Escalated' : 'Done ✓');
+      const cls = b.dataset.cls || (act==='approve' ? 'ok' : act==='resolve' ? 'ok' : act==='escalate' ? 'info' : 'mut');
+      if (chipEl){ chipEl.textContent = done; chipEl.className = 'st ' + cls; }
+      if (act !== 'escalate'){ const acts = row.querySelector('.acts'); if (acts) acts.remove(); }
+      else b.remove();
+    }
+    toast(b.dataset.toast || 'Done · audit logged');
+    auditLog(b.dataset.audit);
+    if (b.dataset.chat) addMsg('ai', b.dataset.chat, 'Action confirmed · transition logged');
+  });
+
+  /* comment reply */
+  cvBody.addEventListener('keydown', e=>{
+    if (e.key !== 'Enter' || !e.target.classList.contains('rin')) return;
+    const v = e.target.value.trim(); if (!v) return;
+    const threadRows = e.target.closest('.card').querySelector('.thread-rows');
+    threadRows.appendChild(el(`<div class="row" style="animation:rise .4s ease both"><div class="ini">${P[cur].me}</div><div class="bd"><b>You<em>just now</em></b><p>${v.replace(/</g,'&lt;')}</p></div></div>`));
+    e.target.value = '';
+    toast('Comment added · thread subscribers notified');
+    auditLog('You commented on the thread');
+  });
+
+  function runScenario(key, via){
+    if (busy) return; busy = true;
+    const sc = SC[key];
+    const go = () => {
+      const t = addTyping();
+      setTimeout(()=>{
+        t.remove();
+        addMsg('ai', sc.reply);
+        renderCanvas(sc.comps);
+        busy = false;
+      }, 950);
+    };
+    if (via === 'type'){
+      inp.value = ''; let i = 0;
+      const tick = setInterval(()=>{
+        inp.value = sc.prompt.slice(0, ++i);
+        if (i >= sc.prompt.length){
+          clearInterval(tick);
+          setTimeout(()=>{ inp.value=''; addMsg('user', sc.prompt); go(); }, 260);
+        }
+      }, 16);
+      return;
+    }
+    addMsg('user', sc.prompt); go();
+  }
+
+  function setPersona(id){
+    cur = id; const p = P[id];
+    meAva.textContent = p.me;
+    [...personaBar.children].forEach(b => b.classList.toggle('active', b.dataset.p === id));
+    rail.innerHTML = '<div class="sec">Workspace</div>';
+    ['Overview','Approvals','Tasks','Workflows','Agents','Audit log'].forEach(n=>{
+      const badge = p.badges[n] ? `<span class="badge">${p.badges[n]}</span>` : '';
+      rail.insertAdjacentHTML('beforeend', `<button class="nvi" title="Standard view · static in this concept">${icons[n]||''}<span>${n}</span>${badge}</button>`);
+    });
+    rail.insertAdjacentHTML('beforeend','<div class="sec">Pinned</div>');
+    p.pins.forEach(([label,scen])=>{
+      const b = el(`<button class="nvi pin"><span class="pdot"></span><span>${label}</span></button>`);
+      b.addEventListener('click', ()=>{ if(!busy){ addMsg('ai', `Opened <b>${label}</b> from your pinned views. No chat needed.`, 'Same components, different door.'); renderCanvas(SC[scen].comps); } });
+      rail.appendChild(b);
+    });
+    rail.insertAdjacentHTML('beforeend', `<div class="foot"><img src="data:image/png;base64,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" alt="Newtuple"><span>Build Your Agentic Enterprise</span></div>`);
+    renderChips(p.chipRoot || 'vp_root');
+    thread.innerHTML = '';
+    addMsg('ai', p.welcome);
+    clearLive();
+    document.body.classList.remove('rail-collapsed');   // greeting/empty → rail visible again
+    cvBody.innerHTML = `<div id="empty"><div class="spark"></div><h3>This space composes itself</h3><p>Ask in chat, tap a quick action, or open a pinned view.</p></div>`;
+    cvHead.classList.remove('show');
+  }
+
+  Object.entries(P).forEach(([id,p])=>{
+    const b = el(`<button data-p="${id}">${p.label}</button>`);
+    b.addEventListener('click', ()=>{ if(!busy) setPersona(id); });
+    personaBar.appendChild(b);
+  });
+
+  function sendFree(){
+    const v = inp.value.trim();
+    if (!v || busy) return;
+    busy = true; inp.value = '';
+    addMsg('user', v);
+    const t = addTyping();
+    setTimeout(()=>{
+      t.remove();
+      const sc = SC[P[cur].def];
+      addMsg('ai', 'In the live product, the interface composes around exactly that ask. Here’s a preview with sample data.');
+      renderCanvas(sc.comps);
+      busy = false;
+    }, 950);
+  }
+  document.getElementById('send').addEventListener('click', sendFree);
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') sendFree(); });
+
+  // document intelligence: open the real document on demand
+  cvBody.addEventListener('click', e=>{ const v = e.target.closest('.di-view'); if(v){ docPreview(v.dataset.doc, false); } });
+  document.getElementById('docModalClose').addEventListener('click', closeDocModal);
+  document.getElementById('docModal').addEventListener('click', e=>{ if(e.target.id==='docModal') closeDocModal(); });
+  // human approval gate
+  document.getElementById('apprApprove').addEventListener('click', ()=> auditOutcome('active'));
+  document.getElementById('apprReject').addEventListener('click', ()=> auditOutcome('reject'));
+
+  setPersona('vp');
+  // no auto-run: the demo waits at the greeting until you click a chip
+})();
+</script>
+<script>window.DOC_PDF={"w9":"JVBERi0xLjMKJZOMi54gUmVwb3J0TGFiIEdlbmVyYXRlZCBQREYgZG9jdW1lbnQgKG9wZW5zb3VyY2UpCjEgMCBvYmoKPDwKL0YxIDIgMCBSIC9GMiAzIDAgUiAvRjMgNCAwIFIKPj4KZW5kb2JqCjIgMCBvYmoKPDwKL0Jhc2VGb250IC9IZWx2ZXRpY2EgL0VuY29kaW5nIC9XaW5BbnNpRW5jb2RpbmcgL05hbWUgL0YxIC9TdWJ0eXBlIC9UeXBlMSAvVHlwZSAvRm9udAo+PgplbmRvYmoKMyAwIG9iago8PAovQmFzZUZvbnQgL0hlbHZldGljYS1Cb2xkIC9FbmNvZGluZyAvV2luQW5zaUVuY29kaW5nIC9OYW1lIC9GMiAvU3VidHlwZSAvVHlwZTEgL1R5cGUgL0ZvbnQKPj4KZW5kb2JqCjQgMCBvYmoKPDwKL0Jhc2VGb250IC9IZWx2ZXRpY2EtT2JsaXF1ZSAvRW5jb2RpbmcgL1dpbkFuc2lFbmNvZGluZyAvTmFtZSAvRjMgL1N1YnR5cGUgL1R5cGUxIC9UeXBlIC9Gb250Cj4+CmVuZG9iago1IDAgb2JqCjw8Ci9Db250ZW50cyA5IDAgUiAvTWVkaWFCb3ggWyAwIDAgNjEyIDc5MiBdIC9QYXJlbnQgOCAwIFIgL1Jlc291cmNlcyA8PAovRm9udCAxIDAgUiAvUHJvY1NldCBbIC9QREYgL1RleHQgL0ltYWdlQiAvSW1hZ2VDIC9JbWFnZUkgXQo+PiAvUm90YXRlIDAgL1RyYW5zIDw8Cgo+PiAKICAvVHlwZSAvUGFnZQo+PgplbmRvYmoKNiAwIG9iago8PAovUGFnZU1vZGUgL1VzZU5vbmUgL1BhZ2VzIDggMCBSIC9UeXBlIC9DYXRhbG9nCj4+CmVuZG9iago3IDAgb2JqCjw8Ci9BdXRob3IgKGFub255bW91cykgL0NyZWF0aW9uRGF0ZSAoRDoyMDI2MDcwODEzNTg1OCswNScwMCcpIC9DcmVhdG9yIChhbm9ueW1vdXMpIC9LZXl3b3JkcyAoKSAvTW9kRGF0ZSAoRDoyMDI2MDcwODEzNTg1OCswNScwMCcpIC9Qcm9kdWNlciAoUmVwb3J0TGFiIFBERiBMaWJyYXJ5IC0gXChvcGVuc291cmNlXCkpIAogIC9TdWJqZWN0ICh1bnNwZWNpZmllZCkgL1RpdGxlICh1bnRpdGxlZCkgL1RyYXBwZWQgL0ZhbHNlCj4+CmVuZG9iago4IDAgb2JqCjw8Ci9Db3VudCAxIC9LaWRzIFsgNSAwIFIgXSAvVHlwZSAvUGFnZXMKPj4KZW5kb2JqCjkgMCBvYmoKPDwKL0ZpbHRlciBbIC9BU0NJSTg1RGVjb2RlIC9GbGF0ZURlY29kZSBdIC9MZW5ndGggMTEyOQo+PgpzdHJlYW0KR2F0JWI+QkFMaCY7QiQ7KCRFdD5AQkZHJmxtRSQqL1InJio6Yz5eY11GPDNnai09NUBkRSI2QXAiTENBJTxjXXInSCQ8SjNyTzI6cUQ5NnVIP2YtQGNAQ3JmSU4qWSdIcGVvdVRiQVc9QE1INWFbZDkkOFkkOjtjcis9ZExwTW91V2dRcDwwSF8wITBpVmdvSV0rVlZaIkc4PDFXdGA1b3IpTSwyMyxWOVpVQzdzXnEuTWF1KzNlYlldQCRRWipiTm05L2VMNWpxRz4wL2U4ZFsvKSMvJjJTTFVZOGxadDFnJmJhIm9rMUcmcDslaU1vaCQyWkRpO09tblVZcVtTXXMqTVo8XVwtYldyWjY7JGldNUZUJzpKaVFob1wrbnFjNCMscUo2VVZeOzpGRWwjTVZdSi50ZE5KUDovQ3NPc2MkKCIrdDcqTFRkJyFqPnRkamdPZkwwUGc7Ol1ZZ2RbKXFPdDpgR2NCOCMvLXE5ImYuUVo8Ly82XE1qMFVLUlpWR21KPC1vRiJoKUFZSSNmKFpUZmcxcyUkaEVNTzVcMF5HR2dmVilxXi0uNTc7JmhbOT5pLz9KTWwjOVYsVTg3ISFsNyFMVWtwXzBmT1JKXjU9RSVwRFxmLjtWYTA4TlAtJ2BbIWlaTjIjbVdROWJPJClXPFY3N3FiKDZeP2IsbWNiLGkmTSdEJkQkMF1cIWU1cGtlZSdxUUROZEllLS1wMT4nUll1PEErZyh1OHMtN009SU0kOzNyTjZbbFgzNyRbU1tsUkdUMi0uazMhcC9VdWs6PVBUJEVZTEJSbEZoZkkrVEMoQlslZydcU1paciotZWxKOlNiUyRTN0dwVEIrMHJwXjE/cGNQU2czOkBDX2ErUDJlLnMoS0pCT0txLFZnaG1xJGEmMnM4T2pVWFFSayJHKEtLZWE+WC1mIkslUGgxUExENCwlQzFiRi80XDpqPDomLEAiSTZwbDZyPWgqIygiVmhlTEIkMjJIPGdcSXNbL3ViaSUnTC1zaTdNZiJWNUNyPCtbKDwhR2UlSV5HT05DRFFxS2snLllSW282dWJqUnJkRG8yVU9rY0ksITBOOzFDIToLKC44bD9cYGQuWzdTayhGU1FuL1BdRUczUExLLVwhMFMnPHU4akBaPnJAOVdBUyRvXVhlWG5FcD5nVCReb1dVajsuWklCPVo4dVVLLGtuQmhsP1dcKjtuTDdhO1UpWmpbcnMpPnEzYTVHX0sxRVksYipISiYsL3JrSWxBZk0mVElmTGZhSmMqK0JbblcnTlc7YzViNWZ1QlkqLzZVLFJkcSxlaClqKjVJZFZKYlg4a3QjRj8tVTRSZ0pcb10/aCJQcG1ibnNKTSMoN01VMTpRQmBlcThVJ1VgV3NvMnNAUTZfYFNnTmpwWy1BP1Y3PTxvXT9PUz5wNCNqc2BnJzxEcTdiODloIkJAOzhIMmlDLCxKOzUkUkBWST1uLmtmTz5wV1NCUDRWQl06RSFtKS1WZWN+PmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDEwCjAwMDAwMDAwMDAgNjU1MzUgZiAKMDAwMDAwMDA2MSAwMDAwMCBuIAowMDAwMDAwMTEyIDAwMDAwIG4gCjAwMDAwMDAyMTkgMDAwMDAgbiAKMDAwMDAwMDMzMSAwMDAwMCBuIAowMDAwMDAwNDQ2IDAwMDAwIG4gCjAwMDAwMDA2MzkgMDAwMDAgbiAKMDAwMDAwMDcwNyAwMDAwMCBuIAowMDAwMDAwOTY4IDAwMDAwIG4gCjAwMDAwMDEwMjcgMDAwMDAgbiAKdHJhaWxlcgo8PAovSUQgCls8OTkyYjdmMjY5MzY5MzkzYTk3MDNlZDBiOGVjN2YxMDU+PDk5MmI3ZjI2OTM2OTM5M2E5NzAzZWQwYjhlYzdmMTA1Pl0KJSBSZXBvcnRMYWIgZ2VuZXJhdGVkIFBERiBkb2N1bWVudCAtLSBkaWdlc3QgKG9wZW5zb3VyY2UpCgovSW5mbyA3IDAgUgovUm9vdCA2IDAgUgovU2l6ZSAxMAo+PgpzdGFydHhyZWYKMjI0NwolJUVPRgo=","coi":"JVBERi0xLjMKJZOMi54gUmVwb3J0TGFiIEdlbmVyYXRlZCBQREYgZG9jdW1lbnQgKG9wZW5zb3VyY2UpCjEgMCBvYmoKPDwKL0YxIDIgMCBSIC9GMiAzIDAgUiAvRjMgNCAwIFIKPj4KZW5kb2JqCjIgMCBvYmoKPDwKL0Jhc2VGb250IC9IZWx2ZXRpY2EgL0VuY29kaW5nIC9XaW5BbnNpRW5jb2RpbmcgL05hbWUgL0YxIC9TdWJ0eXBlIC9UeXBlMSAvVHlwZSAvRm9udAo+PgplbmRvYmoKMyAwIG9iago8PAovQmFzZUZvbnQgL0hlbHZldGljYS1Cb2xkIC9FbmNvZGluZyAvV2luQW5zaUVuY29kaW5nIC9OYW1lIC9GMiAvU3VidHlwZSAvVHlwZTEgL1R5cGUgL0ZvbnQKPj4KZW5kb2JqCjQgMCBvYmoKPDwKL0Jhc2VGb250IC9IZWx2ZXRpY2EtT2JsaXF1ZSAvRW5jb2RpbmcgL1dpbkFuc2lFbmNvZGluZyAvTmFtZSAvRjMgL1N1YnR5cGUgL1R5cGUxIC9UeXBlIC9Gb250Cj4+CmVuZG9iago1IDAgb2JqCjw8Ci9Db250ZW50cyA5IDAgUiAvTWVkaWFCb3ggWyAwIDAgNjEyIDc5MiBdIC9QYXJlbnQgOCAwIFIgL1Jlc291cmNlcyA8PAovRm9udCAxIDAgUiAvUHJvY1NldCBbIC9QREYgL1RleHQgL0ltYWdlQiAvSW1hZ2VDIC9JbWFnZUkgXQo+PiAvUm90YXRlIDAgL1RyYW5zIDw8Cgo+PiAKICAvVHlwZSAvUGFnZQo+PgplbmRvYmoKNiAwIG9iago8PAovUGFnZU1vZGUgL1VzZU5vbmUgL1BhZ2VzIDggMCBSIC9UeXBlIC9DYXRhbG9nCj4+CmVuZG9iago3IDAgb2JqCjw8Ci9BdXRob3IgKGFub255bW91cykgL0NyZWF0aW9uRGF0ZSAoRDoyMDI2MDcwODEzNTg1OCswNScwMCcpIC9DcmVhdG9yIChhbm9ueW1vdXMpIC9LZXl3b3JkcyAoKSAvTW9kRGF0ZSAoRDoyMDI2MDcwODEzNTg1OCswNScwMCcpIC9Qcm9kdWNlciAoUmVwb3J0TGFiIFBERiBMaWJyYXJ5IC0gXChvcGVuc291cmNlXCkpIAogIC9TdWJqZWN0ICh1bnNwZWNpZmllZCkgL1RpdGxlICh1bnRpdGxlZCkgL1RyYXBwZWQgL0ZhbHNlCj4+CmVuZG9iago4IDAgb2JqCjw8Ci9Db3VudCAxIC9LaWRzIFsgNSAwIFIgXSAvVHlwZSAvUGFnZXMKPj4KZW5kb2JqCjkgMCBvYmoKPDwKL0ZpbHRlciBbIC9BU0NJSTg1RGVjb2RlIC9GbGF0ZURlY29kZSBdIC9MZW5ndGggMTE0Mgo+PgpzdHJlYW0KR2F0JSI/JCJeXCY6Tl9DbHBEbEslUUxhSzJZOFN0VXMwO08pRV10LVJEKClYJShiJyE+WmpoRl5bRmMxXzNfWiwoZDtkKklba0pUaDNBP04/YHMzYkYrQjtgPmh1cEpINFpxMnFNbCo2JmYvbVFrSjA0TSs8Xk1Qa2g2ISxrbksuIlxKbUxPJCFlMVxuTiVsV3MsOU1MaiZwb1NGQD1gWCssdG8wNltaUC1FZDU0UC9FWEVLKEZwPz1Wb0A3RlhCM1U2bWlfSENVQSRfM1t0M1JLYGojY29BPjZDR2tTRmxNTDlQOm4sX1BhZiEobClWVDNDMEUhVV5zN1s/PT01I2xRK0FTNFVbdSpgTCRDVXAvcVBKUy80Lmkzb1MhOFcvdERFI2M4QEpSLEhAWWgnI2xYZkBnVUpvTyFUJCpIQ0JEX0ZBLWRAT0ROXCdqODNZKU8qZidpO3VOO0c6Z1pdTFthcFQzTidRTVg4XFY2OzU2MGYzViE2aSMsJykuP1lUKj9jJ20icXBTWVdMNltqOHMsMG5CLFNHS2hpXWVjaitgJiVVY2UmZnNZS3VnUSJPaDs7UiVRIkAobztBSWRqaDQkSy5nMWZDNWIpPCxTX2tzby0mPzJZNTdFKV49Pj5xMzVBUShAPXFmPz1zUUk7aG5ebDk+XU05LllEckMhRDY4LjFrcCtBSjYsNkpNRUhgQiZNOj1CMjJeMG5oRVI3cUwzYksoTCVLKElfXSJYX0ZLSFRvOl1eKCs3UlxYR2spdFtaUVsxXE5vZE4sQls4IW9cRWAwa2NSI2IsKkAqRDRuIWVdcW9UQFFHaTMvZlRyQ3BdKmFSNUZmbz4xYHMzTihNVzAlMT9wZGo4XiRhTWZrVkx0OVVAbSlXbS8rL1g5J0phciRMUFlLQypYZj9QJF5WSFxvZ2BIIidOKXByaidaMkVVU3EqYVBqa0ZTRipwM3FZWFs3WEElPWBbJjJAWTNAPnRaQ0tbKDRoPWJNImNgNyFpamI7O2lHKmdsMnI5Vy1VLUlKWlJmOnJYWzIyaVpRLmBEWztxVE9MXDxmbnBYKlBKYSFGRFtTMjFDZWxrSSxkRz1QTi90OjlwRilnTVxEbEYydGhlXiReVShtRVo+Vjc6ZD4xJkBQbW1fSlRsbUNdI1sha0ksZWxYbUsuZDxAXTQnT0k7aVloUWpsXWxtW0AiZCU9KCpjLXNBSVAwNXJIMSIqTVUmSXMyUyFfOmctP2dBPTA6QCZDX1RYZ1ZaOF0lbWI9RD5FcEM6alsyQlRkZFE8QGlGa0krX2hXZjdxcEtyZVJYRykxPm0xVWM8TDlQU1xJN0BvWjAubGk8cGw8LTs+VWZaQmJjNjhxXUpCOXB0UTg7cHVXJl42ZCdHUjNvN0dySSskMlBJIi5EZzYpQFdDZHJ0Uy8lLUFcQWtTJFNgcmtbMzpWNkUjRUc5SXIpLEUnLyFOYTM2Yyprc1ZBYjcjYz9rN1dQJHRgbXMyVXQ2W2RTPS85am1HcW9BLSQ9fj5lbmRzdHJlYW0KZW5kb2JqCnhyZWYKMCAxMAowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDAwNjEgMDAwMDAgbiAKMDAwMDAwMDExMiAwMDAwMCBuIAowMDAwMDAwMjE5IDAwMDAwIG4gCjAwMDAwMDAzMzEgMDAwMDAgbiAKMDAwMDAwMDQ0NiAwMDAwMCBuIAowMDAwMDAwNjM5IDAwMDAwIG4gCjAwMDAwMDA3MDcgMDAwMDAgbiAKMDAwMDAwMDk2OCAwMDAwMCBuIAowMDAwMDAxMDI3IDAwMDAwIG4gCnRyYWlsZXIKPDwKL0lEIApbPDM2MzQyMDhhNWJlNDEzZWNkZjY3NDUxNmM4OGYxM2IwPjwzNjM0MjA4YTViZTQxM2VjZGY2NzQ1MTZjODhmMTNiMD5dCiUgUmVwb3J0TGFiIGdlbmVyYXRlZCBQREYgZG9jdW1lbnQgLS0gZGlnZXN0IChvcGVuc291cmNlKQoKL0luZm8gNyAwIFIKL1Jvb3QgNiAwIFIKL1NpemUgMTAKPj4Kc3RhcnR4cmVmCjIyNjAKJSVFT0YK","sqf":"JVBERi0xLjMKJZOMi54gUmVwb3J0TGFiIEdlbmVyYXRlZCBQREYgZG9jdW1lbnQgKG9wZW5zb3VyY2UpCjEgMCBvYmoKPDwKL0YxIDIgMCBSIC9GMiAzIDAgUiAvRjMgNCAwIFIKPj4KZW5kb2JqCjIgMCBvYmoKPDwKL0Jhc2VGb250IC9IZWx2ZXRpY2EgL0VuY29kaW5nIC9XaW5BbnNpRW5jb2RpbmcgL05hbWUgL0YxIC9TdWJ0eXBlIC9UeXBlMSAvVHlwZSAvRm9udAo+PgplbmRvYmoKMyAwIG9iago8PAovQmFzZUZvbnQgL0hlbHZldGljYS1Cb2xkIC9FbmNvZGluZyAvV2luQW5zaUVuY29kaW5nIC9OYW1lIC9GMiAvU3VidHlwZSAvVHlwZTEgL1R5cGUgL0ZvbnQKPj4KZW5kb2JqCjQgMCBvYmoKPDwKL0Jhc2VGb250IC9IZWx2ZXRpY2EtT2JsaXF1ZSAvRW5jb2RpbmcgL1dpbkFuc2lFbmNvZGluZyAvTmFtZSAvRjMgL1N1YnR5cGUgL1R5cGUxIC9UeXBlIC9Gb250Cj4+CmVuZG9iago1IDAgb2JqCjw8Ci9Db250ZW50cyA5IDAgUiAvTWVkaWFCb3ggWyAwIDAgNjEyIDc5MiBdIC9QYXJlbnQgOCAwIFIgL1Jlc291cmNlcyA8PAovRm9udCAxIDAgUiAvUHJvY1NldCBbIC9QREYgL1RleHQgL0ltYWdlQiAvSW1hZ2VDIC9JbWFnZUkgXQo+PiAvUm90YXRlIDAgL1RyYW5zIDw8Cgo+PiAKICAvVHlwZSAvUGFnZQo+PgplbmRvYmoKNiAwIG9iago8PAovUGFnZU1vZGUgL1VzZU5vbmUgL1BhZ2VzIDggMCBSIC9UeXBlIC9DYXRhbG9nCj4+CmVuZG9iago3IDAgb2JqCjw8Ci9BdXRob3IgKGFub255bW91cykgL0NyZWF0aW9uRGF0ZSAoRDoyMDI2MDcwODEzNTg1OCswNScwMCcpIC9DcmVhdG9yIChhbm9ueW1vdXMpIC9LZXl3b3JkcyAoKSAvTW9kRGF0ZSAoRDoyMDI2MDcwODEzNTg1OCswNScwMCcpIC9Qcm9kdWNlciAoUmVwb3J0TGFiIFBERiBMaWJyYXJ5IC0gXChvcGVuc291cmNlXCkpIAogIC9TdWJqZWN0ICh1bnNwZWNpZmllZCkgL1RpdGxlICh1bnRpdGxlZCkgL1RyYXBwZWQgL0ZhbHNlCj4+CmVuZG9iago4IDAgb2JqCjw8Ci9Db3VudCAxIC9LaWRzIFsgNSAwIFIgXSAvVHlwZSAvUGFnZXMKPj4KZW5kb2JqCjkgMCBvYmoKPDwKL0ZpbHRlciBbIC9BU0NJSTg1RGVjb2RlIC9GbGF0ZURlY29kZSBdIC9MZW5ndGggOTgyCj4+CnN0cmVhbQpHYXRVMT8nRVx0KHIjMDc0ST49dTo9Ri5SOidCQWpRPz0iNjFNPV5zY2l1QyMpYmEucEorJmpCRyQvQSRcMl0tQy9VOVA6WUFhWDppcEYuUEpAPnBhMVpANzgoK1xtQWBFNWVnP00odSlnKlwmbF5kI3JYckkoIXAzNSFNSWEwSGlKNiYqOz8rPzclSiJZJDBTOG45ISpuKignU1JdbXAzbXUlTitqcl9YPVg2XTlhIjIjUltociYqKXJVMiRKP2ErZTozSCc4Jyc0VmAuLG1qInJwRUtQIWVWSSw8T3VPUywhSz10cFRLLF1aayhwPktlT1RMLm9vVGUsQi5QL1lXSFVtMjdhYTkoO01CJyZIQStHazxuOC9JUGNnJl0ibXReZmwicC1UKT1qL0spKTkmTV9yPiEqY3VMJG45PUJKYihRTCpcLyQySEhaJyZ1MF08Yjc1LGlYVyhtdVE2OD8tJC9wTlw0ZVlGQF5dIzNeXmIiVTZQRXFiXWRiQS06RDhzU1c2SFJCZSsrLTZrPF1mTC51YS8sRyQlIjQ1Pm9yaStOKUxbU2JScUxVbGEyVUdkITdsRVpKPzN0L0hXI0NWISJRJzNMV1ZMW0J1UGBJOEw9Y3VdMVA6ZixwX0k9cyolOlFCNzxJdW5SXkhOPVpwbiY9ZVBZVGNwMko+Ui9DUXNzSFhJVktyWSwoYFVzNl9AcD1JdFlRMF5lNXFHMStBOG8uQzFrPy06ZFRTU00oXS5vRWdyJjhgTkw7WWNLa09BUlQ+Ll9qLjlfREJGOShKdVs5cGU5NWc5c3A1SkguZSUrN2s/RE0jX09mUEUycFM7IV9tW2tpPXBVbXAtQS1qbVYqQDRXTkpEQEBnJCNjWzFUaCdMZCVjTGUtOzM3LjtiUjxWPipZQz9DPThDJ0xwY1hddGhOTFRsJyhyLz1cV2ZfLUxpTzo8Vy1mNDwza1EsQD0uSTpyOSRcR1NAKnNmJyVcbVBtWk9cZzQscGpPKk49N1k/YUxzTzNURF8mcCxyI01BZiV1amtqWlslc0tVIUVESF5jcGZfc1dYPS1fa1gnR0lBWDNDIy1STFdHSDl0XSJ1NjAxU1hCZkdpJz8wXnRuOW1gdHBJIko4QDFjazBbR00qXWhXZlQoSVc2WyttI3BRYCRITUIxZmwiJyMvZSlNZzQuM2ksNFdQWlBPTEAmIldNUF83YD5yNyMxQDRjN2RCOTckPi5WKytQN2ZSR1BGc0RHIlB0ZzQ2YiJDOUBLOE8qNyo/P2xDVGNKUz9IYGFaO11XY0k0KGpgcHMycHI6L34+ZW5kc3RyZWFtCmVuZG9iagp4cmVmCjAgMTAKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDYxIDAwMDAwIG4gCjAwMDAwMDAxMTIgMDAwMDAgbiAKMDAwMDAwMDIxOSAwMDAwMCBuIAowMDAwMDAwMzMxIDAwMDAwIG4gCjAwMDAwMDA0NDYgMDAwMDAgbiAKMDAwMDAwMDYzOSAwMDAwMCBuIAowMDAwMDAwNzA3IDAwMDAwIG4gCjAwMDAwMDA5NjggMDAwMDAgbiAKMDAwMDAwMTAyNyAwMDAwMCBuIAp0cmFpbGVyCjw8Ci9JRCAKWzwwYzNhYTVhYjk0ZTJjMmI3ZTZlYjcyOTY2YWRhYmMzNz48MGMzYWE1YWI5NGUyYzJiN2U2ZWI3Mjk2NmFkYWJjMzc+XQolIFJlcG9ydExhYiBnZW5lcmF0ZWQgUERGIGRvY3VtZW50IC0tIGRpZ2VzdCAob3BlbnNvdXJjZSkKCi9JbmZvIDcgMCBSCi9Sb290IDYgMCBSCi9TaXplIDEwCj4+CnN0YXJ0eHJlZgoyMDk5CiUlRU9GCg==","bank":"JVBERi0xLjMKJZOMi54gUmVwb3J0TGFiIEdlbmVyYXRlZCBQREYgZG9jdW1lbnQgKG9wZW5zb3VyY2UpCjEgMCBvYmoKPDwKL0YxIDIgMCBSIC9GMiAzIDAgUiAvRjMgNCAwIFIKPj4KZW5kb2JqCjIgMCBvYmoKPDwKL0Jhc2VGb250IC9IZWx2ZXRpY2EgL0VuY29kaW5nIC9XaW5BbnNpRW5jb2RpbmcgL05hbWUgL0YxIC9TdWJ0eXBlIC9UeXBlMSAvVHlwZSAvRm9udAo+PgplbmRvYmoKMyAwIG9iago8PAovQmFzZUZvbnQgL0hlbHZldGljYS1Cb2xkIC9FbmNvZGluZyAvV2luQW5zaUVuY29kaW5nIC9OYW1lIC9GMiAvU3VidHlwZSAvVHlwZTEgL1R5cGUgL0ZvbnQKPj4KZW5kb2JqCjQgMCBvYmoKPDwKL0Jhc2VGb250IC9IZWx2ZXRpY2EtT2JsaXF1ZSAvRW5jb2RpbmcgL1dpbkFuc2lFbmNvZGluZyAvTmFtZSAvRjMgL1N1YnR5cGUgL1R5cGUxIC9UeXBlIC9Gb250Cj4+CmVuZG9iago1IDAgb2JqCjw8Ci9Db250ZW50cyA5IDAgUiAvTWVkaWFCb3ggWyAwIDAgNjEyIDc5MiBdIC9QYXJlbnQgOCAwIFIgL1Jlc291cmNlcyA8PAovRm9udCAxIDAgUiAvUHJvY1NldCBbIC9QREYgL1RleHQgL0ltYWdlQiAvSW1hZ2VDIC9JbWFnZUkgXQo+PiAvUm90YXRlIDAgL1RyYW5zIDw8Cgo+PiAKICAvVHlwZSAvUGFnZQo+PgplbmRvYmoKNiAwIG9iago8PAovUGFnZU1vZGUgL1VzZU5vbmUgL1BhZ2VzIDggMCBSIC9UeXBlIC9DYXRhbG9nCj4+CmVuZG9iago3IDAgb2JqCjw8Ci9BdXRob3IgKGFub255bW91cykgL0NyZWF0aW9uRGF0ZSAoRDoyMDI2MDcwODEzNTg1OCswNScwMCcpIC9DcmVhdG9yIChhbm9ueW1vdXMpIC9LZXl3b3JkcyAoKSAvTW9kRGF0ZSAoRDoyMDI2MDcwODEzNTg1OCswNScwMCcpIC9Qcm9kdWNlciAoUmVwb3J0TGFiIFBERiBMaWJyYXJ5IC0gXChvcGVuc291cmNlXCkpIAogIC9TdWJqZWN0ICh1bnNwZWNpZmllZCkgL1RpdGxlICh1bnRpdGxlZCkgL1RyYXBwZWQgL0ZhbHNlCj4+CmVuZG9iago4IDAgb2JqCjw8Ci9Db3VudCAxIC9LaWRzIFsgNSAwIFIgXSAvVHlwZSAvUGFnZXMKPj4KZW5kb2JqCjkgMCBvYmoKPDwKL0ZpbHRlciBbIC9BU0NJSTg1RGVjb2RlIC9GbGF0ZURlY29kZSBdIC9MZW5ndGggOTI3Cj4+CnN0cmVhbQpHYXQ9KT5BcXRFKGsoa1YzMCtKal8vW28xal9hPGUhU1dNaiNVL2B0LSNSM2Bsc2AmR3FYPTZDMWZEQHRgX2BncW07cFFzbk9YIVU4KGNcKSQ5MWlPREBuKVI4NjYpVytAXls2R3JrXlhCTGIjcGVyNVJgbVgkWFVUWUtpPiY8LDolQTdQOFg7dGZDQExhQGtTJCdAKiRpSyFtbzhrJmk+a3JsMDxBcEhKMUlDdSJVaXROPSRXdUtpIT9bYigmcT8tITpMQGIhWiNgMTpxI1koU0Q8UlxONixBZV1RYiRaTXJEWy1zWipBaz5AYzxLOD8lcXEjTydPciwsYls0cGEzXDVxaSlrNzw3Riw5Lz8vRDAiTm9AJjtGciVKdVZeaDBJRFVzNSxQPjpjVyYnTW9XJEw/MktxSSJBVS8zUS8mKV4oYFVNaW9VX0w9clpuV1lual9YaVdcMGFpQFhNcj4iZT9xODBSVGNXVjY7RDspZUFpclo1XVRBbnBgJytLXGhIOVIoLCpCcTVRc00tVCVtWVJmMC0vPCVbay9oXmtYNiE0R10pRVxlNEsoPmtZKDdFUjxbIUh0PWguVnMubE9KdThdNidwKEVbW2RZZFBjVitBTGUhbSNfLSksT1hvaGBFWSxhYVNeUHFIQTsvN11DNT1NL2ovVjxYUWxkJVhsWXBWXi9TJ25FZFxlcVFgIih0MFViLkFJOyRfciguNWY+KERQU0o/Mzg3UDg7TUUhSz1hVFxSUVstTTI8SU43JTtzKU5CVkZVRydiITRKUEFRQSlyLlU/LU1zLk8xXyZsNTZgWXBnZDhZRVRWcEZ1IVlPP3FwJFgnKVxBZCpcJDBHS15qPFg9c187PktfWHEoXjA4RGFqODwnR0lYZ3MjSDFDam9CXjxaIiYlWD9oRTNlLk0/PV5FQVNtMFhFPDBIO29WMHUxLkZELi5Ma1VoODZlLjYnbU5YVSVeQ3RtNEtmbjkvUyZLRm0hUTFFajg3IjotR2thU1xeQVwkV0AjMlJSXC1gRmcqZiJSRE9yZVYyL1JDTmw0YVYmZjwvKT86LkFaTnJnQzRlJTFgVk9sOSw+PVBqOlA1SkNLdU45JGM9V10lY3VMWzplcHBaRGdkWW5VVS01JDlYS0ojIVhlaD1hR2FXJlEvPUZfVjFsb0ItUFMrcE5uc1dJSmJESEZKZ1NHOzBWWFhzb2R1KyVpXjhWNmpDYGU7ZWAnc05Ufj5lbmRzdHJlYW0KZW5kb2JqCnhyZWYKMCAxMAowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDAwNjEgMDAwMDAgbiAKMDAwMDAwMDExMiAwMDAwMCBuIAowMDAwMDAwMjE5IDAwMDAwIG4gCjAwMDAwMDAzMzEgMDAwMDAgbiAKMDAwMDAwMDQ0NiAwMDAwMCBuIAowMDAwMDAwNjM5IDAwMDAwIG4gCjAwMDAwMDA3MDcgMDAwMDAgbiAKMDAwMDAwMDk2OCAwMDAwMCBuIAowMDAwMDAxMDI3IDAwMDAwIG4gCnRyYWlsZXIKPDwKL0lEIApbPDE1ZDMzNWYxMzQwMjVlZWJmYTUxODllMTk4MTllMzk1PjwxNWQzMzVmMTM0MDI1ZWViZmE1MTg5ZTE5ODE5ZTM5NT5dCiUgUmVwb3J0TGFiIGdlbmVyYXRlZCBQREYgZG9jdW1lbnQgLS0gZGlnZXN0IChvcGVuc291cmNlKQoKL0luZm8gNyAwIFIKL1Jvb3QgNiAwIFIKL1NpemUgMTAKPj4Kc3RhcnR4cmVmCjIwNDQKJSVFT0YK"};</script>
+</body>
+</html>
