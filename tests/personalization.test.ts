@@ -20,6 +20,9 @@ describe('personalization engine', () => {
 
     expect(manifest.narrative.id).toBe('retail-enterprise-transformation')
     expect(manifest.audienceSummary).toBe('enterprise retail cio in the evaluation stage')
+    expect(manifest.version).toBe(2)
+    expect(manifest.pathOrder).toEqual(['agents', 'apps'])
+    expect(manifest.sectionCopy.secondaryActionHref).toBe('/retail')
     expect(manifest.demoIds).toEqual(['dialogtuple', 'flowtuple'])
     expect(manifest.caseStudySlugs.slice(0, 2)).toEqual([
       'enterprise-saas-ai-agents',
@@ -65,6 +68,60 @@ describe('personalization engine', () => {
     }
 
     expect(buildExperienceManifest(context)).toEqual(buildExperienceManifest(context))
+  })
+
+  it('builds a healthcare operations experience with human review controls', () => {
+    const manifest = buildExperienceManifest({
+      industry: 'healthcare',
+      role: 'operations_leader',
+      goals: ['workflow_automation', 'document_processing'],
+      stage: 'evaluation',
+      priorities: ['security', 'compliance', 'accuracy'],
+      companySize: 'enterprise',
+      desiredAction: 'view_cases',
+    })
+
+    expect(manifest.narrative.id).toBe('healthcare-operations-intelligence')
+    expect(manifest.caseStudySlugs[0]).toBe('healthcare-laundry-rfid-automation')
+    expect(manifest.architectureExamples.map(item => item.id)).toContain('healthcare-human-review')
+    expect(manifest.sectionCopy.faqTitle).toContain('Healthcare')
+    expect(manifest.testimonialIndustryOrder[0]).toBe('Healthcare')
+  })
+
+  it('builds an aviation experience around governed operational data', () => {
+    const manifest = buildExperienceManifest({
+      industry: 'aviation',
+      role: 'cio',
+      goals: ['data_access', 'workflow_automation'],
+      stage: 'scale',
+      priorities: ['integration', 'security', 'accuracy'],
+      companySize: 'enterprise',
+      desiredAction: 'review_architecture',
+    })
+
+    expect(manifest.narrative.id).toBe('aviation-connected-intelligence')
+    expect(manifest.caseStudySlugs[0]).toBe('aviation-oem-agentic-data-access')
+    expect(manifest.architectureExamples.map(item => item.id)).toContain('aviation-agentic-data-layer')
+    expect(manifest.sectionOrder.indexOf('architecture')).toBeLessThan(manifest.sectionOrder.indexOf('case_studies'))
+    expect(manifest.sectionCopy.secondaryActionHref).toBe('/aviation')
+  })
+
+  it('builds a SaaS product experience with application development first', () => {
+    const manifest = buildExperienceManifest({
+      industry: 'technology_saas',
+      role: 'cto',
+      goals: ['application_development', 'ai_agents', 'evaluation'],
+      stage: 'pilot',
+      priorities: ['speed', 'cost', 'scale'],
+      companySize: 'mid_market',
+      desiredAction: 'view_demo',
+    })
+
+    expect(manifest.narrative.id).toBe('saas-ai-product-platform')
+    expect(manifest.pathOrder).toEqual(['apps', 'agents'])
+    expect(manifest.demoIds).toEqual(['flowtuple', 'gaugetuple'])
+    expect(manifest.architectureExamples.map(item => item.id)).toContain('multi-tenant-ai-saas')
+    expect(manifest.sectionCopy.demosTitle).toContain('Product foundations')
   })
 
   it('rejects unsupported values and empty goals', () => {

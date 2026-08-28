@@ -1,5 +1,5 @@
-export const INDUSTRIES = ['retail', 'financial_services', 'general'] as const
-export const BUYER_ROLES = ['cio', 'product_leader', 'ai_leader', 'engineering_leader'] as const
+export const INDUSTRIES = ['retail', 'financial_services', 'healthcare', 'aviation', 'technology_saas', 'general'] as const
+export const BUYER_ROLES = ['cio', 'cto', 'product_leader', 'ai_leader', 'engineering_leader', 'operations_leader'] as const
 export const BUYER_STAGES = ['discovery', 'evaluation', 'pilot', 'scale'] as const
 export const GOALS = [
   'customer_support',
@@ -72,8 +72,28 @@ export interface PersonalizedCta {
   href: string
 }
 
+export interface PersonalizedSectionCopy {
+  pathsBefore: string
+  pathsHighlight: string
+  pathsAfter: string
+  caseStudiesTitle: string
+  caseStudiesAccent: string
+  caseStudiesDescription: string
+  demosTitle: string
+  demosDescription: string
+  demosActionLabel: string
+  architectureEyebrow: string
+  architectureTitle: string
+  architectureDescription: string
+  testimonialsTitle: string
+  testimonialsDescription: string
+  faqTitle: string
+  secondaryActionLabel: string
+  secondaryActionHref: string
+}
+
 export interface ExperienceManifest {
-  version: 1
+  version: 2
   experienceId: string
   audienceSummary: string
   context: BuyerContext
@@ -81,9 +101,11 @@ export interface ExperienceManifest {
   caseStudySlugs: string[]
   demoIds: string[]
   architectureExamples: ArchitectureExample[]
+  pathOrder: Array<'agents' | 'apps'>
+  sectionCopy: PersonalizedSectionCopy
+  testimonialIndustryOrder: string[]
   sectionOrder: HomepageSectionId[]
   cta: PersonalizedCta
   confidence: number
   reasons: string[]
 }
-

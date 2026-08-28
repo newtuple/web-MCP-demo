@@ -1,12 +1,16 @@
 import {
   ARCHITECTURES,
+  AVIATION_OPERATIONS_SECTION_ORDER,
   CASE_STUDY_CATALOG,
   CTAS,
   DEFAULT_SECTION_ORDER,
   DEMOS,
   FINANCIAL_PRODUCT_SECTION_ORDER,
+  HEALTHCARE_OPERATIONS_SECTION_ORDER,
   NARRATIVES,
   RETAIL_CIO_SECTION_ORDER,
+  SAAS_PRODUCT_SECTION_ORDER,
+  SECTION_COPY_BY_INDUSTRY,
   type TaggedContent,
 } from './catalog'
 import {
@@ -79,16 +83,45 @@ function selectTop<T extends TaggedContent>(items: T[], context: BuyerContext, l
 function getSectionOrder(context: BuyerContext): HomepageSectionId[] {
   if (context.industry === 'retail' && context.role === 'cio') return RETAIL_CIO_SECTION_ORDER
   if (context.industry === 'financial_services' && context.role === 'product_leader') return FINANCIAL_PRODUCT_SECTION_ORDER
+  if (context.industry === 'healthcare') return HEALTHCARE_OPERATIONS_SECTION_ORDER
+  if (context.industry === 'aviation') return AVIATION_OPERATIONS_SECTION_ORDER
+  if (context.industry === 'technology_saas') return SAAS_PRODUCT_SECTION_ORDER
   return DEFAULT_SECTION_ORDER
+}
+
+function getPathOrder(context: BuyerContext): Array<'agents' | 'apps'> {
+  const productFirst = ['cto', 'product_leader', 'engineering_leader'].includes(context.role)
+    || context.goals.includes('application_development')
+  return productFirst ? ['apps', 'agents'] : ['agents', 'apps']
+}
+
+function getTestimonialIndustryOrder(context: BuyerContext): string[] {
+  const orderByIndustry = {
+    retail: ['Retail', 'Sales', 'Connectivity', 'AI'],
+    financial_services: ['Financial Services', 'AI', 'Technology'],
+    healthcare: ['Healthcare', 'HR Tech', 'AI'],
+    aviation: ['Aviation', 'AI', 'Technology'],
+    technology_saas: ['Technology', 'AI', 'HR Tech'],
+    general: ['AI', 'Technology'],
+  } satisfies Record<BuyerContext['industry'], string[]>
+  return orderByIndustry[context.industry]
 }
 
 function makeExperienceId(context: BuyerContext): string {
   const primaryGoal = context.goals[0]
-  return `${context.industry}-${context.role}-${context.stage}-${primaryGoal}-v1`
+  return `${context.industry}-${context.role}-${context.stage}-${primaryGoal}-v2`
 }
 
 function makeAudienceSummary(context: BuyerContext): string {
-  const industry = context.industry === 'financial_services' ? 'financial services' : context.industry
+  const industryLabels: Record<BuyerContext['industry'], string> = {
+    retail: 'retail',
+    financial_services: 'financial services',
+    healthcare: 'healthcare',
+    aviation: 'aviation',
+    technology_saas: 'technology and SaaS',
+    general: 'cross-industry',
+  }
+  const industry = industryLabels[context.industry]
   const role = context.role.replaceAll('_', ' ')
   return `${context.companySize ? `${context.companySize.replaceAll('_', ' ')} ` : ''}${industry} ${role} in the ${context.stage} stage`
 }
@@ -118,7 +151,7 @@ export function buildExperienceManifest(value: unknown): ExperienceManifest {
   ]
 
   return {
-    version: 1,
+    version: 2,
     experienceId: makeExperienceId(context),
     audienceSummary: makeAudienceSummary(context),
     context,
@@ -131,6 +164,9 @@ export function buildExperienceManifest(value: unknown): ExperienceManifest {
     caseStudySlugs: caseStudies.map(item => item.slug),
     demoIds: demos.map(item => item.id),
     architectureExamples: architectures.map(({ id, title, description, layers }) => ({ id, title, description, layers })),
+    pathOrder: getPathOrder(context),
+    sectionCopy: SECTION_COPY_BY_INDUSTRY[context.industry],
+    testimonialIndustryOrder: getTestimonialIndustryOrder(context),
     sectionOrder: getSectionOrder(context),
     cta: {
       id: cta.id,
@@ -147,7 +183,7 @@ export function buildExperienceManifest(value: unknown): ExperienceManifest {
 export function isExperienceManifest(value: unknown): value is ExperienceManifest {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return false
   const manifest = value as Partial<ExperienceManifest>
-  return manifest.version === 1
+  return manifest.version === 2
     && typeof manifest.experienceId === 'string'
     && Array.isArray(manifest.sectionOrder)
     && manifest.sectionOrder[0] === 'hero'
@@ -155,6 +191,9 @@ export function isExperienceManifest(value: unknown): value is ExperienceManifes
     && Array.isArray(manifest.caseStudySlugs)
     && Array.isArray(manifest.demoIds)
     && Array.isArray(manifest.architectureExamples)
+    && Array.isArray(manifest.pathOrder)
+    && Boolean(manifest.sectionCopy)
+    && Array.isArray(manifest.testimonialIndustryOrder)
     && Boolean(manifest.narrative)
     && Boolean(manifest.cta)
 }

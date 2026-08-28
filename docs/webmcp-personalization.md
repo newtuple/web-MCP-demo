@@ -38,11 +38,12 @@ The Newtuple homepage supports a controlled, session-based experience for buyer 
 
 The buyer agent supplies context only. It cannot supply website copy, HTML, scripts, links, case-study identifiers, or section positions. The personalization engine selects approved content from `lib/personalization/catalog.ts`.
 
-The experience manifest always keeps the hero first and the final call to action last. The homepage remains fully functional when WebMCP is not available.
+Supported domains include retail, financial services, healthcare, aviation, technology/SaaS, and a general cross-industry fallback. The manifest can change the approved homepage narrative, section language, case studies, demos, architecture examples, CTA, secondary action, service-path order, testimonial priority, and section order.
+
+The version 2 experience manifest always keeps the hero first and the final call to action last. The homepage remains fully functional when WebMCP is not available.
 
 ## Session Data
 
 The browser stores previews and the active experience in `sessionStorage`. It does not send buyer context to a server. The active experience can be reset from the homepage or through WebMCP.
 
 The feedback tool emits a `newtuple:experience-feedback` browser event. An analytics integration can listen for this event without changing the personalization engine.
-

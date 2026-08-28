@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import {
   ArrowRight,
@@ -213,6 +213,11 @@ function SectionWithSidebar({
 
 export default function HomeContent({ data, caseStudies }: { data: HomeData; caseStudies: CaseStudySummary[] }) {
   const { hero, paths, clientLogos, partnerEcosystem, manifesto, accelerators, testimonials, faq, cta } = data
+  const caseStudyGrid = data.caseStudyGrid ?? {
+    title: "Work we've",
+    titleAccent: 'done.',
+    description: 'Production AI systems across aviation, finance, healthcare, and enterprise SaaS.',
+  }
   const { manifest, resetManifest } = useWebMCPPersonalization()
   const effectiveHero = manifest
     ? {
@@ -240,16 +245,46 @@ export default function HomeContent({ data, caseStudies }: { data: HomeData; cas
         .map(id => accelerators.items.find(item => item.name.toLowerCase() === id))
         .filter((item): item is HomeData['accelerators']['items'][number] => Boolean(item))
     : accelerators.items
+  const effectivePaths = manifest
+    ? manifest.pathOrder
+        .map(kind => paths.find(item => item.title.toLowerCase().includes(kind === 'agents' ? 'agent' : 'app')))
+        .filter((item): item is HomeData['paths'][number] => Boolean(item))
+    : paths
+  const sectionCopy = manifest?.sectionCopy ?? {
+    pathsBefore: 'Two ways we accelerate',
+    pathsHighlight: 'AI',
+    pathsAfter: 'for you',
+    caseStudiesTitle: caseStudyGrid.title,
+    caseStudiesAccent: caseStudyGrid.titleAccent,
+    caseStudiesDescription: caseStudyGrid.description,
+    demosTitle: accelerators.sectionTitle,
+    demosDescription: accelerators.sectionDescription,
+    demosActionLabel: 'Explore All Accelerators',
+    architectureEyebrow: 'Architecture examples',
+    architectureTitle: 'A practical path from use case to production',
+    architectureDescription: 'Reference patterns for secure, measurable, and maintainable AI systems.',
+    testimonialsTitle: 'Real stories, real results',
+    testimonialsDescription: 'Voices from teams that shipped production AI with us.',
+    faqTitle: 'Questions? We have answers',
+    secondaryActionLabel: 'Explore Accelerators',
+    secondaryActionHref: '/genai-accelerators',
+  }
+  const effectiveTestimonials = useMemo(
+    () => manifest
+      ? [...testimonials.items].sort((a, b) => {
+          const aIndex = manifest.testimonialIndustryOrder.indexOf(a.industry)
+          const bIndex = manifest.testimonialIndustryOrder.indexOf(b.industry)
+          const normalizedA = aIndex === -1 ? Number.MAX_SAFE_INTEGER : aIndex
+          const normalizedB = bIndex === -1 ? Number.MAX_SAFE_INTEGER : bIndex
+          return normalizedA - normalizedB
+        })
+      : testimonials.items,
+    [manifest, testimonials.items],
+  )
   const architectureExamples = manifest?.architectureExamples
     ?? ARCHITECTURES.slice(0, 3).map(({ id, title, description, layers }) => ({ id, title, description, layers }))
   const sectionOrder = manifest?.sectionOrder ?? DEFAULT_SECTION_ORDER
   const sectionStyle = (id: HomepageSectionId) => ({ order: Math.max(sectionOrder.indexOf(id), 0) })
-  const caseStudyGrid = data.caseStudyGrid ?? {
-    title: "Work we've",
-    titleAccent: 'done.',
-    description: 'Production AI systems across aviation, finance, healthcare, and enterprise SaaS.',
-  }
-
   const manifestoLines = [
     manifesto.title,
     manifesto.subtitle,
@@ -262,7 +297,7 @@ export default function HomeContent({ data, caseStudies }: { data: HomeData; cas
     return 'text-lg text-gray-400 font-light leading-relaxed mb-6'
   }
 
-  const [testimonialsColumnA, testimonialsColumnB] = testimonials.items.reduce<[TestimonialItem[], TestimonialItem[]]>(
+  const [testimonialsColumnA, testimonialsColumnB] = effectiveTestimonials.reduce<[TestimonialItem[], TestimonialItem[]]>(
     (columns, item, index) => {
       columns[index % 2].push(item)
       return columns
@@ -270,7 +305,11 @@ export default function HomeContent({ data, caseStudies }: { data: HomeData; cas
     [[], []]
   )
   const desktopRightColumn = testimonialsColumnB.length > 0 ? testimonialsColumnB : testimonialsColumnA
-  const [activeTestimonial, setActiveTestimonial] = useState<TestimonialItem | null>(testimonials.items[0] ?? null)
+  const [activeTestimonial, setActiveTestimonial] = useState<TestimonialItem | null>(effectiveTestimonials[0] ?? null)
+
+  useEffect(() => {
+    setActiveTestimonial(effectiveTestimonials[0] ?? null)
+  }, [effectiveTestimonials])
 
   return (
     <div className="flex flex-col">
@@ -328,8 +367,8 @@ export default function HomeContent({ data, caseStudies }: { data: HomeData; cas
                   >
                     {effectiveCta.buttonText}
                   </Button>
-                  <Button href="/genai-accelerators" variant="outline" size="lg">
-                    Explore Accelerators
+                  <Button href={sectionCopy.secondaryActionHref} variant="outline" size="lg">
+                    {sectionCopy.secondaryActionLabel}
                   </Button>
                 </div>
               </FadeIn>
@@ -380,20 +419,20 @@ export default function HomeContent({ data, caseStudies }: { data: HomeData; cas
         <SectionWithSidebar tools={pathsTools} title="Build Planning" sidebarMode="centered">
           <Container>
             <h2 className="text-3xl md:text-4xl text-gray-900 mb-16 text-center lg:text-left font-light">
-              Two ways we accelerate{' '}
+              {sectionCopy.pathsBefore}{' '}
               <span className="relative inline-flex items-center">
                 <span className="relative z-10 rounded-md bg-gray-900 px-2 py-0.5 font-semibold text-white transition-colors duration-300">
-                  AI
+                  {sectionCopy.pathsHighlight}
                 </span>
                 <span
                   aria-hidden="true"
                   className="pointer-events-none absolute -bottom-1 left-1/2 h-[3px] w-8 -translate-x-1/2 rounded-full bg-gray-900/40 animate-pulse-subtle"
                 />
               </span>{' '}
-              for you
+              {sectionCopy.pathsAfter}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-7 md:gap-8">
-              {paths.map((item, i) => {
+              {effectivePaths.map((item, i) => {
                 return (
                   <FadeIn key={item.title} delay={i * 0.1}>
                     <div className="group relative h-full rounded-3xl transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-[0_24px_54px_-24px_rgba(0,71,171,0.45),0_12px_24px_-14px_rgba(15,23,42,0.25)]">
@@ -462,13 +501,13 @@ export default function HomeContent({ data, caseStudies }: { data: HomeData; cas
           <Container>
             <div className="max-w-3xl mx-auto lg:mx-0 text-center lg:text-left mb-16">
               <h2 className="text-3xl md:text-4xl lg:text-5xl text-gray-900 mb-4">
-                <span className="font-bold">{caseStudyGrid.title} </span>
+                <span className="font-bold">{sectionCopy.caseStudiesTitle} </span>
                 <span className="font-bold bg-clip-text text-transparent bg-gradient-to-r from-cobalt-900 via-cobalt-700 to-cobalt-500">
-                  {caseStudyGrid.titleAccent}
+                  {sectionCopy.caseStudiesAccent}
                 </span>
               </h2>
               <p className="text-lg text-gray-600 font-light">
-                {caseStudyGrid.description}
+                {sectionCopy.caseStudiesDescription}
               </p>
             </div>
           </Container>
@@ -511,14 +550,14 @@ export default function HomeContent({ data, caseStudies }: { data: HomeData; cas
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(90%_60%_at_50%_0%,rgba(0,71,171,0.06),transparent_70%)]" />
         <Container className="relative z-10">
           <TypingBlock
-            lines={['Real stories, real results']}
+            lines={[sectionCopy.testimonialsTitle]}
             lineDelay={200}
             lineClassName={() => 'text-3xl md:text-4xl text-gray-900 mb-4 font-bold text-center'}
             warpSpeed
           />
           <FadeIn delay={0.1}>
             <p className="text-center text-sm md:text-base text-gray-600 font-light mb-10 md:mb-12">
-              Voices from teams that shipped production AI with us.
+              {sectionCopy.testimonialsDescription}
             </p>
           </FadeIn>
         </Container>
@@ -546,7 +585,7 @@ export default function HomeContent({ data, caseStudies }: { data: HomeData; cas
         <div className="relative z-10 md:hidden">
           <Container>
             <TestimonialColumn
-              items={testimonials.items}
+              items={effectiveTestimonials}
               direction="up"
               heightClass="h-[520px]"
               activeKey={activeTestimonial ? getTestimonialKey(activeTestimonial) : null}
@@ -587,7 +626,7 @@ export default function HomeContent({ data, caseStudies }: { data: HomeData; cas
         <SectionWithSidebar tools={acceleratorTools} title="Platform" sidebarMode="centered">
           <Container className="relative z-10">
             <TypingBlock
-              lines={[accelerators.sectionTitle, accelerators.sectionDescription]}
+              lines={[sectionCopy.demosTitle, sectionCopy.demosDescription]}
               lineDelay={200}
               lineClassName={(i) =>
                 i === 0
@@ -665,7 +704,7 @@ export default function HomeContent({ data, caseStudies }: { data: HomeData; cas
               <div className="text-center mt-12">
                 <Button href="/genai-accelerators" variant="outline" className="border-2 border-cobalt-900 text-cobalt-900 hover:text-white">
                   <span className="inline-flex items-center gap-2">
-                    Explore All Accelerators
+                    {sectionCopy.demosActionLabel}
                     <ArrowRight className="w-4 h-4" />
                   </span>
                 </Button>
@@ -686,15 +725,13 @@ export default function HomeContent({ data, caseStudies }: { data: HomeData; cas
           <div className="mb-14 max-w-3xl">
             <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-cobalt-400/30 bg-cobalt-400/10 px-3 py-1 text-sm font-medium text-cyan-300">
               <Layers3 className="h-4 w-4" />
-              Architecture examples
+              {sectionCopy.architectureEyebrow}
             </span>
             <h2 className="text-3xl font-bold text-white md:text-4xl">
-              A practical path from use case to production
+              {sectionCopy.architectureTitle}
             </h2>
             <p className="mt-4 text-lg font-light leading-relaxed text-gray-400">
-              {manifest
-                ? `Selected for ${manifest.audienceSummary}.`
-                : 'Reference patterns for secure, measurable, and maintainable AI systems.'}
+              {manifest ? `${sectionCopy.architectureDescription} Selected for ${manifest.audienceSummary}.` : sectionCopy.architectureDescription}
             </p>
           </div>
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
@@ -729,7 +766,7 @@ export default function HomeContent({ data, caseStudies }: { data: HomeData; cas
         <SectionWithSidebar tools={faqTools} title="Knowledge" dark>
           <Container>
             <TypingBlock
-              lines={['Questions? We have answers']}
+              lines={[sectionCopy.faqTitle]}
               lineDelay={200}
               lineClassName={() => 'text-3xl md:text-4xl text-white mb-16 font-bold text-center lg:text-left'}
               warpSpeed
