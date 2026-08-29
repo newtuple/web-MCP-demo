@@ -15,7 +15,7 @@ function CaseStudyCard({ study }: { study: CaseStudySummary }) {
   return (
     <div className="w-[360px] flex-shrink-0">
       <div className="h-full flex flex-col rounded-2xl bg-white p-6 md:p-8 shadow-premium">
-        <span className="inline-flex items-center rounded-full bg-cobalt-50 px-3 py-1 text-xs font-medium text-cobalt-900 uppercase tracking-wider mb-4 w-fit">
+        <span className="inline-flex items-center rounded-full bg-[var(--accent-50)] px-3 py-1 text-xs font-medium text-[var(--accent-900)] uppercase tracking-wider mb-4 w-fit">
           {study.competency}
         </span>
 

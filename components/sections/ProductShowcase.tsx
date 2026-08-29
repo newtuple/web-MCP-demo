@@ -36,7 +36,7 @@ function FeatureBullets({ features }: { features: ShowcaseFeature[] }) {
     <div className="space-y-4 mt-6">
       {features.map((f) => (
         <div key={f.title} className="flex items-start gap-3">
-          <f.icon className="w-5 h-5 text-cobalt-900 flex-shrink-0 mt-0.5" strokeWidth={1.5} />
+          <f.icon className="w-5 h-5 text-[var(--accent-900)] flex-shrink-0 mt-0.5" strokeWidth={1.5} />
           <div>
             <span className="font-semibold text-gray-900 text-sm">{f.title}</span>
             <span className="text-gray-600 font-light text-sm">  {f.description}</span>

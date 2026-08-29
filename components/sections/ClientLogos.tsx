@@ -47,10 +47,10 @@ export default function ClientLogos({
                     alt={client.name}
                     className="h-11 w-auto max-w-[160px] object-contain transition-transform duration-300 group-hover:scale-[1.04] sm:h-12 sm:max-w-[180px] md:h-14 md:max-w-[210px] lg:h-16"
                   />
-                  <span className="pointer-events-none absolute -bottom-1 left-1/2 h-[2px] w-0 -translate-x-1/2 rounded-full bg-cobalt-400/60 transition-all duration-300 group-hover:w-8" />
+                  <span className="pointer-events-none absolute -bottom-1 left-1/2 h-[2px] w-0 -translate-x-1/2 rounded-full bg-[var(--accent-400)]/60 transition-all duration-300 group-hover:w-8" />
                 </div>
               ) : (
-                <div className="group inline-flex items-center gap-2 px-3 py-1.5 text-gray-500 transition-colors duration-200 hover:text-cobalt-900">
+                <div className="group inline-flex items-center gap-2 px-3 py-1.5 text-gray-500 transition-colors duration-200 hover:text-[var(--accent-900)]">
                   <Building2 className="w-4 h-4 flex-shrink-0" strokeWidth={1.5} />
                   <span className="text-sm font-medium whitespace-nowrap">{client.name}</span>
                 </div>

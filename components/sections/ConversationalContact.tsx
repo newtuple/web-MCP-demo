@@ -441,7 +441,7 @@ export default function ConversationalContact({
         >
           <div className="p-6 pt-10 overflow-y-auto flex-1">
             <div className="flex items-center gap-2 mb-6">
-              <Sparkles className="w-3.5 h-3.5 text-cobalt-900" />
+              <Sparkles className="w-3.5 h-3.5 text-[var(--accent-900)]" />
               <span className="text-xs font-medium uppercase tracking-wider text-gray-400">Conversation</span>
             </div>
             <div ref={scrollRef} className="space-y-4">
@@ -460,7 +460,7 @@ export default function ConversationalContact({
                     className={`text-sm leading-relaxed ${
                       msg.role === 'assistant'
                         ? 'text-gray-500 font-light'
-                        : 'text-gray-900 font-medium cursor-pointer hover:text-cobalt-900 transition-colors'
+                        : 'text-gray-900 font-medium cursor-pointer hover:text-[var(--accent-900)] transition-colors'
                     }`}
                   >
                     {msg.content}
@@ -480,7 +480,7 @@ export default function ConversationalContact({
         <div className="w-full max-w-4xl flex flex-col items-center text-center">
           <div className="mb-6 md:mb-7">
             <h1 className="text-3xl md:text-5xl font-extralight text-gray-900 mb-2.5">
-              <HighlightedText text={title} highlight={titleHighlight} highlightClassName="text-cobalt-900" />
+              <HighlightedText text={title} highlight={titleHighlight} highlightClassName="text-[var(--accent-900)]" />
             </h1>
             <p className="text-base md:text-lg text-gray-600 font-light max-w-4xl mx-auto">
               {description}
@@ -547,7 +547,7 @@ export default function ConversationalContact({
                       <div className="flex items-center justify-center">
                         <button
                           type="submit"
-                          className="rounded-full bg-cobalt-900 text-white px-5 py-2 text-sm font-semibold"
+                          className="rounded-full bg-[var(--accent-900)] text-white px-5 py-2 text-sm font-semibold"
                           disabled={isStreaming}
                         >
                           Next
@@ -590,7 +590,7 @@ export default function ConversationalContact({
                         type="checkbox"
                         checked={consentChecked}
                         onChange={(e) => setConsentChecked(e.target.checked)}
-                        className="h-4 w-4 rounded border-gray-300 text-cobalt-900 focus:ring-cobalt-900"
+                        className="h-4 w-4 rounded border-gray-300 text-[var(--accent-900)] focus:ring-[var(--accent-900)]"
                       />
                       <span className="text-sm text-gray-600">I agree to be contacted by Newtuple</span>
                     </label>
@@ -599,7 +599,7 @@ export default function ConversationalContact({
                       <div className="flex items-center justify-center">
                         <button
                           type="submit"
-                          className="rounded-full bg-cobalt-900 text-white px-5 py-2 text-sm font-semibold"
+                          className="rounded-full bg-[var(--accent-900)] text-white px-5 py-2 text-sm font-semibold"
                           disabled={isStreaming}
                         >
                           Next
@@ -616,14 +616,14 @@ export default function ConversationalContact({
                       <button
                         type="button"
                         onClick={() => handleChoice('job')}
-                        className="rounded-full border border-cobalt-900 text-cobalt-900 px-5 py-2 text-sm font-semibold"
+                        className="rounded-full border border-[var(--accent-900)] text-[var(--accent-900)] px-5 py-2 text-sm font-semibold"
                       >
                         Applying for a role
                       </button>
                       <button
                         type="button"
                         onClick={() => handleChoice('services')}
-                        className="rounded-full bg-cobalt-900 text-white px-5 py-2 text-sm font-semibold"
+                        className="rounded-full bg-[var(--accent-900)] text-white px-5 py-2 text-sm font-semibold"
                       >
                         Interested in talking to AI experts
                       </button>
@@ -706,7 +706,7 @@ export default function ConversationalContact({
                     <div className="flex items-center justify-center">
                       <button
                         type="submit"
-                        className="rounded-full bg-cobalt-900 text-white px-5 py-2 text-sm font-semibold"
+                        className="rounded-full bg-[var(--accent-900)] text-white px-5 py-2 text-sm font-semibold"
                         disabled={isStreaming || submitState === 'submitting'}
                       >
                         {submitState === 'submitting' ? 'Submitting...' : 'Submit'}

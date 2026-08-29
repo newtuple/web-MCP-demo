@@ -14,7 +14,7 @@ export default function QuoteCard({ quote, icon: Icon, attribution, className = 
       <blockquote className="text-lg font-light leading-relaxed italic mb-6">
         &ldquo;{quote}&rdquo;
       </blockquote>
-      {attribution ? <div className="text-sm text-cobalt-200">{attribution}</div> : null}
+      {attribution ? <div className="text-sm text-[var(--accent-200)]">{attribution}</div> : null}
     </Card>
   )
 }

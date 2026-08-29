@@ -120,7 +120,7 @@ export default function TypingHeadline({
         <span className="[grid-area:1/1]">
           {renderPhrase(currentPhrase, displayed)}
           <span
-            className="inline-block w-[3px] md:w-[4px] h-[0.85em] bg-cobalt-900 ml-1 align-baseline translate-y-[0.05em] rounded-sm"
+            className="inline-block w-[3px] md:w-[4px] h-[0.85em] bg-[var(--accent-900)] ml-1 align-baseline translate-y-[0.05em] rounded-sm"
             style={{ animation: 'blink-caret 1s step-end infinite' }}
           />
         </span>

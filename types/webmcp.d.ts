@@ -20,3 +20,11 @@ interface Document {
   modelContext?: WebMCPModelContext
 }
 
+interface Navigator {
+  modelContext?: WebMCPModelContext
+}
+
+interface Window {
+  __newtupleWebMCPToolsRegistered?: boolean
+}
+

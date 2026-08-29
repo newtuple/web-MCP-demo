@@ -35,8 +35,8 @@ function PostCard({ post }: { post: BlogPostSummary }) {
             />
           </div>
         ) : (
-          <div className="aspect-[16/9] bg-gradient-to-br from-cobalt-50 to-cobalt-100/80 flex items-center justify-center">
-            <div className="w-16 h-16 rounded-2xl bg-cobalt-200/40" />
+          <div className="aspect-[16/9] bg-gradient-to-br from-[var(--accent-50)] to-[var(--accent-100)]/80 flex items-center justify-center">
+            <div className="w-16 h-16 rounded-2xl bg-[var(--accent-200)]/40" />
           </div>
         )}
         <div className="p-6">
@@ -47,7 +47,7 @@ function PostCard({ post }: { post: BlogPostSummary }) {
               {post.readingTime} min read
             </span>
           </div>
-          <h3 className="text-xl font-semibold text-gray-900 group-hover:text-cobalt-800 transition-colors mb-2 line-clamp-2">
+          <h3 className="text-xl font-semibold text-gray-900 group-hover:text-[var(--accent-800)] transition-colors mb-2 line-clamp-2">
             {post.title}
           </h3>
           <p className="text-gray-600 font-light text-sm leading-relaxed line-clamp-3 mb-4">
@@ -156,7 +156,7 @@ export default function BlogListContent({ posts }: { posts: BlogPostSummary[] })
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
                   placeholder="Search blogs and articles"
-                  className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-3 text-sm text-gray-700 outline-none transition-colors focus:border-cobalt-300"
+                  className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-3 text-sm text-gray-700 outline-none transition-colors focus:border-[var(--accent-300)]"
                 />
               </label>
 
@@ -166,7 +166,7 @@ export default function BlogListContent({ posts }: { posts: BlogPostSummary[] })
                   onClick={() => setScope('all')}
                   className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
                     scope === 'all'
-                      ? 'bg-cobalt-900 text-white'
+                      ? 'bg-[var(--accent-900)] text-white'
                       : 'bg-white text-gray-600 hover:text-gray-900'
                   }`}
                 >
@@ -177,7 +177,7 @@ export default function BlogListContent({ posts }: { posts: BlogPostSummary[] })
                   onClick={() => setScope('latest')}
                   className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
                     scope === 'latest'
-                      ? 'bg-cobalt-900 text-white'
+                      ? 'bg-[var(--accent-900)] text-white'
                       : 'bg-white text-gray-600 hover:text-gray-900'
                   }`}
                 >
@@ -196,7 +196,7 @@ export default function BlogListContent({ posts }: { posts: BlogPostSummary[] })
                       onClick={() => setSelectedTagKey(tag.key)}
                       className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
                         selectedTagKey === tag.key
-                          ? 'border-cobalt-300 bg-cobalt-50 text-cobalt-900'
+                          ? 'border-[var(--accent-300)] bg-[var(--accent-50)] text-[var(--accent-900)]'
                           : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:text-gray-900'
                       }`}
                     >
@@ -230,8 +230,8 @@ export default function BlogListContent({ posts }: { posts: BlogPostSummary[] })
                       />
                     </div>
                   ) : (
-                    <div className="aspect-[16/9] lg:aspect-auto bg-gradient-to-br from-cobalt-50 to-cobalt-100/80 flex items-center justify-center">
-                      <div className="w-20 h-20 rounded-2xl bg-cobalt-200/40" />
+                    <div className="aspect-[16/9] lg:aspect-auto bg-gradient-to-br from-[var(--accent-50)] to-[var(--accent-100)]/80 flex items-center justify-center">
+                      <div className="w-20 h-20 rounded-2xl bg-[var(--accent-200)]/40" />
                     </div>
                   )}
                   <div className="p-8 lg:p-10 flex flex-col justify-center">
@@ -243,7 +243,7 @@ export default function BlogListContent({ posts }: { posts: BlogPostSummary[] })
                         {featured.post.readingTime} min read
                       </span>
                     </div>
-                    <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 group-hover:text-cobalt-800 transition-colors mb-3">
+                    <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 group-hover:text-[var(--accent-800)] transition-colors mb-3">
                       {featured.post.title}
                     </h2>
                     <p className="text-gray-600 font-light leading-relaxed mb-4">
@@ -293,7 +293,7 @@ export default function BlogListContent({ posts }: { posts: BlogPostSummary[] })
                 }}
                 className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
                   hasFilters
-                    ? 'border-cobalt-300 bg-cobalt-50 text-cobalt-900 hover:bg-cobalt-100'
+                    ? 'border-[var(--accent-300)] bg-[var(--accent-50)] text-[var(--accent-900)] hover:bg-[var(--accent-100)]'
                     : 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'
                 }`}
                 disabled={!hasFilters}
@@ -308,7 +308,7 @@ export default function BlogListContent({ posts }: { posts: BlogPostSummary[] })
       <section className="py-16 md:py-20 bg-white border-t border-gray-200">
         <Container className="text-center">
           <FadeIn>
-            <p className="text-[11px] uppercase tracking-[0.16em] text-cobalt-900 font-semibold mb-3">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--accent-900)] font-semibold mb-3">
               Start Building
             </p>
             <h2 className="text-3xl md:text-4xl lg:text-5xl text-gray-900 leading-tight mb-4">
@@ -317,7 +317,7 @@ export default function BlogListContent({ posts }: { posts: BlogPostSummary[] })
             <p className="text-lg text-gray-600 font-light max-w-2xl mx-auto mb-8">
               Talk to our team about AI agents, data platforms, and GenAI accelerators.
             </p>
-            <Button href="/contactus" size="lg" className="bg-gray-950 text-white hover:text-white" fillClassName="bg-cobalt-900">
+            <Button href="/contactus" size="lg" className="bg-gray-950 text-white hover:text-white" fillClassName="bg-[var(--accent-900)]">
               Let&apos;s talk
             </Button>
           </FadeIn>

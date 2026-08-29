@@ -62,7 +62,7 @@ export default function StateMachineHero() {
   return (
     <div className="rounded-3xl border border-gray-200 bg-white/90 p-5 shadow-premium-lg backdrop-blur-sm sm:p-6">
       <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
-        <b className="text-[11px] font-semibold uppercase tracking-[0.2em] text-cobalt-900">
+        <b className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--accent-900)]">
           A live workflow · supplier onboarding
         </b>
         <span className="text-[11px] text-gray-400">agents fill the slots · people keep judgment</span>

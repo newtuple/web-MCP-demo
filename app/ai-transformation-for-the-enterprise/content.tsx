@@ -86,7 +86,7 @@ export default function AITransformationContent({ data }: { data: AITransformati
             <Card className="p-8 bg-gradient-cobalt text-white" hover={false}>
               <CheckCircle className="w-12 h-12 text-cyan-400 mb-6" strokeWidth={1.5} />
               <h3 className="text-2xl font-bold mb-4">{data.challenge.approach.title}</h3>
-              <p className="text-cobalt-100 font-light leading-relaxed">
+              <p className="text-[var(--accent-100)] font-light leading-relaxed">
                 {data.challenge.approach.description}
               </p>
             </Card>
@@ -119,7 +119,7 @@ export default function AITransformationContent({ data }: { data: AITransformati
           {data.approach.items.map((item) => (
             <StaggerItem key={item.step}>
               <Card className="h-full relative">
-                <span className="text-5xl font-bold text-cobalt-50 absolute top-4 right-4 select-none">{item.step}</span>
+                <span className="text-5xl font-bold text-[var(--accent-50)] absolute top-4 right-4 select-none">{item.step}</span>
                 <h3 className="text-xl font-semibold text-gray-900 mb-3">{item.title}</h3>
                 <p className="text-gray-600 font-light leading-relaxed text-sm">{item.description}</p>
               </Card>

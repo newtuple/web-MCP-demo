@@ -26,7 +26,7 @@ export default function HeroBackground() {
           repeat: Infinity,
           ease: "linear",
         }}
-        className="absolute -top-[10%] -left-[10%] w-[70%] h-[70%] rounded-full bg-cobalt-900/20 blur-[120px]"
+        className="absolute -top-[10%] -left-[10%] w-[70%] h-[70%] rounded-full bg-[var(--accent-900)]/20 blur-[120px]"
       />
       <motion.div
         animate={{
@@ -52,7 +52,7 @@ export default function HeroBackground() {
           repeat: Infinity,
           ease: "linear",
         }}
-        className="absolute -bottom-[10%] left-[20%] w-[50%] h-[50%] rounded-full bg-cobalt-600/10 blur-[110px]"
+        className="absolute -bottom-[10%] left-[20%] w-[50%] h-[50%] rounded-full bg-[var(--accent-600)]/10 blur-[110px]"
       />
 
       {/* Floating Orbs */}
@@ -78,7 +78,7 @@ export default function HeroBackground() {
           repeat: Infinity,
           ease: "easeInOut",
         }}
-        className="absolute top-[60%] right-[20%] w-3 h-3 rounded-full bg-cobalt-400 shadow-[0_0_20px_rgba(96,144,250,0.6)]"
+        className="absolute top-[60%] right-[20%] w-3 h-3 rounded-full bg-[var(--accent-400)] shadow-[0_0_20px_rgba(96,144,250,0.6)]"
       />
       <motion.div
         animate={{

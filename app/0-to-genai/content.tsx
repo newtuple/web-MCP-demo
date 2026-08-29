@@ -71,8 +71,8 @@ export default function ZeroToGenAIContent({ data }: { data: ZeroToGenAIData }) 
             return (
               <StaggerItem key={item.step}>
                 <Card className="h-full relative">
-                  <span className="text-5xl font-bold text-cobalt-50 absolute top-4 right-4 select-none">{item.step}</span>
-                  <Icon className="w-10 h-10 text-cobalt-900 mb-4" strokeWidth={1.5} />
+                  <span className="text-5xl font-bold text-[var(--accent-50)] absolute top-4 right-4 select-none">{item.step}</span>
+                  <Icon className="w-10 h-10 text-[var(--accent-900)] mb-4" strokeWidth={1.5} />
                   <h3 className="text-xl font-semibold text-gray-900 mb-3">{item.title}</h3>
                   <p className="text-gray-600 font-light leading-relaxed text-sm">{item.description}</p>
                 </Card>
@@ -102,7 +102,7 @@ export default function ZeroToGenAIContent({ data }: { data: ZeroToGenAIData }) 
             <Card className="p-8 bg-gradient-cobalt text-white" hover={false}>
               <Sparkles className="w-12 h-12 text-cyan-400 mb-6" strokeWidth={1.5} />
               <h3 className="text-2xl font-bold mb-4">{data.benefits.highlight.title}</h3>
-              <p className="text-cobalt-100 font-light leading-relaxed">
+              <p className="text-[var(--accent-100)] font-light leading-relaxed">
                 {data.benefits.highlight.description}
               </p>
             </Card>

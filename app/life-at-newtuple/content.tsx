@@ -76,7 +76,7 @@ const galleryImages: GalleryImage[] = [
 function HeroVisual() {
   return (
     <div className="relative mx-auto w-full max-w-[540px]">
-      <div className="pointer-events-none absolute -inset-8 rounded-full bg-cobalt-100/70 blur-3xl" />
+      <div className="pointer-events-none absolute -inset-8 rounded-full bg-[var(--accent-100)]/70 blur-3xl" />
 
       <div className="relative rounded-3xl border border-gray-200/90 bg-white p-3 shadow-[0_28px_58px_-36px_rgba(15,23,42,0.35)]">
         <div className="relative aspect-[16/11] overflow-hidden rounded-2xl">
@@ -145,7 +145,7 @@ function PhotoCarouselRow({
             type="button"
             key={`${image.src}-${index}`}
             onClick={() => onImageSelect(image)}
-            className="group/card relative h-[210px] w-[250px] sm:h-[230px] sm:w-[280px] md:h-[250px] md:w-[320px] overflow-hidden rounded-xl border border-gray-700/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cobalt-400/70"
+            className="group/card relative h-[210px] w-[250px] sm:h-[230px] sm:w-[280px] md:h-[250px] md:w-[320px] overflow-hidden rounded-xl border border-gray-700/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-400)]/70"
           >
             <Image
               src={image.src}
@@ -227,13 +227,13 @@ export default function LifeContent({ data }: { data: LifeData }) {
     <>
       <section className="relative overflow-hidden bg-white">
         <div className="pointer-events-none absolute inset-0 bg-grid" />
-        <div className="pointer-events-none absolute -top-24 left-[10%] h-72 w-72 rounded-full bg-cobalt-100/70 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-20 right-[6%] h-64 w-64 rounded-full bg-cobalt-50 blur-3xl" />
+        <div className="pointer-events-none absolute -top-24 left-[10%] h-72 w-72 rounded-full bg-[var(--accent-100)]/70 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-20 right-[6%] h-64 w-64 rounded-full bg-[var(--accent-50)] blur-3xl" />
         <Container className="relative z-10 pt-28 pb-16 md:pt-36 md:pb-24">
           <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] gap-12 lg:gap-14 items-center">
             <FadeIn>
               <div className="max-w-2xl">
-                <span className="inline-flex items-center gap-2 rounded-full border border-cobalt-100 bg-cobalt-50/80 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-cobalt-900 mb-7">
+                <span className="inline-flex items-center gap-2 rounded-full border border-[var(--accent-100)] bg-[var(--accent-50)]/80 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--accent-900)] mb-7">
                   <Sparkles className="h-3.5 w-3.5" />
                   {data.hero.badge}
                 </span>
@@ -248,7 +248,7 @@ export default function LifeContent({ data }: { data: LifeData }) {
                     href={data.cta.buttonHref}
                     size="lg"
                     className="bg-gray-950 text-white hover:text-white"
-                    fillClassName="bg-cobalt-900"
+                    fillClassName="bg-[var(--accent-900)]"
                   >
                     <span className="inline-flex items-center gap-2 whitespace-nowrap">
                       {data.cta.buttonText}
@@ -260,7 +260,7 @@ export default function LifeContent({ data }: { data: LifeData }) {
                     variant="outline"
                     size="lg"
                     className="border-gray-300 text-gray-900 hover:text-white"
-                    fillClassName="bg-cobalt-900"
+                    fillClassName="bg-[var(--accent-900)]"
                   >
                     Explore moments
                   </Button>
@@ -278,7 +278,7 @@ export default function LifeContent({ data }: { data: LifeData }) {
       <Section className="py-14 md:py-16 bg-white">
         <FadeIn>
           <div className="text-center mb-10 md:mb-12">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-cobalt-900 font-semibold mb-2">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--accent-900)] font-semibold mb-2">
               Culture DNA
             </p>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{data.culture.sectionTitle}</h2>
@@ -290,11 +290,11 @@ export default function LifeContent({ data }: { data: LifeData }) {
         <StaggerChildren className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
           {cultureItems.map((item, index) => (
             <StaggerItem key={item.title}>
-              <article className="group relative h-full min-h-[230px] overflow-hidden rounded-2xl border border-gray-200/90 bg-white p-5 md:p-6 shadow-[0_14px_28px_-22px_rgba(15,23,42,0.28)] transition-all duration-300 hover:-translate-y-1 hover:border-cobalt-300 hover:shadow-[0_24px_40px_-26px_rgba(0,71,171,0.36)]">
-                <div className="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-cobalt-400 to-transparent -translate-x-[110%] transition-transform duration-700 group-hover:translate-x-0" />
+              <article className="group relative h-full min-h-[230px] overflow-hidden rounded-2xl border border-gray-200/90 bg-white p-5 md:p-6 shadow-[0_14px_28px_-22px_rgba(15,23,42,0.28)] transition-all duration-300 hover:-translate-y-1 hover:border-[var(--accent-300)] hover:shadow-[0_24px_40px_-26px_rgba(0,71,171,0.36)]">
+                <div className="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-[var(--accent-400)] to-transparent -translate-x-[110%] transition-transform duration-700 group-hover:translate-x-0" />
                 <div className="mb-4 flex items-start justify-between gap-3">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-cobalt-100 bg-cobalt-50">
-                    <item.icon className="h-5 w-5 text-cobalt-900" strokeWidth={1.6} />
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-[var(--accent-100)] bg-[var(--accent-50)]">
+                    <item.icon className="h-5 w-5 text-[var(--accent-900)]" strokeWidth={1.6} />
                   </div>
                   <span className="text-[11px] font-semibold tracking-[0.14em] text-gray-400">
                     {(index + 1).toString().padStart(2, '0')}
@@ -313,7 +313,7 @@ export default function LifeContent({ data }: { data: LifeData }) {
         <Container className="relative z-10">
           <FadeIn>
             <div className="text-center mb-10 md:mb-12">
-              <p className="text-[11px] uppercase tracking-[0.16em] text-cobalt-300 font-semibold mb-2">
+              <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--accent-300)] font-semibold mb-2">
                 Rhythm of Work
               </p>
               <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">{data.dayInLife.title}</h2>
@@ -325,9 +325,9 @@ export default function LifeContent({ data }: { data: LifeData }) {
           <StaggerChildren className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
             {data.dayInLife.items.map((item) => (
               <StaggerItem key={item.time}>
-                <article className="group relative h-full overflow-hidden rounded-2xl border border-gray-800/90 bg-gray-900/85 p-5 shadow-[0_18px_34px_-24px_rgba(0,0,0,0.72)] transition-all duration-300 hover:border-cobalt-400/55 hover:shadow-[0_24px_42px_-24px_rgba(0,71,171,0.45)]">
-                  <div className="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-cobalt-400 to-transparent -translate-x-[110%] transition-transform duration-700 group-hover:translate-x-0" />
-                  <span className="inline-flex items-center rounded-full border border-cobalt-400/30 bg-cobalt-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-cobalt-300">
+                <article className="group relative h-full overflow-hidden rounded-2xl border border-gray-800/90 bg-gray-900/85 p-5 shadow-[0_18px_34px_-24px_rgba(0,0,0,0.72)] transition-all duration-300 hover:border-[var(--accent-400)]/55 hover:shadow-[0_24px_42px_-24px_rgba(0,71,171,0.45)]">
+                  <div className="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-[var(--accent-400)] to-transparent -translate-x-[110%] transition-transform duration-700 group-hover:translate-x-0" />
+                  <span className="inline-flex items-center rounded-full border border-[var(--accent-400)]/30 bg-[var(--accent-500)]/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--accent-300)]">
                     {item.time}
                   </span>
                   <h3 className="text-lg font-semibold text-white mt-4 mb-2 leading-tight">{item.title}</h3>
@@ -344,7 +344,7 @@ export default function LifeContent({ data }: { data: LifeData }) {
         <Container className="relative z-10">
           <FadeIn>
             <div className="text-center mb-8 md:mb-10">
-              <p className="text-[11px] uppercase tracking-[0.16em] text-cobalt-300 font-semibold mb-2">
+              <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--accent-300)] font-semibold mb-2">
                 Visual Diary
               </p>
               <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">{data.photoGallery.title}</h2>
@@ -365,7 +365,7 @@ export default function LifeContent({ data }: { data: LifeData }) {
       <Section className="py-14 md:py-16 bg-white">
         <FadeIn>
           <div className="text-center mb-10 md:mb-12">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-cobalt-900 font-semibold mb-2">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--accent-900)] font-semibold mb-2">
               Team Experience
             </p>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900">{data.perks.sectionTitle}</h2>
@@ -375,11 +375,11 @@ export default function LifeContent({ data }: { data: LifeData }) {
         <StaggerChildren className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
           {perkItems.map((perk, index) => (
             <StaggerItem key={perk.title}>
-              <article className="group relative h-full min-h-[220px] overflow-hidden rounded-2xl border border-gray-200/90 bg-white p-5 md:p-6 shadow-[0_14px_28px_-22px_rgba(15,23,42,0.28)] transition-all duration-300 hover:-translate-y-1 hover:border-cobalt-300 hover:shadow-[0_24px_40px_-26px_rgba(0,71,171,0.36)]">
-                <div className="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-cobalt-400 to-transparent -translate-x-[110%] transition-transform duration-700 group-hover:translate-x-0" />
+              <article className="group relative h-full min-h-[220px] overflow-hidden rounded-2xl border border-gray-200/90 bg-white p-5 md:p-6 shadow-[0_14px_28px_-22px_rgba(15,23,42,0.28)] transition-all duration-300 hover:-translate-y-1 hover:border-[var(--accent-300)] hover:shadow-[0_24px_40px_-26px_rgba(0,71,171,0.36)]">
+                <div className="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-[var(--accent-400)] to-transparent -translate-x-[110%] transition-transform duration-700 group-hover:translate-x-0" />
                 <div className="mb-4 flex items-start justify-between gap-3">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-cobalt-100 bg-cobalt-50">
-                    <perk.icon className="h-5 w-5 text-cobalt-900" strokeWidth={1.6} />
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-[var(--accent-100)] bg-[var(--accent-50)]">
+                    <perk.icon className="h-5 w-5 text-[var(--accent-900)]" strokeWidth={1.6} />
                   </div>
                   <span className="text-[11px] font-semibold tracking-[0.14em] text-gray-400">
                     {(index + 1).toString().padStart(2, '0')}
@@ -396,7 +396,7 @@ export default function LifeContent({ data }: { data: LifeData }) {
       <section className="py-16 md:py-20 bg-white border-t border-gray-200">
         <Container className="text-center">
           <FadeIn>
-            <p className="text-[11px] uppercase tracking-[0.16em] text-cobalt-900 font-semibold mb-3">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--accent-900)] font-semibold mb-3">
               Join the Journey
             </p>
             <h2 className="text-3xl md:text-4xl lg:text-5xl text-gray-900 leading-tight mb-4">
@@ -409,7 +409,7 @@ export default function LifeContent({ data }: { data: LifeData }) {
               href={data.cta.buttonHref}
               size="lg"
               className="bg-gray-950 text-white hover:text-white"
-              fillClassName="bg-cobalt-900"
+              fillClassName="bg-[var(--accent-900)]"
             >
               <span className="inline-flex items-center gap-2 whitespace-nowrap">
                 {data.cta.buttonText}

@@ -4,16 +4,24 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Menu, X, ChevronDown } from 'lucide-react'
+import { Menu, X, ChevronDown, Bot, RotateCcw } from 'lucide-react'
 import { NAV_SERVICES, NAV_ACCELERATORS, NAV_INDUSTRIES, NAV_COMPANY } from '@/lib/constants'
 import Container from '@/components/ui/Container'
 import Button from '@/components/ui/Button'
+import { useVisitorContext } from '@/components/webmcp/useVisitorContext'
 
 interface DropdownItem {
   label: string
   href: string
   description?: string
   external?: boolean
+}
+
+const STRIP_ACCENTS: Record<string, { bar: string; text: string; reset: string; link: string; underline: string }> = {
+  general: { bar: 'border-[var(--accent-100)] bg-[var(--accent-50)]', text: 'text-[var(--accent-900)]', reset: 'text-[var(--accent-700)] hover:text-[var(--accent-900)]', link: 'hover:text-[var(--accent-900)]', underline: 'bg-[var(--accent-900)]' },
+  services: { bar: 'border-cyan-100 bg-cyan-50', text: 'text-cyan-900', reset: 'text-cyan-700 hover:text-cyan-900', link: 'hover:text-cyan-700', underline: 'bg-cyan-700' },
+  products: { bar: 'border-amber-100 bg-amber-50', text: 'text-amber-900', reset: 'text-amber-700 hover:text-amber-900', link: 'hover:text-amber-700', underline: 'bg-amber-600' },
+  careers: { bar: 'border-emerald-100 bg-emerald-50', text: 'text-emerald-900', reset: 'text-emerald-700 hover:text-emerald-900', link: 'hover:text-emerald-700', underline: 'bg-emerald-700' },
 }
 
 const BLOG_PATH = '/blog'
@@ -49,7 +57,7 @@ function NavDropdown({
   return (
     <div ref={ref} className="relative" onMouseEnter={handleEnter} onMouseLeave={handleLeave}>
       <button
-        className="flex items-center gap-1 text-sm font-medium text-gray-700 hover:text-cobalt-900 transition-colors py-2"
+        className="flex items-center gap-1 text-sm font-medium text-gray-700 hover:text-[var(--accent-900)] transition-colors py-2"
         onClick={() => setOpen(!open)}
       >
         {label}
@@ -70,7 +78,7 @@ function NavDropdown({
                   href={item.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`block rounded-lg px-3 hover:bg-cobalt-50 transition-colors ${
+                  className={`block rounded-lg px-3 hover:bg-[var(--accent-50)] transition-colors ${
                     item.description ? 'py-2.5 min-h-[56px]' : 'py-2'
                   }`}
                   onClick={() => setOpen(false)}
@@ -84,7 +92,7 @@ function NavDropdown({
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`block rounded-lg px-3 hover:bg-cobalt-50 transition-colors ${
+                  className={`block rounded-lg px-3 hover:bg-[var(--accent-50)] transition-colors ${
                     item.description ? 'py-2.5 min-h-[56px]' : 'py-2'
                   }`}
                   onClick={() => setOpen(false)}
@@ -169,7 +177,7 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
             <Link
               href={BLOG_NAV_ITEM.href}
               onClick={onClose}
-              className="block rounded-xl border border-gray-200 bg-gradient-to-b from-white to-gray-50/70 px-4 py-3 text-sm font-semibold text-gray-900 uppercase tracking-wider hover:text-cobalt-900 hover:bg-white transition-colors"
+              className="block rounded-xl border border-gray-200 bg-gradient-to-b from-white to-gray-50/70 px-4 py-3 text-sm font-semibold text-gray-900 uppercase tracking-wider hover:text-[var(--accent-900)] hover:bg-white transition-colors"
             >
               {BLOG_NAV_ITEM.label}
             </Link>
@@ -221,7 +229,7 @@ function MobileSection({
                   href={item.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block rounded-md px-3 py-2 text-sm text-gray-600 hover:text-cobalt-900 hover:bg-white transition-colors"
+                  className="block rounded-md px-3 py-2 text-sm text-gray-600 hover:text-[var(--accent-900)] hover:bg-white transition-colors"
                   onClick={onClose}
                 >
                   <div className="font-medium">{item.label}</div>
@@ -231,7 +239,7 @@ function MobileSection({
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="block rounded-md px-3 py-2 text-sm text-gray-600 hover:text-cobalt-900 hover:bg-white transition-colors"
+                  className="block rounded-md px-3 py-2 text-sm text-gray-600 hover:text-[var(--accent-900)] hover:bg-white transition-colors"
                   onClick={onClose}
                 >
                   <div className="font-medium">{item.label}</div>
@@ -250,6 +258,8 @@ export default function Navigation() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const closeMobile = useCallback(() => setMobileOpen(false), [])
+  const { variant, resetContext } = useVisitorContext()
+  const stripAccent = STRIP_ACCENTS[variant.intent] ?? STRIP_ACCENTS.general
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10)
@@ -259,8 +269,27 @@ export default function Navigation() {
 
   return (
     <>
+      {variant.isPersonalized && (
+        <div className={`fixed top-0 left-0 right-0 z-50 animate-fade-up border-b ${stripAccent.bar}`}>
+          <Container>
+            <div className={`flex flex-wrap items-center justify-center gap-2 py-1.5 text-center text-xs font-semibold sm:text-sm ${stripAccent.text}`}>
+              <Bot className="h-3.5 w-3.5 shrink-0 animate-pulse-subtle" />
+              <span>{variant.adaptationSummary}</span>
+              <button
+                type="button"
+                onClick={resetContext}
+                className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 transition-colors hover:bg-white ${stripAccent.reset}`}
+              >
+                <RotateCcw className="h-3 w-3" />
+                Reset
+              </button>
+            </div>
+          </Container>
+        </div>
+      )}
+
       <header
-        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
+        className={`fixed left-0 right-0 z-40 transition-all duration-300 ${variant.isPersonalized ? 'top-8' : 'top-0'} ${
           scrolled
             ? 'bg-white/90 backdrop-blur-xl shadow-sm'
             : 'bg-transparent'
@@ -276,18 +305,36 @@ export default function Navigation() {
               />
             </Link>
 
-            <nav className="hidden lg:flex items-center gap-8">
-              <NavDropdown label="Services" items={NAV_SERVICES} />
-              <NavDropdown label="Accelerators" items={NAV_ACCELERATORS} />
-              <NavDropdown label="Industries" items={NAV_INDUSTRIES} />
-              <NavDropdown label="Company" items={NAV_COMPANY_DROPDOWN} />
-              <Link
-                href={BLOG_NAV_ITEM.href}
-                className="text-sm font-medium text-gray-700 hover:text-cobalt-900 transition-colors py-2"
-              >
-                {BLOG_NAV_ITEM.label}
-              </Link>
-            </nav>
+            {variant.isPersonalized ? (
+              <nav className="hidden lg:flex items-center gap-6">
+                {variant.navigation.map((item, index) => (
+                  <Link
+                    key={`${item.label}-${index}`}
+                    href={item.href}
+                    className={`group relative text-sm font-medium text-gray-700 transition-colors py-2 ${stripAccent.link}`}
+                  >
+                    {item.label}
+                    <span
+                      aria-hidden="true"
+                      className={`absolute inset-x-0 -bottom-0.5 h-px origin-left scale-x-0 transition-transform duration-300 group-hover:scale-x-100 ${stripAccent.underline}`}
+                    />
+                  </Link>
+                ))}
+              </nav>
+            ) : (
+              <nav className="hidden lg:flex items-center gap-8">
+                <NavDropdown label="Services" items={NAV_SERVICES} />
+                <NavDropdown label="Accelerators" items={NAV_ACCELERATORS} />
+                <NavDropdown label="Industries" items={NAV_INDUSTRIES} />
+                <NavDropdown label="Company" items={NAV_COMPANY_DROPDOWN} />
+                <Link
+                  href={BLOG_NAV_ITEM.href}
+                  className="text-sm font-medium text-gray-700 hover:text-[var(--accent-900)] transition-colors py-2"
+                >
+                  {BLOG_NAV_ITEM.label}
+                </Link>
+              </nav>
+            )}
 
             <div className="hidden lg:block">
               <Button href="/contactus" size="sm">

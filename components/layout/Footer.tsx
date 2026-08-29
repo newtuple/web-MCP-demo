@@ -9,9 +9,9 @@ import { COMPANY, NAV_SERVICES, NAV_ACCELERATORS, NAV_COMPANY } from '@/lib/cons
 export default function Footer() {
   const headingClass = 'text-xs font-semibold uppercase tracking-[0.12em] text-gray-400 mb-3'
   const linkClass =
-    "group/link relative inline-flex text-sm text-gray-300 transition-colors duration-200 hover:text-white focus-visible:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cobalt-500/70 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-950 rounded-sm after:content-[''] after:absolute after:left-0 after:-bottom-0.5 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-cobalt-400 after:transition-transform after:duration-200 hover:after:scale-x-100 focus-visible:after:scale-x-100"
+    "group/link relative inline-flex text-sm text-gray-300 transition-colors duration-200 hover:text-white focus-visible:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-500)]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-950 rounded-sm after:content-[''] after:absolute after:left-0 after:-bottom-0.5 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-[var(--accent-400)] after:transition-transform after:duration-200 hover:after:scale-x-100 focus-visible:after:scale-x-100"
   const socialClass =
-    'inline-flex h-8 w-8 items-center justify-center rounded-full text-gray-300 transition-colors duration-200 hover:text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cobalt-500/70 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-950'
+    'inline-flex h-8 w-8 items-center justify-center rounded-full text-gray-300 transition-colors duration-200 hover:text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-500)]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-950'
 
   return (
     <footer className="bg-gray-950 text-white">
