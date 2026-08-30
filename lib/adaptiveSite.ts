@@ -164,6 +164,13 @@ export function inferVisitorContext(statement: string): VisitorContext {
     goal = 'AI agent workflow automation'
   }
 
+  // Keep the visitor's actual brief when the classifier cannot identify a named play.
+  // This prevents unrelated prompts from collapsing into the same generic surface.
+  const visitorBrief = statement.trim().replace(/\s+/g, ' ')
+  if (visitorBrief && ['AI transformation', 'Newtuple product discovery', 'career opportunity'].includes(goal)) {
+    goal = visitorBrief.slice(0, 120)
+  }
+
   let buying_stage: BuyingStage = intent === 'careers' ? 'ready' : 'exploring'
   if (includesAny(text, ['shortlist', 'compare', 'vendor', 'evaluating'])) {
     buying_stage = 'evaluating'

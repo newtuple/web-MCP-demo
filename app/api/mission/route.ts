@@ -43,7 +43,10 @@ export async function POST(request: Request) {
     if (!response.ok) throw new Error(`OpenAI returned ${response.status}`)
     const payload = await response.json()
     const raw = payload.output_text ? JSON.parse(payload.output_text) : null
-    return NextResponse.json({ context: normalizeVisitorContext(raw ?? fallback), source: 'openai' })
+    const modelContext = normalizeVisitorContext(raw ?? fallback)
+    const genericGoals = ['AI transformation', 'Newtuple product discovery', 'career opportunity']
+    const context = genericGoals.includes(modelContext.goal) && fallback.goal !== 'AI transformation' ? { ...modelContext, goal: fallback.goal } : modelContext
+    return NextResponse.json({ context, source: 'openai' })
   } catch {
     return NextResponse.json({ context: fallback, source: 'fallback' })
   }
