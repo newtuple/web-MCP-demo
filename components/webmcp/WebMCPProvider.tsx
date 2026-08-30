@@ -136,26 +136,311 @@ export default function WebMCPProvider() {
       })
 
       void register({
+        name: 'get_current_experience',
+        title: 'Read current ZeroNav experience',
+        description: 'Return the currently compiled Newtuple experience, including generated navigation, hero, CTAs, proof, and visitor context.',
+        annotations: { readOnlyHint: true },
+        execute: () => generateAdaptiveSiteVariant(readContext()),
+      })
+
+      void register({
+        name: 'explain_current_experience',
+        title: 'Explain current experience',
+        description: 'Explain why ZeroNav selected the current website structure and content for this visitor.',
+        annotations: { readOnlyHint: true },
+        execute: () => {
+          const current = readContext()
+          const currentVariant = generateAdaptiveSiteVariant(current)
+          return { reason: currentVariant.reasonForVisitor, context: current, selectedNavigation: currentVariant.navigation.map((item) => item.label), selectedProof: currentVariant.caseStudySlugs }
+        },
+      })
+
+      void register({
+        name: 'request_deeper_technical_view',
+        title: 'Request technical view',
+        description: 'Recompile the current ZeroNav experience for a technically deep visitor, prioritizing architecture, integrations, APIs, and implementation proof.',
+        annotations: { readOnlyHint: false },
+        execute: () => toolResult(updateContext({ technical_depth: 'high' })),
+      })
+
+      void register({
+        name: 'request_business_view',
+        title: 'Request business view',
+        description: 'Recompile the current ZeroNav experience for a business audience, prioritizing outcomes, proof, ROI, and the next decision.',
+        annotations: { readOnlyHint: false },
+        execute: () => toolResult(updateContext({ technical_depth: 'low' })),
+      })
+
+      void register({
+        name: 'select_goal',
+        title: 'Select visitor goal',
+        description: 'Set the visitor mission from a plain-language goal and recompile the entire website around it.',
+        inputSchema: { type: 'object', properties: { goal: { type: 'string', description: 'The outcome the visitor wants to accomplish.' } }, required: ['goal'] },
+        annotations: { readOnlyHint: false },
+        execute: (input = {}) => {
+          const goal = String(input.goal ?? '')
+          return toolResult(updateContext({ goal, intent: goal.toLowerCase().includes('product') ? 'products' : 'services' }))
+        },
+      })
+
+      void register({
+        name: 'compile_experience',
+        title: 'Compile a new experience',
+        description: 'Start a visible ZeroNav compile: interpret a visitor mission, select fresh content and proof, then reveal a newly generated interface after a short reasoning phase.',
+        inputSchema: { type: 'object', properties: { statement: { type: 'string', description: 'The visitor mission to compile into a tailored Newtuple experience.' } }, required: ['statement'] },
+        annotations: { readOnlyHint: false },
+        execute: (input = {}) => {
+          const statement = String(input.statement ?? '')
+          window.dispatchEvent(new CustomEvent('newtuple-zeronav-compile', { detail: { statement } }))
+          return { status: 'compiling', statement, next: 'wait_for_generated_experience' }
+        },
+      })
+
+      void register({
+        name: 'find_relevant_case_studies',
+        title: 'Find relevant case studies',
+        description: 'Return approved Newtuple case studies selected for the current visitor mission.',
+        annotations: { readOnlyHint: true },
+        execute: () => {
+          const currentVariant = generateAdaptiveSiteVariant(readContext())
+          return { slugs: currentVariant.caseStudySlugs, href: currentVariant.caseStudyHref }
+        },
+      })
+
+      void register({
+        name: 'generate_recommended_path',
+        title: 'Generate recommended path',
+        description: 'Return the current ZeroNav path in order: navigation, primary CTA, secondary CTA, proof, and suggested next prompts.',
+        annotations: { readOnlyHint: true },
+        execute: () => {
+          const currentVariant = generateAdaptiveSiteVariant(readContext())
+          return { steps: currentVariant.navigation, primaryCta: currentVariant.primaryCta, secondaryCta: currentVariant.secondaryCta, proof: currentVariant.caseStudySlugs, prompts: currentVariant.suggestedPrompts }
+        },
+      })
+
+      void register({
+        name: 'start_consultation',
+        title: 'Prepare consultation',
+        description: 'Prepare a consultation handoff from the current visitor mission. This creates no lead and sends no message until a human approves it.',
+        annotations: { readOnlyHint: false },
+        execute: () => ({ status: 'awaiting_human', approvalRequired: true, context: readContext(), next: 'human_review' }),
+      })
+
+      const emitSimulation = (input: Record<string, unknown>) => {
+        window.dispatchEvent(new CustomEvent('newtuple-simulation-change', { detail: input }))
+      }
+
+      void register({
+        name: 'create_business_scenario',
+        title: 'Create business scenario',
+        description: 'Configure the visible Reality Engine for supplier onboarding, customer support, or LLM evaluation.',
+        inputSchema: { type: 'object', properties: { scenario: { type: 'string', enum: ['supplier', 'support', 'evaluation'] } }, required: ['scenario'] },
+        annotations: { readOnlyHint: false },
+        execute: (input = {}) => {
+          const scenario = String(input.scenario ?? 'supplier')
+          emitSimulation({ scenario })
+          return { scenario, status: 'configured', next: 'run_transformation_simulation' }
+        },
+      })
+
+      void register({
+        name: 'run_transformation_simulation',
+        title: 'Run transformation simulation',
+        description: 'Run the visible before-and-after business impact simulation using monthly volume, manual work percentage, error rate, and approval handoffs.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            scenario: { type: 'string', enum: ['supplier', 'support', 'evaluation'] },
+            volume: { type: 'number', description: 'Monthly work volume.' },
+            manual: { type: 'number', description: 'Current manual work percentage.' },
+            errors: { type: 'number', description: 'Current error or rework percentage.' },
+            approvals: { type: 'number', description: 'Current approval handoffs.' },
+          },
+          required: ['volume', 'manual', 'errors', 'approvals'],
+        },
+        annotations: { readOnlyHint: false },
+        execute: (input = {}) => {
+          const volume = Number(input.volume ?? 10000)
+          const manual = Number(input.manual ?? 70)
+          const errors = Number(input.errors ?? 18)
+          const approvals = Number(input.approvals ?? 5)
+          emitSimulation({ ...input, volume, manual, errors, approvals, run: true })
+          return {
+            before: { volume, manual, errors, approvals },
+            projected: { manual: Math.max(8, Math.round(manual * 0.28)), errors: Math.max(1, Math.round(errors * 0.2)), approvals: Math.max(1, approvals - 2) },
+            approvalRequired: true,
+          }
+        },
+      })
+
+      void register({
+        name: 'map_current_workflow',
+        title: 'Map current workflow',
+        description: 'Return the four-stage workflow map for the selected business scenario so an agent can inspect the bottleneck before recommending change.',
+        inputSchema: { type: 'object', properties: { scenario: { type: 'string', enum: ['supplier', 'support', 'evaluation'] } }, required: ['scenario'] },
+        annotations: { readOnlyHint: true },
+        execute: (input = {}) => {
+          const stages = {
+            supplier: ['Supplier forms', 'Data validation', 'Human review', 'ERP / PIM sync'],
+            support: ['Customer question', 'Intent routing', 'Agent response', 'Human escalation'],
+            evaluation: ['Test set', 'Model run', 'Quality scoring', 'Release gate'],
+          }[String(input.scenario ?? 'supplier') as 'supplier' | 'support' | 'evaluation'] ?? ['Supplier forms', 'Data validation', 'Human review', 'ERP / PIM sync']
+          return { stages, bottleneck: stages[1], status: 'mapped' }
+        },
+      })
+
+      void register({
+        name: 'detect_bottleneck',
+        title: 'Detect bottleneck',
+        description: 'Inspect the visible operation and identify the stage where work is accumulating. This is read-only.',
+        annotations: { readOnlyHint: true },
+        execute: () => ({ stage: 'validation queue', severity: 'high', reason: 'manual review is serializing otherwise safe work', recommendedNextTool: 'deploy_newtuple_agents' }),
+      })
+
+      void register({
+        name: 'deploy_newtuple_agents',
+        title: 'Deploy Newtuple agents',
+        description: 'Start the visible agent takeover sequence for the current operation. Safe work is automated and risky work remains behind human approval.',
+        annotations: { readOnlyHint: false },
+        execute: () => {
+          emitSimulation({ action: 'deploy' })
+          return { status: 'recovered', safeWorkAutomated: true, humanApproval: 'required_for_risky_records' }
+        },
+      })
+
+      void register({
+        name: 'request_human_approval',
+        title: 'Request human approval',
+        description: 'Surface the next risky operation for a human decision. This tool never approves or submits the action itself.',
+        annotations: { readOnlyHint: false },
+        execute: () => ({ status: 'awaiting_human', action: 'review_risky_records', approvalRequired: true }),
+      })
+
+      void register({
+        name: 'stress_test_operation',
+        title: 'Stress test operation',
+        description: 'Increase the visible workload and run the operation under pressure to reveal whether the proposed controls hold.',
+        annotations: { readOnlyHint: false },
+        execute: () => {
+          emitSimulation({ action: 'stress' })
+          return { status: 'stress_test_started', volumeMultiplier: 1.67, next: 'deploy_newtuple_agents' }
+        },
+      })
+
+      void register({
+        name: 'compare_solution_paths',
+        title: 'Compare solution paths',
+        description: 'Compare the approved Newtuple solution paths for the visitor scenario with a clear trade-off between speed, control, and depth.',
+        annotations: { readOnlyHint: true },
+        execute: () => ({ paths: [{ name: 'Accelerator-first', fit: 'fastest proof', tradeoff: 'narrower initial scope' }, { name: 'Workflow-first', fit: 'best for governed operations', tradeoff: 'requires process mapping' }, { name: 'Agent-platform build', fit: 'highest long-term flexibility', tradeoff: 'larger implementation surface' }] }),
+      })
+
+      void register({
+        name: 'generate_architecture',
+        title: 'Generate architecture',
+        description: 'Generate a bounded architecture outline from the visitor context. Returns components and integration questions; it does not deploy anything.',
+        annotations: { readOnlyHint: true },
+        execute: () => ({ sourceSystems: readContext().systems.length ? readContext().systems : ['ERP / CRM / data platform'], intelligence: ['Newtuple agents', 'workflow orchestration', 'evaluation and observability'], destination: readContext().goal, deploymentStatus: 'design_only', questions: ['Where does human approval remain mandatory?', 'What is the baseline metric?', 'Which data may leave the system boundary?'] }),
+      })
+
+      void register({
+        name: 'calculate_business_impact',
+        title: 'Calculate business impact',
+        description: 'Return a conservative impact estimate from the currently supplied simulation assumptions.',
+        inputSchema: { type: 'object', properties: { manual: { type: 'number' }, errors: { type: 'number' } }, required: ['manual', 'errors'] },
+        annotations: { readOnlyHint: true },
+        execute: (input = {}) => {
+          const manual = Number(input.manual ?? 70)
+          const errors = Number(input.errors ?? 18)
+          return { manualReductionPercent: Math.round((1 - Math.max(8, manual * 0.28) / manual) * 100), errorReductionPercent: Math.round((1 - Math.max(1, errors * 0.2) / errors) * 100), method: 'conservative scenario estimate' }
+        },
+      })
+
+      void register({
+        name: 'create_executive_brief',
+        title: 'Create executive brief',
+        description: 'Prepare a concise executive brief from the current visitor context and recommended Newtuple path. This does not send anything.',
+        annotations: { readOnlyHint: true },
+        execute: () => {
+          const current = readContext()
+          const currentVariant = generateAdaptiveSiteVariant(current)
+          return { title: 'Newtuple transformation brief', context: current, recommendation: currentVariant.primaryCta, evidence: currentVariant.caseStudySlugs, status: 'ready_to_copy' }
+        },
+      })
+
+      void register({
+        name: 'prepare_human_approved_workshop',
+        title: 'Prepare human-approved workshop',
+        description: 'Prepare a workshop proposal from the current mission. It never submits a lead, sends a message, or books a meeting without explicit human approval.',
+        annotations: { readOnlyHint: true },
+        execute: () => ({ status: 'awaiting_human', approvalRequired: true, deliverables: ['current-state workflow', 'simulation assumptions', 'recommended architecture questions', 'selected evidence'] }),
+      })
+
+      void register({
         name: 'reorder_navigation',
+        title: 'Reorder navigation',
         description: 'Return the current adaptive Newtuple navigation for the visitor.',
+        annotations: { readOnlyHint: true },
         execute: () => generateAdaptiveSiteVariant(readContext()).navigation,
       })
 
       void register({
         name: 'generate_page_variant',
+        title: 'Generate page variant',
         description: 'Generate the complete current Newtuple.com page variant (navigation, hero, CTAs, relevant case studies) from the visible visitor context.',
+        annotations: { readOnlyHint: true },
         execute: () => generateAdaptiveSiteVariant(readContext()),
       })
 
       void register({
+        name: 'get_current_mission',
+        title: 'Read current mission',
+        description: 'Read the current visitor mission, including goal, role, industry, systems, confidence inputs, and the next recommended action.',
+        annotations: { readOnlyHint: true },
+        execute: () => {
+          const current = readContext()
+          const currentVariant = generateAdaptiveSiteVariant(current)
+          return { context: current, mission: currentVariant.hero, primaryCta: currentVariant.primaryCta, caseStudySlugs: currentVariant.caseStudySlugs }
+        },
+      })
+
+      void register({
+        name: 'select_evidence',
+        title: 'Select mission evidence',
+        description: 'Select the approved Newtuple case studies and proof paths that best support the current visitor goal.',
+        inputSchema: { type: 'object', properties: { goal: { type: 'string', description: 'Optional business goal to use when selecting evidence.' } } },
+        annotations: { readOnlyHint: true },
+        execute: () => {
+          const currentVariant = generateAdaptiveSiteVariant(readContext())
+          return { goal: currentVariant.context.goal, caseStudySlugs: currentVariant.caseStudySlugs, href: currentVariant.caseStudyHref }
+        },
+      })
+
+      void register({
+        name: 'prepare_next_action',
+        title: 'Prepare next action',
+        description: 'Prepare the next recommended Newtuple action for the visitor. This only returns a proposal; it never submits a lead or sends a message.',
+        inputSchema: { type: 'object', properties: { approval: { type: 'string', enum: ['required'], description: 'Human approval is always required.' } }, required: ['approval'] },
+        annotations: { readOnlyHint: true },
+        execute: () => {
+          const currentVariant = generateAdaptiveSiteVariant(readContext())
+          return { action: currentVariant.primaryCta.label, href: currentVariant.primaryCta.href, approvalRequired: true, status: 'awaiting_human' }
+        },
+      })
+
+      void register({
         name: 'select_case_studies',
+        title: 'Select case studies',
         description: 'Return the case study slugs Newtuple is emphasizing for this visitor.',
+        annotations: { readOnlyHint: true },
         execute: () => generateAdaptiveSiteVariant(readContext()).caseStudySlugs,
       })
 
       void register({
         name: 'choose_cta',
+        title: 'Choose call to action',
         description: 'Return the primary and secondary call to action Newtuple selected for the current visitor.',
+        annotations: { readOnlyHint: true },
         execute: () => {
           const variant = generateAdaptiveSiteVariant(readContext())
           return { primary: variant.primaryCta, secondary: variant.secondaryCta }

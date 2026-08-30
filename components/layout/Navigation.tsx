@@ -258,6 +258,8 @@ export default function Navigation() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const closeMobile = useCallback(() => setMobileOpen(false), [])
+  const pathname = usePathname()
+  const zeroNav = pathname === '/'
   const { variant, resetContext } = useVisitorContext()
   const stripAccent = STRIP_ACCENTS[variant.intent] ?? STRIP_ACCENTS.general
 
@@ -269,7 +271,7 @@ export default function Navigation() {
 
   return (
     <>
-      {variant.isPersonalized && (
+      {!zeroNav && variant.isPersonalized && (
         <div className={`fixed top-0 left-0 right-0 z-50 animate-fade-up border-b ${stripAccent.bar}`}>
           <Container>
             <div className={`flex flex-wrap items-center justify-center gap-2 py-1.5 text-center text-xs font-semibold sm:text-sm ${stripAccent.text}`}>
@@ -305,7 +307,12 @@ export default function Navigation() {
               />
             </Link>
 
-            {variant.isPersonalized ? (
+            {zeroNav ? (
+              <div className="hidden items-center gap-2 text-xs font-semibold text-gray-400 lg:flex">
+                <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                ZeroNav surface active
+              </div>
+            ) : variant.isPersonalized ? (
               <nav className="hidden lg:flex items-center gap-6">
                 {variant.navigation.map((item, index) => (
                   <Link
@@ -336,19 +343,19 @@ export default function Navigation() {
               </nav>
             )}
 
-            <div className="hidden lg:block">
+            {!zeroNav && <div className="hidden lg:block">
               <Button href="/contactus" size="sm">
                 Contact Us
               </Button>
-            </div>
+            </div>}
 
-            <button
+            {!zeroNav && <button
               className="lg:hidden p-2.5 rounded-lg hover:bg-gray-100 active:bg-gray-200"
               onClick={() => setMobileOpen(true)}
               aria-label="Open menu"
             >
               <Menu className="w-6 h-6 text-gray-900" />
-            </button>
+            </button>}
           </div>
         </Container>
       </header>

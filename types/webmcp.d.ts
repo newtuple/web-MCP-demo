@@ -5,7 +5,12 @@ interface WebMCPToolExecuteOptions {
 interface WebMCPToolDefinition {
   name: string
   description: string
+  title?: string
   inputSchema?: Record<string, unknown>
+  annotations?: {
+    readOnlyHint?: boolean
+    untrustedContentHint?: boolean
+  }
   execute: (input: Record<string, unknown>, options: WebMCPToolExecuteOptions) => unknown | Promise<unknown>
 }
 
@@ -27,4 +32,3 @@ interface Navigator {
 interface Window {
   __newtupleWebMCPToolsRegistered?: boolean
 }
-
