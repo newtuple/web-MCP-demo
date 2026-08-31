@@ -1,0 +1,989 @@
+<title>Building WebMCP Tools</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&display=swap">
+
+<style>
+:root {
+  --ground:   #fcfcfe;
+  --surface:  #f2f2f7;
+  --sunken:   #e9e9f1;
+  --line:     #dfdfea;
+  --line-soft:#ecedf3;
+  --ink:      #15161f;
+  --muted:    #5c5f72;
+  --faint:    #8a8d9e;
+  --agent:    #4f46c9;
+  --agent-bg: #ecebfb;
+  --page:     #a55d06;
+  --page-bg:  #fbf0e0;
+  --warn:     #9a3412;
+  --ok:       #15693f;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: "IBM Plex Serif", Georgia, serif;
+  font-size: 16px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap {
+  max-width: 812px;
+  margin: 0 auto;
+  padding: 0 32px 120px;
+}
+
+/* ---------------------------------------------------------------- main */
+
+main { padding-top: 56px; min-width: 0; }
+
+
+section { scroll-margin-top: 24px; padding-bottom: 8px; }
+section:first-of-type { padding-top: 0; }
+section + section { margin-top: 60px; padding-top: 52px; border-top: 1px solid var(--line); }
+
+h2 {
+  font-family: "IBM Plex Sans", sans-serif;
+  font-weight: 600;
+  font-size: 27px;
+  letter-spacing: -.018em;
+  line-height: 1.2;
+  margin: 0 0 22px;
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  align-items: baseline;
+  text-wrap: balance;
+}
+h2 .n {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--agent);
+  font-variant-numeric: tabular-nums;
+}
+h3 {
+  font-family: "IBM Plex Sans", sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: -.005em;
+  margin: 34px 0 12px;
+  color: var(--ink);
+}
+h3::before {
+  content: "";
+  display: inline-block;
+  width: 14px;
+  height: 1px;
+  background: var(--agent);
+  vertical-align: middle;
+  margin-right: 9px;
+  margin-bottom: 3px;
+}
+
+p { margin: 0 0 16px; max-width: 66ch; }
+main a { color: var(--agent); text-underline-offset: 2px; }
+
+ul, ol { margin: 0 0 18px; padding-left: 22px; max-width: 66ch; }
+li { margin-bottom: 6px; }
+li::marker { color: var(--faint); }
+
+strong { font-weight: 600; }
+em { font-style: italic; }
+
+code {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: .875em;
+  background: var(--sunken);
+  padding: .1em .36em;
+  border-radius: 3px;
+  border: 1px solid var(--line-soft);
+}
+
+pre {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12.8px;
+  line-height: 1.62;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-left: 2px solid var(--agent);
+  border-radius: 0 5px 5px 0;
+  padding: 15px 17px;
+  margin: 0 0 20px;
+  overflow-x: auto;
+  tab-size: 2;
+}
+pre code { background: none; border: 0; padding: 0; font-size: inherit; }
+pre .cm { color: var(--faint); font-style: italic; }
+pre .st { color: var(--ok); }
+pre.shell {
+  border-left-color: var(--muted);
+  color: var(--muted);
+}
+
+/* -------------------------------------------------------------- table */
+
+.tbl { overflow-x: auto; margin: 0 0 22px; border: 1px solid var(--line); border-radius: 5px; }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+th {
+  text-align: left;
+  font-weight: 600;
+  font-size: 10.5px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--faint);
+  background: var(--surface);
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line-soft);
+  vertical-align: top;
+}
+tr:last-child td { border-bottom: 0; }
+td code { font-size: .85em; }
+
+/* ------------------------------------------------------------ figures */
+
+figure {
+  margin: 26px 0 28px;
+  padding: 20px 20px 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+figure .svgbox { overflow-x: auto; }
+figure svg { display: block; max-width: 100%; height: auto; margin: 0 auto; color: var(--ink); }
+figcaption {
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--muted);
+  margin-top: 14px;
+  padding-top: 11px;
+  border-top: 1px solid var(--line);
+  text-align: left;
+}
+figcaption b { color: var(--ink); font-weight: 600; }
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-top: 12px;
+}
+.legend i { display: inline-flex; align-items: center; gap: 6px; font-style: normal; }
+.legend i::before {
+  content: "";
+  width: 11px; height: 11px; border-radius: 2px;
+  border: 1.5px solid currentColor;
+}
+.legend .a { color: var(--agent); }
+.legend .p { color: var(--page); }
+.legend .b { color: var(--muted); }
+
+/* -------------------------------------------------------------- notes */
+
+.note {
+  border-left: 2px solid var(--page);
+  background: var(--page-bg);
+  padding: 13px 16px;
+  margin: 0 0 20px;
+  border-radius: 0 5px 5px 0;
+  font-size: 15px;
+}
+.note p:last-child { margin-bottom: 0; }
+.note .lbl {
+  display: block;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--page);
+  margin-bottom: 6px;
+}
+
+/* --------------------------------------------------------------- misc */
+
+.lead { font-size: 18px; line-height: 1.55; color: var(--ink); }
+
+footer {
+  margin-top: 60px;
+  padding-top: 26px;
+  border-top: 2px solid var(--ink);
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+@media (max-width: 900px) {
+  .wrap { padding: 0 20px 80px; }
+  main { padding-top: 34px; }
+  h2 { grid-template-columns: 34px 1fr; font-size: 23px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+</style>
+
+<div class="wrap">
+
+
+<main>
+
+
+<!-- ============================================================== 1 -->
+<section id="s1">
+  <h2><span class="n">01</span> What WebMCP is</h2>
+
+  <p class="lead">WebMCP is a browser API that lets a website hand its own JavaScript functions to an AI agent.</p>
+
+  <p>Instead of the agent looking at a screenshot of your page and guessing where to click, your page gives it a list like this:</p>
+
+<pre><code>add_to_cart      needs: productId (string), quantity (number)
+apply_coupon     needs: code (string)
+get_cart_total   needs: nothing</code></pre>
+
+  <p>The agent picks one, fills in the values, and the browser runs your real function.</p>
+
+  <p>The API lives at <code>document.modelContext</code>. It is a W3C proposal from the Web Machine Learning Community Group, with Google and Microsoft driving it. Chrome ships it behind an origin trial.</p>
+
+</section>
+
+<!-- ============================================================== 2 -->
+<section id="s2">
+  <h2><span class="n">02</span> The problem it solves</h2>
+
+  <p>Today an agent uses a website the same way a person does, except worse.</p>
+
+  <p>It takes a screenshot. It guesses that the blue rectangle near the top is probably a search box. It clicks at pixel coordinates. It takes another screenshot to see what happened. Then it repeats.</p>
+
+  <p>WebMCP removes the guessing. Your page states what it can do, in words, with a schema. The agent reads that and calls the function directly.</p>
+
+</section>
+
+<!-- ============================================================== 3 -->
+<section id="s3">
+  <h2><span class="n">03</span> How it works</h2>
+
+  <p>Three parties. The agent never touches your page directly. Every interaction goes through the browser.</p>
+
+  <figure>
+    <div class="svgbox">
+    <svg viewBox="0 0 880 520" role="img" aria-label="Sequence diagram. The page registers tools with the browser. The agent asks the browser for the tool list, then asks it to execute one. The browser calls the page's execute function, which updates the UI and returns content, which the browser passes back to the agent as a string.">
+      <defs>
+        <marker id="ar-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 1 L 9 5 L 0 9 z" fill="var(--agent)"/>
+        </marker>
+        <marker id="ar-p" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 1 L 9 5 L 0 9 z" fill="var(--page)"/>
+        </marker>
+      </defs>
+
+      <rect x="20"  y="18" width="200" height="40" rx="5" fill="var(--agent-bg)" stroke="var(--agent)" stroke-width="1.5"/>
+      <text x="120" y="37" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="13" font-weight="600" fill="var(--agent)">AGENT</text>
+      <text x="120" y="51" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="10" fill="var(--muted)">ChatGPT, Codex, your script</text>
+
+      <rect x="340" y="18" width="200" height="40" rx="5" fill="var(--sunken)" stroke="var(--muted)" stroke-width="1.5"/>
+      <text x="440" y="37" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="13" font-weight="600" fill="var(--ink)">BROWSER</text>
+      <text x="440" y="51" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="10" fill="var(--muted)">holds the registry</text>
+
+      <rect x="660" y="18" width="200" height="40" rx="5" fill="var(--page-bg)" stroke="var(--page)" stroke-width="1.5"/>
+      <text x="760" y="37" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="13" font-weight="600" fill="var(--page)">PAGE</text>
+      <text x="760" y="51" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="10" fill="var(--muted)">your site, in the tab</text>
+
+      <line x1="120" y1="58" x2="120" y2="500" stroke="var(--line)" stroke-width="1.5" stroke-dasharray="3 5"/>
+      <line x1="440" y1="58" x2="440" y2="500" stroke="var(--line)" stroke-width="1.5" stroke-dasharray="3 5"/>
+      <line x1="760" y1="58" x2="760" y2="500" stroke="var(--line)" stroke-width="1.5" stroke-dasharray="3 5"/>
+
+      <text x="752" y="93" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="var(--page)">registerTool(tool, {signal})</text>
+      <line x1="756" y1="102" x2="444" y2="102" stroke="var(--page)" stroke-width="2" marker-end="url(#ar-p)"/>
+      <circle cx="620" cy="118" r="9" fill="var(--page)"/>
+      <text x="620" y="122" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" font-weight="600" fill="var(--ground)">1</text>
+      <text x="640" y="122" font-family="IBM Plex Sans, sans-serif" font-size="10.5" fill="var(--muted)">once per tool, at page load</text>
+
+      <rect x="352" y="140" width="176" height="46" rx="4" fill="var(--sunken)" stroke="var(--line)" stroke-width="1"/>
+      <text x="440" y="157" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--muted)">registry for this tab</text>
+      <text x="440" y="174" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="600" fill="var(--ink)">name + schema + fn ref</text>
+      <circle cx="341" cy="140" r="9" fill="var(--muted)"/>
+      <text x="341" y="144" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" font-weight="600" fill="var(--ground)">2</text>
+
+      <text x="128" y="222" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="var(--agent)">getTools()</text>
+      <line x1="124" y1="231" x2="436" y2="231" stroke="var(--agent)" stroke-width="2" marker-end="url(#ar-a)"/>
+      <circle cx="280" cy="247" r="9" fill="var(--agent)"/>
+      <text x="280" y="251" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" font-weight="600" fill="var(--ground)">3</text>
+
+      <text x="432" y="278" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="var(--agent)">names, descriptions, schemas</text>
+      <line x1="436" y1="287" x2="124" y2="287" stroke="var(--agent)" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#ar-a)"/>
+      <text x="128" y="304" font-family="IBM Plex Sans, sans-serif" font-size="10.5" fill="var(--muted)">no execute function is ever handed over</text>
+
+      <text x="128" y="342" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="var(--agent)">executeTool(tool, args)</text>
+      <line x1="124" y1="351" x2="436" y2="351" stroke="var(--agent)" stroke-width="2" marker-end="url(#ar-a)"/>
+      <circle cx="280" cy="367" r="9" fill="var(--agent)"/>
+      <text x="280" y="371" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" font-weight="600" fill="var(--ground)">4</text>
+
+      <text x="448" y="342" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="var(--page)">calls your execute()</text>
+      <line x1="444" y1="351" x2="756" y2="351" stroke="var(--page)" stroke-width="2" marker-end="url(#ar-p)"/>
+      <circle cx="600" cy="367" r="9" fill="var(--page)"/>
+      <text x="600" y="371" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" font-weight="600" fill="var(--ground)">5</text>
+
+      <rect x="644" y="388" width="216" height="44" rx="4" fill="var(--page-bg)" stroke="var(--page)" stroke-width="1"/>
+      <text x="752" y="405" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11" font-weight="600" fill="var(--page)">runs real app code</text>
+      <text x="752" y="421" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="10.5" fill="var(--muted)">UI updates on screen</text>
+      <circle cx="633" cy="388" r="9" fill="var(--page)"/>
+      <text x="633" y="392" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" font-weight="600" fill="var(--ground)">6</text>
+
+      <text x="752" y="458" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="var(--page)">{ content: [ ... ] }</text>
+      <line x1="756" y1="467" x2="444" y2="467" stroke="var(--page)" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#ar-p)"/>
+
+      <text x="432" y="492" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="var(--agent)">result, as a string</text>
+      <line x1="436" y1="501" x2="124" y2="501" stroke="var(--agent)" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#ar-a)"/>
+      <circle cx="280" cy="484" r="9" fill="var(--agent)"/>
+      <text x="280" y="488" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" font-weight="600" fill="var(--ground)">7</text>
+    </svg>
+    </div>
+    <div class="legend">
+      <i class="a">agent to browser</i>
+      <i class="p">page to browser</i>
+      <i class="b">held by the browser</i>
+    </div>
+    <figcaption><b>One tool call, end to end.</b> Solid arrows are calls, dashed arrows are returns. The browser sits between the two sides at every step: it stores a pointer to your function, hands the agent only the description, and does the calling itself.</figcaption>
+  </figure>
+
+  <p>Read that as:</p>
+
+  <ol>
+    <li>Your page loads and calls <code>registerTool()</code> once per tool.</li>
+    <li>The browser writes each one into a registry attached to that tab. It stores a pointer to your function, not a copy.</li>
+    <li>The agent asks the browser for the list with <code>getTools()</code>. It gets names, descriptions and schemas. It does not get your functions.</li>
+    <li>The agent picks one and calls <code>executeTool(tool, args)</code>.</li>
+    <li>The browser looks up the stored function and calls it with those arguments.</li>
+    <li>Your function runs like normal app code. The screen updates because it is the app's real code doing the work.</li>
+    <li>Your function returns a result. The browser passes it back to the agent.</li>
+  </ol>
+</section>
+
+<!-- ============================================================== 4 -->
+<section id="s4">
+  <h2><span class="n">04</span> Requirements</h2>
+
+  <h3>For your site</h3>
+
+  <div class="tbl"><table>
+    <thead><tr><th>Requirement</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td>HTTPS</td><td>The API is marked <code>SecureContext</code> in the spec. It does not exist on plain HTTP. <code>http://localhost</code> is treated as secure, so local dev works.</td></tr>
+      <tr><td>No <code>document.domain</code></td><td>A document that opted into the legacy <code>document.domain</code> setter loses origin isolation and cannot use WebMCP.</td></tr>
+      <tr><td>Permissions Policy allows <code>tools</code></td><td>Defaults to <code>self</code>, so your own page works out of the box. To allow an embedded iframe, send <code>Permissions-Policy: tools=(self "https://partner.example")</code>.</td></tr>
+      <tr><td>No build step or library</td><td>It is a plain browser API. Vanilla JS is fine.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>For testing locally</h3>
+  <p>Enable the flag, then relaunch Chrome:</p>
+<pre class="shell"><code>chrome://flags/#enable-webmcp-testing</code></pre>
+
+  <h3>For production</h3>
+  <p>Join the WebMCP origin trial (available from Chrome 149) and add the token to your page:</p>
+<pre><code>&lt;meta http-equiv="origin-trial" content="YOUR_TOKEN_HERE"&gt;</code></pre>
+
+  <h3>Feature detection</h3>
+  <p>Always check before using it. Older browsers do not have it, and the API surface is still moving.</p>
+<pre class="lang-js"><code>if ("modelContext" in document) {
+  registerAllTools();
+} else {
+  console.info("WebMCP not available, site works normally");
+}</code></pre>
+
+  <div class="note">
+    <span class="lbl">Rule</span>
+    <p>Your site must work fine without it. WebMCP is an addition, never a dependency.</p>
+  </div>
+</section>
+
+<!-- ============================================================== 5 -->
+<section id="s5">
+  <h2><span class="n">05</span> Making your first tool</h2>
+
+  <p>Here is the smallest useful tool.</p>
+
+<pre class="lang-js"><code>const controller = new AbortController();
+
+await document.modelContext.registerTool({
+  name: "add_todo",
+  description: "Add a new item to the user's todo list",
+
+  inputSchema: {
+    type: "object",
+    properties: {
+      text: {
+        type: "string",
+        description: "The text content of the todo item"
+      }
+    },
+    required: ["text"]
+  },
+
+  async execute({ text }) {
+    addTodoToList(text);          // your existing app function
+
+    return {
+      content: [
+        { type: "text", text: `Added todo: "${text}"` }
+      ]
+    };
+  }
+}, { signal: controller.signal });</code></pre>
+
+  <p>That is the whole pattern. Five things:</p>
+
+  <ol>
+    <li>A <code>name</code> the agent will refer to</li>
+    <li>A <code>description</code> in plain English</li>
+    <li>An <code>inputSchema</code> saying what arguments it takes</li>
+    <li>An <code>execute</code> function that does the work</li>
+    <li>A <code>signal</code> so you can remove the tool later</li>
+  </ol>
+
+  <p>The important part: <code>execute</code> should call the function your own UI already calls. Do not write a separate code path for the agent. If your Add button calls <code>addTodoToList(text)</code>, your tool calls <code>addTodoToList(text)</code>. One code path, one set of bugs.</p>
+</section>
+
+<!-- ============================================================== 6 -->
+<section id="s6">
+  <h2><span class="n">06</span> The tool object in detail</h2>
+
+  <p>Full shape from the spec:</p>
+
+<pre><code>dictionary ModelContextTool {
+  required DOMString name;
+  USVString title;
+  required DOMString description;
+  object inputSchema;
+  required ToolExecuteCallback execute;
+  ToolAnnotations annotations;
+};</code></pre>
+
+  <h3>name</h3>
+  <p>Required. What the agent calls it. Use <code>snake_case</code>. Use a verb. Be specific.</p>
+<pre class="lang-js"><code>name: "add_itinerary_activity"    // good
+name: "search_products"           // good
+name: "handleClick"               // bad, means nothing to an agent
+name: "doStuff"                   // bad</code></pre>
+
+  <h3>title</h3>
+  <p>Optional. A human friendly label for UI that lists tools. <code>"Add Activity"</code> where <code>name</code> is <code>add_itinerary_activity</code>.</p>
+
+  <h3>description</h3>
+  <p>Required, and it matters more than people expect. This is the only thing the agent reads to decide whether to use your tool. Write it for someone who has never seen your app.</p>
+<pre class="lang-js"><code>// bad
+description: "Adds an activity"
+
+// good
+description: "Add an activity to an empty hourly slot in the itinerary. \
+Fails if the slot is already occupied or if the traveler has manually \
+edited that slot."</code></pre>
+  <p>Say what it does. Say when it fails. Say what it will not touch.</p>
+
+  <h3>inputSchema</h3>
+  <p>Standard JSON Schema. This is a contract, and the browser validates against it, so use it properly.</p>
+<pre class="lang-js"><code>inputSchema: {
+  type: "object",
+  properties: {
+    date: {
+      type: "string",
+      description: "Local date in YYYY-MM-DD format"
+    },
+    hour: {
+      type: "integer",
+      minimum: 7,
+      maximum: 22,
+      description: "Start hour on a 24 hour clock"
+    },
+    category: {
+      type: "string",
+      enum: ["eat", "explore", "culture", "coffee", "rest"]
+    },
+    duration: {
+      type: "number",
+      minimum: 0.5,
+      maximum: 8,
+      description: "Length in hours"
+    }
+  },
+  required: ["date", "hour"],
+  additionalProperties: false
+}</code></pre>
+
+  <p>Things worth doing every time:</p>
+  <ul>
+    <li>Put a <code>description</code> on each property, not just on the tool</li>
+    <li>Use <code>enum</code> for fixed choices, so the agent cannot invent a category</li>
+    <li>Use <code>minimum</code> and <code>maximum</code> on numbers</li>
+    <li>Say what format a string needs, because "date" alone means nothing</li>
+    <li>Set <code>additionalProperties: false</code> so typos get rejected instead of silently ignored</li>
+  </ul>
+
+  <p>Every constraint you add is one fewer thing the agent can get wrong.</p>
+
+  <h3>execute</h3>
+  <p>Required. An async function. Gets the validated arguments as its first parameter.</p>
+<pre class="lang-js"><code>async execute({ date, hour }, options) {
+  // options.signal is an AbortSignal, for long running work
+  const result = await myApp.addActivity(date, hour);
+
+  return {
+    content: [
+      { type: "text", text: `Added at ${hour}:00 on ${date}` }
+    ]
+  };
+}</code></pre>
+
+  <p>The return shape is <code>{ content: [ { type: "text", text: "..." } ] }</code>. Make the text useful. The agent reads this to decide what to do next.</p>
+
+<pre class="lang-js"><code>// bad, tells the agent nothing
+return { content: [{ type: "text", text: "OK" }] };
+
+// good, agent knows the state now
+return { content: [{ type: "text", text:
+  `Added "Morning walk" at 9:00 on 2026-09-18. Day 1 now has 6 activities. \
+Remaining empty slots: 7:00, 12:00, 17:00.` }] };</code></pre>
+
+  <p>Failures should return a clear message rather than throwing:</p>
+
+<pre class="lang-js"><code>async execute({ date, hour, title }) {
+  if (slotIsTaken(date, hour)) {
+    return { content: [{ type: "text", text:
+      `Cannot add. ${hour}:00 on ${date} already has "${getSlot(date, hour).title}". \
+Use update_activity to change it, or pick an empty hour.` }] };
+  }
+  // ...
+}</code></pre>
+
+  <p>That message tells the agent exactly how to recover. A thrown error just tells it something broke.</p>
+
+  <p>The second parameter carries <code>options.signal</code>, an <code>AbortSignal</code>. Pass it to <code>fetch</code> so a cancelled tool call actually stops the network request.</p>
+
+  <h3>annotations</h3>
+  <p>Optional hints about the tool's behaviour.</p>
+<pre class="lang-js"><code>annotations: {
+  readOnlyHint: true,           // does not change anything
+  untrustedContentHint: false   // output may contain user or third party text
+}</code></pre>
+
+  <p>Set <code>readOnlyHint: true</code> on anything that only reads. Agents and browsers can use it to skip confirmation prompts on safe calls.</p>
+
+  <p>Set <code>untrustedContentHint: true</code> when your tool returns text you did not write, for example user comments or scraped content. It warns the agent that the text might contain instructions trying to hijack it.</p>
+
+  <div class="note">
+    <span class="lbl">Both are hints</span>
+    <p>Nothing is enforced. Do your own permission checks inside <code>execute</code>.</p>
+  </div>
+</section>
+
+<!-- ============================================================== 7 -->
+<section id="s7">
+  <h2><span class="n">07</span> Removing tools</h2>
+
+  <p>There is no <code>unregisterTool()</code>. You remove a tool by aborting the signal you passed at registration.</p>
+
+<pre class="lang-js"><code>const controller = new AbortController();
+
+await document.modelContext.registerTool(myTool, { signal: controller.signal });
+
+// later
+controller.abort();   // tool is gone from the registry</code></pre>
+
+  <p>This is the most useful part of the API and the part most people skip.</p>
+
+  <p>Only register what is actually possible right now. If a tool cannot succeed in the current state, take it off the list. The agent then cannot even attempt it.</p>
+
+  <figure>
+    <div class="svgbox">
+    <svg viewBox="0 0 860 300" role="img" aria-label="Two page states side by side. With an empty cart the agent's tool list holds add_to_cart and view_cart. Once the cart has items, the page registers checkoutTool and the agent's list gains checkout. Emptying the cart aborts the controller and checkout disappears from the list.">
+      <defs>
+        <marker id="ar-s" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 1 L 9 5 L 0 9 z" fill="var(--page)"/>
+        </marker>
+      </defs>
+
+      <!-- state A -->
+      <text x="30" y="26" font-family="IBM Plex Mono, monospace" font-size="10.5" letter-spacing="1.2" fill="var(--faint)">PAGE STATE A</text>
+      <rect x="30" y="36" width="250" height="52" rx="5" fill="var(--page-bg)" stroke="var(--page)" stroke-width="1.5"/>
+      <text x="155" y="59" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="13" font-weight="600" fill="var(--page)">cart is empty</text>
+      <text x="155" y="76" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--muted)">cart.items.length === 0</text>
+
+      <text x="30" y="126" font-family="IBM Plex Mono, monospace" font-size="10.5" letter-spacing="1.2" fill="var(--faint)">WHAT THE AGENT SEES</text>
+      <rect x="30" y="136" width="250" height="112" rx="5" fill="var(--agent-bg)" stroke="var(--agent)" stroke-width="1.5"/>
+      <text x="48" y="163" font-family="IBM Plex Mono, monospace" font-size="12" fill="var(--agent)">add_to_cart</text>
+      <text x="48" y="188" font-family="IBM Plex Mono, monospace" font-size="12" fill="var(--agent)">view_cart</text>
+      <line x1="48" y1="204" x2="262" y2="204" stroke="var(--agent)" stroke-width="1" stroke-dasharray="3 4" opacity=".45"/>
+      <text x="48" y="226" font-family="IBM Plex Sans, sans-serif" font-size="11" font-style="italic" fill="var(--faint)">checkout does not exist,</text>
+      <text x="48" y="240" font-family="IBM Plex Sans, sans-serif" font-size="11" font-style="italic" fill="var(--faint)">so it cannot be attempted</text>
+
+      <!-- transitions -->
+      <line x1="296" y1="118" x2="564" y2="118" stroke="var(--page)" stroke-width="2" marker-end="url(#ar-s)"/>
+      <text x="430" y="110" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="var(--page)">registerTool(checkoutTool, {signal})</text>
+      <text x="430" y="95" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="10.5" fill="var(--muted)">first item added</text>
+
+      <line x1="564" y1="176" x2="296" y2="176" stroke="var(--page)" stroke-width="2" marker-end="url(#ar-s)"/>
+      <text x="430" y="168" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="var(--page)">controller.abort()</text>
+      <text x="430" y="196" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="10.5" fill="var(--muted)">cart emptied</text>
+
+      <!-- state B -->
+      <text x="580" y="26" font-family="IBM Plex Mono, monospace" font-size="10.5" letter-spacing="1.2" fill="var(--faint)">PAGE STATE B</text>
+      <rect x="580" y="36" width="250" height="52" rx="5" fill="var(--page-bg)" stroke="var(--page)" stroke-width="1.5"/>
+      <text x="705" y="59" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="13" font-weight="600" fill="var(--page)">cart has items</text>
+      <text x="705" y="76" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--muted)">cart.items.length &gt; 0</text>
+
+      <text x="580" y="126" font-family="IBM Plex Mono, monospace" font-size="10.5" letter-spacing="1.2" fill="var(--faint)">WHAT THE AGENT SEES</text>
+      <rect x="580" y="136" width="250" height="112" rx="5" fill="var(--agent-bg)" stroke="var(--agent)" stroke-width="1.5"/>
+      <text x="598" y="163" font-family="IBM Plex Mono, monospace" font-size="12" fill="var(--agent)">add_to_cart</text>
+      <text x="598" y="188" font-family="IBM Plex Mono, monospace" font-size="12" fill="var(--agent)">view_cart</text>
+      <rect x="590" y="200" width="230" height="30" rx="4" fill="var(--agent)" opacity=".14"/>
+      <text x="598" y="220" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600" fill="var(--agent)">checkout</text>
+      <text x="740" y="220" font-family="IBM Plex Sans, sans-serif" font-size="10.5" fill="var(--agent)">newly available</text>
+
+      <text x="430" y="278" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="var(--muted)">You never wrote a check inside the tool. The option simply is not there.</text>
+    </svg>
+    </div>
+    <div class="legend">
+      <i class="p">page state and registration</i>
+      <i class="a">the agent's tool list</i>
+    </div>
+    <figcaption><b>Registration is how you constrain the agent.</b> The tool list is derived from page state, so an impossible action is not on the menu at all. This is stronger than validating inside <code>execute</code>, because the agent never even forms the intent.</figcaption>
+  </figure>
+
+<pre class="lang-js"><code>let checkoutController = null;
+
+function onCartChanged(cart) {
+  if (cart.items.length &gt; 0 &amp;&amp; !checkoutController) {
+    checkoutController = new AbortController();
+    document.modelContext.registerTool(checkoutTool,
+      { signal: checkoutController.signal });
+  }
+
+  if (cart.items.length === 0 &amp;&amp; checkoutController) {
+    checkoutController.abort();
+    checkoutController = null;
+  }
+}</code></pre>
+
+  <p>Now <code>checkout</code> simply does not exist while the cart is empty. You did not have to write a check inside the tool, and the agent did not have to be told not to try.</p>
+
+  <p>Other cases where you should unregister:</p>
+  <ul>
+    <li>Admin tools when the user is not an admin</li>
+    <li><code>submit_form</code> while the form is invalid</li>
+    <li>Page specific tools when the user navigates away in a single page app</li>
+    <li><code>respond_to_comment</code> when there are no comments</li>
+  </ul>
+
+  <p>Group related tools under one controller if they share a lifetime:</p>
+
+<pre class="lang-js"><code>const loggedInTools = new AbortController();
+
+for (const tool of [profileTool, ordersTool, logoutTool]) {
+  await document.modelContext.registerTool(tool, { signal: loggedInTools.signal });
+}
+
+function onLogout() {
+  loggedInTools.abort();   // all three gone at once
+}</code></pre>
+</section>
+
+<!-- ============================================================== 8 -->
+<section id="s8">
+  <h2><span class="n">08</span> Telling the agent the menu changed</h2>
+
+  <p>The agent will not poll <code>getTools()</code> in a loop. The browser fires an event when the registry changes.</p>
+
+<pre class="lang-js"><code>document.modelContext.ontoolchange = () =&gt; {
+  // a tool was registered or aborted, re-read the list
+};</code></pre>
+
+  <p>You do not fire this yourself. The browser does it when you register or abort. It is on the agent side to listen. Worth knowing because it is why dynamic registration works at all.</p>
+</section>
+
+<!-- ============================================================== 9 -->
+<section id="s9">
+  <h2><span class="n">09</span> The declarative HTML version</h2>
+
+  <p>If your tool is just a form, you can skip JavaScript entirely.</p>
+
+<pre><code>&lt;form toolname="search_cars"
+      tooldescription="Search available cars by make and model"
+      toolautosubmit&gt;
+
+  &lt;input type="text"
+         name="make"
+         toolparamdescription="The vehicle's make, for example BMW or Ford"
+         required&gt;
+
+  &lt;input type="text"
+         name="model"
+         toolparamdescription="The vehicle's model, for example 330i or F-150"
+         required&gt;
+
+  &lt;button type="submit"&gt;Search&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+
+  <p>Four attributes:</p>
+
+  <div class="tbl"><table>
+    <thead><tr><th>Attribute</th><th>Goes on</th><th>Means</th></tr></thead>
+    <tbody>
+      <tr><td><code>toolname</code></td><td><code>&lt;form&gt;</code></td><td>same as <code>ModelContextTool.name</code></td></tr>
+      <tr><td><code>tooldescription</code></td><td><code>&lt;form&gt;</code></td><td>same as <code>.description</code></td></tr>
+      <tr><td><code>toolautosubmit</code></td><td><code>&lt;form&gt;</code></td><td>boolean, lets the agent submit without a human click</td></tr>
+      <tr><td><code>toolparamdescription</code></td><td>form controls</td><td>describes one parameter</td></tr>
+    </tbody>
+  </table></div>
+
+  <p>The schema is derived from your inputs. <code>name</code> becomes the property name, <code>required</code> becomes a required field, <code>type="number"</code> becomes a number.</p>
+
+  <p>Use this for search forms, filters and simple lookups. Use the JavaScript API when you need enums, ranges, conditional logic, or a return value richer than a page navigation.</p>
+
+  <div class="note">
+    <span class="lbl">Careful</span>
+    <p>Leave <code>toolautosubmit</code> off for anything that spends money, sends a message, or deletes something. Without it the agent fills the form and stops, and a person presses the button.</p>
+  </div>
+</section>
+
+<!-- ============================================================= 10 -->
+<section id="s10">
+  <h2><span class="n">10</span> Reading and calling tools</h2>
+
+  <p>This is the agent side. You need it if you are writing your own agent, a test harness, or a browser extension.</p>
+
+<pre class="lang-js"><code>// 1. get the list
+const tools = await document.modelContext.getTools();</code></pre>
+
+  <p>Each entry is a <code>RegisteredTool</code>:</p>
+
+<pre class="lang-js"><code>{
+  name: "add_todo",
+  title: "Add Todo",
+  description: "Add a new item to the user's todo list",
+  inputSchema: { /* ... */ },
+  window: Window,                          // which tab or frame owns it
+  origin: "https://example.com",           // which origin registered it
+  annotations: { readOnlyHint: false, untrustedContentHint: false }
+}</code></pre>
+
+  <p>Note there is no <code>execute</code> on it. The agent gets the menu, never the function.</p>
+
+<pre class="lang-js"><code>// 2. call one
+const tool = tools.find(t =&gt; t.name === "add_todo");
+
+const raw = await document.modelContext.executeTool(tool, {
+  text: "Buy milk"
+});</code></pre>
+
+  <p><code>executeTool</code> returns a <strong>string</strong>, not an object. The browser serializes the result across the boundary.</p>
+
+<pre class="lang-js"><code>// 3. parse it
+const result = JSON.parse(raw);
+console.log(result.content[0].text);   // "Added todo: \"Buy milk\""</code></pre>
+
+  <p>Cancellation works through the options argument:</p>
+
+<pre class="lang-js"><code>const ac = new AbortController();
+setTimeout(() =&gt; ac.abort(), 5000);
+
+await document.modelContext.executeTool(tool, args, { signal: ac.signal });</code></pre>
+
+  <p>Turning the list into OpenAI tool format:</p>
+
+<pre class="lang-js"><code>const openaiTools = tools.map(t =&gt; ({
+  type: "function",
+  function: {
+    name: t.name,
+    description: t.description,
+    parameters: t.inputSchema
+  }
+}));</code></pre>
+
+  <p>Into Anthropic format:</p>
+
+<pre class="lang-js"><code>const anthropicTools = tools.map(t =&gt; ({
+  name: t.name,
+  description: t.description,
+  input_schema: t.inputSchema
+}));</code></pre>
+
+  <p>Both are near one to one, because <code>inputSchema</code> is already JSON Schema.</p>
+</section>
+
+<!-- ============================================================= 11 -->
+<section id="s11">
+  <h2><span class="n">11</span> Connection and session</h2>
+
+  <h3>There is no connection</h3>
+
+  <p>This is the part that confuses people coming from regular MCP.</p>
+
+  <p>No server. No socket. No HTTP request. No handshake. No API key. No port.</p>
+
+  <p><code>executeTool()</code> is a function call inside one browser process. It is the same thing as clicking a button, except the agent triggered it instead of your finger.</p>
+
+  <figure>
+    <div class="svgbox">
+    <svg viewBox="0 0 860 340" role="img" aria-label="Comparison. A regular MCP server sits in a separate process, reached over stdio or HTTP, and authenticates to your site with its own credentials, crossing two boundaries. With WebMCP the agent, the browser and the page are all inside one browser tab, the call is a direct function call, and it runs on the user's existing session with no boundary crossed.">
+      <defs>
+        <marker id="ar-n" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 1 L 9 5 L 0 9 z" fill="var(--muted)"/>
+        </marker>
+        <marker id="ar-g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 1 L 9 5 L 0 9 z" fill="var(--agent)"/>
+        </marker>
+      </defs>
+
+      <!-- row 1: regular MCP -->
+      <text x="20" y="24" font-family="IBM Plex Mono, monospace" font-size="10.5" letter-spacing="1.2" fill="var(--faint)">REGULAR MCP SERVER</text>
+
+      <rect x="20" y="40" width="150" height="56" rx="5" fill="var(--surface)" stroke="var(--muted)" stroke-width="1.5"/>
+      <text x="95" y="65" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="12.5" font-weight="600" fill="var(--ink)">Agent</text>
+      <text x="95" y="81" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="10" fill="var(--muted)">on your machine</text>
+
+      <line x1="176" y1="68" x2="294" y2="68" stroke="var(--muted)" stroke-width="1.8" marker-end="url(#ar-n)"/>
+      <text x="235" y="60" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--muted)">stdio / HTTP</text>
+
+      <rect x="300" y="40" width="170" height="56" rx="5" fill="var(--surface)" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="5 4"/>
+      <text x="385" y="65" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="12.5" font-weight="600" fill="var(--ink)">MCP server</text>
+      <text x="385" y="81" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="10" fill="var(--muted)">separate process</text>
+
+      <line x1="476" y1="68" x2="614" y2="68" stroke="var(--muted)" stroke-width="1.8" marker-end="url(#ar-n)"/>
+      <text x="545" y="60" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--muted)">API + its own token</text>
+
+      <rect x="620" y="40" width="220" height="56" rx="5" fill="var(--surface)" stroke="var(--muted)" stroke-width="1.5"/>
+      <text x="730" y="65" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="12.5" font-weight="600" fill="var(--ink)">Your backend</text>
+      <text x="730" y="81" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="10" fill="var(--muted)">needs a public API</text>
+
+      <text x="235" y="118" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="10.5" font-style="italic" fill="var(--faint)">boundary 1</text>
+      <text x="545" y="118" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="10.5" font-style="italic" fill="var(--faint)">boundary 2</text>
+
+      <line x1="20" y1="146" x2="840" y2="146" stroke="var(--line)" stroke-width="1"/>
+
+      <!-- row 2: webmcp -->
+      <text x="20" y="182" font-family="IBM Plex Mono, monospace" font-size="10.5" letter-spacing="1.2" fill="var(--agent)">WEBMCP</text>
+
+      <rect x="20" y="196" width="820" height="98" rx="7" fill="var(--agent-bg)" stroke="var(--agent)" stroke-width="1.5"/>
+      <text x="38" y="218" font-family="IBM Plex Mono, monospace" font-size="10.5" letter-spacing="1.2" fill="var(--agent)">ONE BROWSER TAB, ONE PROCESS</text>
+
+      <rect x="44" y="228" width="150" height="50" rx="5" fill="var(--ground)" stroke="var(--agent)" stroke-width="1.3"/>
+      <text x="119" y="249" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="12.5" font-weight="600" fill="var(--ink)">Agent</text>
+      <text x="119" y="265" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="10" fill="var(--muted)">in the browser</text>
+
+      <line x1="200" y1="253" x2="326" y2="253" stroke="var(--agent)" stroke-width="1.8" marker-end="url(#ar-g)"/>
+      <text x="263" y="245" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--agent)">executeTool()</text>
+
+      <rect x="332" y="228" width="150" height="50" rx="5" fill="var(--ground)" stroke="var(--agent)" stroke-width="1.3"/>
+      <text x="407" y="249" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="12.5" font-weight="600" fill="var(--ink)">Browser</text>
+      <text x="407" y="265" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="10" fill="var(--muted)">the registry</text>
+
+      <line x1="488" y1="253" x2="614" y2="253" stroke="var(--agent)" stroke-width="1.8" marker-end="url(#ar-g)"/>
+      <text x="551" y="245" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--agent)">function call</text>
+
+      <rect x="620" y="228" width="196" height="50" rx="5" fill="var(--ground)" stroke="var(--page)" stroke-width="1.3"/>
+      <text x="718" y="249" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="12.5" font-weight="600" fill="var(--page)">Your page</text>
+      <text x="718" y="265" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="10" fill="var(--muted)">already logged in</text>
+
+      <text x="430" y="322" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="var(--muted)">No boundary is crossed, so there is nothing to authenticate and nothing to configure.</text>
+    </svg>
+    </div>
+    <figcaption><b>What the two hops in the top row cost you.</b> A regular MCP server needs its own process, its own transport and its own credentials against a public API you have to build. WebMCP collapses all of that into one function call inside the tab the user already has open.</figcaption>
+  </figure>
+
+  <div class="tbl"><table>
+    <thead><tr><th></th><th>Regular MCP server</th><th>WebMCP</th></tr></thead>
+    <tbody>
+      <tr><td>Where tools run</td><td>separate process or remote machine</td><td>this browser tab</td></tr>
+      <tr><td>Transport</td><td>stdio or HTTP</td><td>none, direct call</td></tr>
+      <tr><td>Setup</td><td>install a server, configure a token</td><td>open the page</td></tr>
+      <tr><td>Auth</td><td>its own credentials</td><td>the user's existing session</td></tr>
+      <tr><td>Lifetime</td><td>until you stop the server</td><td>until the tab closes</td></tr>
+      <tr><td>Who exposes it</td><td>backend team</td><td>frontend team</td></tr>
+    </tbody>
+  </table></div>
+
+</section>
+
+<!-- ============================================================= 12 -->
+<section id="s12">
+  <h2><span class="n">12</span> Which agents can use your tools</h2>
+
+  <h3>ChatGPT desktop app</h3>
+  <p>Native support, no setup. Requirements:</p>
+  <ul>
+    <li>Latest version of the ChatGPT desktop app</li>
+    <li>Use the built in browser inside the app, not Chrome or Safari</li>
+    <li>Model must be GPT-5.6 Sol or GPT-5.6 Terra. Luna has WebMCP disabled</li>
+    <li>Settings, then Browser, then Permissions, then Enable site tools</li>
+    <li>Not available on Enterprise or Edu workspaces</li>
+  </ul>
+  <p>Once the page is open, ask normally. Check the tools were found by clicking Site tools in the address bar, then Available site tools. Site tools, then Recently used shows the actual calls with arguments and return values, which is the best debugging view you get.</p>
+
+  <h3>Codex</h3>
+  <p>Same desktop app, same built in browser. Codex discovers and calls the tools the same way.</p>
+
+  <h3>Chrome, on its own</h3>
+  <p>Chrome implements the API from version 149 under an origin trial. Any agent running inside Chrome can use it. Google also ships a Model Context Tool Inspector extension that lists registered tools, lets you invoke them by hand, and validates your schemas. Use that while developing.</p>
+
+  <h3>Claude</h3>
+  <p>No native support today. The Claude Chrome extension drives pages with screenshots and DOM snapshots and has no WebMCP path. There is an open feature request.</p>
+  <p>A way around it:</p>
+  <ol>
+    <li>A bridge extension plus a local <code>webmcp-server</code>. The extension reads the page's registered tools, forwards them over a WebSocket, and the server exposes them to Claude Code over stdio as normal MCP tools. Community projects exist for this.</li>
+  </ol>
+</section>
+
+<footer>
+  Built from the WebMCP specification, the Web Machine Learning CG explainer, and the Chrome and ChatGPT developer documentation.
+</footer>
+
+</main>
+</div>
+
+<script>
+// dim comments in JS code blocks, for readability only
+document.querySelectorAll("pre.lang-js code").forEach(function (el) {
+  var out = "";
+  el.textContent.split("\n").forEach(function (line, i) {
+    if (i) out += "\n";
+    var idx = line.indexOf("//");
+    var q = line.indexOf('"'), a = line.indexOf("'"), b = line.indexOf("`");
+    var firstQuote = Math.min(
+      q < 0 ? Infinity : q,
+      a < 0 ? Infinity : a,
+      b < 0 ? Infinity : b
+    );
+    if (idx >= 0 && idx < firstQuote) {
+      out += esc(line.slice(0, idx)) + '<span class="cm">' + esc(line.slice(idx)) + "</span>";
+    } else {
+      out += esc(line);
+    }
+  });
+  el.innerHTML = out;
+});
+
+function esc(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+</script>
