@@ -102,6 +102,16 @@ export default function WebMCPProvider() {
       const register = (tool: WebMCPToolDefinition) => tools.push(tool)
 
       const readContext = () => contextRef.current
+
+      // AdaptiveSiteExperience's visible page is driven by its own local
+      // experience/compiled/phase state, not directly by VisitorContext.
+      // Every tool that mutates context must also fire this so the page
+      // actually rebuilds, instead of only the context object changing
+      // underneath an unmoved screen.
+      const syncExperience = (context: VisitorContext) => {
+        window.dispatchEvent(new CustomEvent('newtuple-context-sync', { detail: { context } }))
+      }
+
       const readGeneratedExperience = () => {
         try {
           const stored = window.sessionStorage.getItem('newtuple:generated-experience:v1')
@@ -129,6 +139,7 @@ export default function WebMCPProvider() {
           const statement = String(input.visitor_statement ?? '')
           const inferred = inferVisitorContext(statement)
           replaceContext(inferred)
+          syncExperience(inferred)
           return toolResult(inferred)
         },
       })
@@ -138,14 +149,22 @@ export default function WebMCPProvider() {
         description:
           'Set a structured Newtuple visitor context before or during a visit. An agent can call this to introduce its principal before the human ever sees the page.',
         inputSchema: visitorContextSchema,
-        execute: (input = {}) => toolResult(replaceContext(normalizeVisitorContext(input as Partial<VisitorContext>))),
+        execute: (input = {}) => {
+          const next = replaceContext(normalizeVisitorContext(input as Partial<VisitorContext>))
+          syncExperience(next)
+          return toolResult(next)
+        },
       })
 
       void register({
         name: 'update_visitor_profile',
         description: 'Partially update the current visitor profile and rebuild the visible site while preserving existing known context.',
         inputSchema: visitorContextSchema,
-        execute: (input = {}) => toolResult(updateContext(input as Partial<VisitorContext>)),
+        execute: (input = {}) => {
+          const next = updateContext(input as Partial<VisitorContext>)
+          syncExperience(next)
+          return toolResult(next)
+        },
       })
 
       void register({
@@ -181,7 +200,11 @@ export default function WebMCPProvider() {
         title: 'Request technical view',
         description: 'Recompile the current ZeroNav experience for a technically deep visitor, prioritizing architecture, integrations, APIs, and implementation proof.',
         annotations: { readOnlyHint: false },
-        execute: () => toolResult(updateContext({ technical_depth: 'high' })),
+        execute: () => {
+          const next = updateContext({ technical_depth: 'high' })
+          syncExperience(next)
+          return toolResult(next)
+        },
       })
 
       void register({
@@ -189,7 +212,11 @@ export default function WebMCPProvider() {
         title: 'Request business view',
         description: 'Recompile the current ZeroNav experience for a business audience, prioritizing outcomes, proof, ROI, and the next decision.',
         annotations: { readOnlyHint: false },
-        execute: () => toolResult(updateContext({ technical_depth: 'low' })),
+        execute: () => {
+          const next = updateContext({ technical_depth: 'low' })
+          syncExperience(next)
+          return toolResult(next)
+        },
       })
 
       void register({
@@ -200,7 +227,9 @@ export default function WebMCPProvider() {
         annotations: { readOnlyHint: false },
         execute: (input = {}) => {
           const goal = String(input.goal ?? '')
-          return toolResult(updateContext({ goal, intent: goal.toLowerCase().includes('product') ? 'products' : 'services' }))
+          const next = updateContext({ goal, intent: goal.toLowerCase().includes('product') ? 'products' : 'services' })
+          syncExperience(next)
+          return toolResult(next)
         },
       })
 
@@ -471,7 +500,11 @@ export default function WebMCPProvider() {
       void register({
         name: 'reset_visitor_context',
         description: 'Reset Newtuple.com to its neutral, non-adapted state.',
-        execute: () => toolResult(resetContext()),
+        execute: () => {
+          const next = resetContext()
+          syncExperience(next)
+          return toolResult(next)
+        },
       })
 
       const signal = controller.signal

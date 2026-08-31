@@ -8,7 +8,7 @@ import {
 } from 'lucide-react'
 import Button from '@/components/ui/Button'
 import Container from '@/components/ui/Container'
-import { generateAdaptiveSiteVariant } from '@/lib/adaptiveSite'
+import { DEFAULT_VISITOR_CONTEXT, generateAdaptiveSiteVariant, type VisitorContext } from '@/lib/adaptiveSite'
 import {
   createFallbackMissionExperience,
   type ExperienceSectionKind,
@@ -118,6 +118,46 @@ export default function AdaptiveSiteExperience({ caseStudies }: { caseStudies: C
     }
     window.addEventListener('newtuple-zeronav-compile', onAgentCompile)
     return () => window.removeEventListener('newtuple-zeronav-compile', onAgentCompile)
+  })
+
+  // Structured WebMCP tools (set_visitor_context, update_visitor_profile,
+  // infer_visitor_context, select_goal, reset_visitor_context, ...) update
+  // the shared VisitorContext but have no free-text mission to send through
+  // the OpenAI compile() path above. They dispatch this event instead so the
+  // page still visibly rebuilds — locally, from the fallback composer, since
+  // their tool descriptions promise an immediate rebuild, not a ~2.4s
+  // OpenAI round trip.
+  useEffect(() => {
+    const onContextSync = (event: Event) => {
+      const nextContext = (event as CustomEvent<{ context?: VisitorContext }>).detail?.context
+      if (!nextContext) return
+
+      const isNeutral = JSON.stringify(nextContext) === JSON.stringify(DEFAULT_VISITOR_CONTEXT)
+      if (isNeutral) {
+        setCompiled(false)
+        setPhase('idle')
+        setExperience(null)
+        setGoal('')
+        return
+      }
+
+      const built = createFallbackMissionExperience('', nextContext)
+      setGoal(nextContext.goal)
+      setExperience(built)
+      setSource('fallback')
+      setModel(null)
+      setFallbackReason(null)
+      setActiveSection('outcome')
+      setPhase('thinking')
+      setCompiled(false)
+      window.setTimeout(() => {
+        setGeneration((value) => value + 1)
+        setPhase('revealing')
+        window.setTimeout(() => { setCompiled(true); setPhase('ready') }, 500)
+      }, 400)
+    }
+    window.addEventListener('newtuple-context-sync', onContextSync)
+    return () => window.removeEventListener('newtuple-context-sync', onContextSync)
   })
 
   if (!compiled) {
