@@ -78,25 +78,38 @@ export default function WebMCPProvider() {
     let retryTimer: number | undefined
     let controller: AbortController | null = null
 
-    const getModelContext = () => document.modelContext ?? navigator.modelContext
+    const updateRegistrationState = (state: WebMCPRegistrationState) => {
+      window.__newtupleWebMCPRegistration = state
+      document.documentElement.dataset.webmcpStatus = state.status
+      document.documentElement.dataset.webmcpToolCount = String(state.registered)
+    }
 
-    const registerTools = (modelContext: WebMCPModelContext) => {
+    const getModelContext = () => {
+      if (document.modelContext) return { modelContext: document.modelContext, surface: 'document' as const }
+      if (navigator.modelContext) return { modelContext: navigator.modelContext, surface: 'navigator' as const }
+      return null
+    }
+
+    const registerTools = async (modelContext: WebMCPModelContext, surface: 'document' | 'navigator') => {
       if (window.__newtupleWebMCPToolsRegistered || disposed) return true
 
       window.__newtupleWebMCPToolsRegistered = true
       controller = new AbortController()
+      const tools: WebMCPToolDefinition[] = []
 
-      const register = async (tool: WebMCPToolDefinition) => {
-        const signal = controller?.signal
-        if (!signal || signal.aborted) return
-        try {
-          await modelContext.registerTool(tool, { signal })
-        } catch {
-          if (!signal.aborted) window.__newtupleWebMCPToolsRegistered = false
-        }
-      }
+      // Collect definitions first. Registration is awaited below so discovery
+      // cannot be marked ready before the browser has accepted the tools.
+      const register = (tool: WebMCPToolDefinition) => tools.push(tool)
 
       const readContext = () => contextRef.current
+      const readGeneratedExperience = () => {
+        try {
+          const stored = window.sessionStorage.getItem('newtuple:generated-experience:v1')
+          return stored ? JSON.parse(stored) : null
+        } catch {
+          return null
+        }
+      }
 
       void register({
         name: 'infer_visitor_context',
@@ -140,7 +153,15 @@ export default function WebMCPProvider() {
         title: 'Read current ZeroNav experience',
         description: 'Return the currently compiled Newtuple experience, including generated navigation, hero, CTAs, proof, and visitor context.',
         annotations: { readOnlyHint: true },
-        execute: () => generateAdaptiveSiteVariant(readContext()),
+        execute: () => readGeneratedExperience() ?? { experience: generateAdaptiveSiteVariant(readContext()), source: 'local_context' },
+      })
+
+      void register({
+        name: 'get_generated_experience',
+        title: 'Read generated experience blueprint',
+        description: 'Return the exact OpenAI or fallback experience blueprint currently rendered for the visitor, including layout, theme, journey, metrics, sections, CTAs, and generation source.',
+        annotations: { readOnlyHint: true },
+        execute: () => readGeneratedExperience() ?? { status: 'not_generated', next: 'compile_experience' },
       })
 
       void register({
@@ -453,27 +474,94 @@ export default function WebMCPProvider() {
         execute: () => toolResult(resetContext()),
       })
 
-      return true
-    }
+      const signal = controller.signal
+      const registeredTools: string[] = []
+      const failedTools: Array<{ name: string; error: string }> = []
 
-    const tryRegister = () => {
-      const modelContext = getModelContext()
-      if (!modelContext) return false
-      return registerTools(modelContext)
-    }
+      updateRegistrationState({
+        status: 'registering',
+        surface,
+        registered: 0,
+        total: tools.length,
+        toolNames: [],
+        failedTools: [],
+      })
 
-    if (!tryRegister()) {
-      retryTimer = window.setInterval(() => {
-        if (tryRegister() && retryTimer) {
-          window.clearInterval(retryTimer)
-          retryTimer = undefined
+      for (const tool of tools) {
+        if (disposed || signal.aborted) return false
+
+        try {
+          try {
+            await Promise.resolve(modelContext.registerTool(tool, { signal }))
+          } catch {
+            if (signal.aborted) return false
+            // WebMCP is still a draft. Some implementations expose the same
+            // method without the registration-options argument.
+            await Promise.resolve(modelContext.registerTool(tool))
+          }
+          registeredTools.push(tool.name)
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error)
+          failedTools.push({ name: tool.name, error: message })
+          console.warn(`[WebMCP] Failed to register ${tool.name}: ${message}`)
         }
-      }, 250)
+      }
+
+      const ready = registeredTools.length > 0
+      window.__newtupleWebMCPToolsRegistered = ready
+      updateRegistrationState({
+        status: ready ? 'ready' : 'error',
+        surface,
+        registered: registeredTools.length,
+        total: tools.length,
+        toolNames: registeredTools,
+        failedTools,
+      })
+
+      if (ready) {
+        window.dispatchEvent(new CustomEvent('newtuple-webmcp-ready', {
+          detail: window.__newtupleWebMCPRegistration,
+        }))
+      }
+
+      return ready
     }
+
+    const waitBeforeRetry = (delay = 500) => new Promise<void>((resolve) => {
+      retryTimer = window.setTimeout(resolve, delay)
+    })
+
+    const startRegistration = async () => {
+      // Yield once so React Strict Mode can complete its development-only
+      // setup/cleanup probe without leaving duplicate tools in draft hosts
+      // that do not implement AbortSignal-based unregistration yet.
+      await waitBeforeRetry(0)
+
+      while (!disposed) {
+        const availableContext = getModelContext()
+        if (!availableContext) {
+          updateRegistrationState({
+            status: 'waiting',
+            surface: 'none',
+            registered: 0,
+            total: 0,
+            toolNames: [],
+            failedTools: [],
+          })
+        } else if (typeof availableContext.modelContext.registerTool === 'function') {
+          const ready = await registerTools(availableContext.modelContext, availableContext.surface)
+          if (ready) return
+        }
+
+        await waitBeforeRetry()
+      }
+    }
+
+    void startRegistration()
 
     return () => {
       disposed = true
-      if (retryTimer) window.clearInterval(retryTimer)
+      if (retryTimer) window.clearTimeout(retryTimer)
       controller?.abort()
       window.__newtupleWebMCPToolsRegistered = false
     }

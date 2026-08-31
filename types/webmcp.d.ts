@@ -18,7 +18,16 @@ interface WebMCPModelContext {
   registerTool: (
     tool: WebMCPToolDefinition,
     options?: { signal?: AbortSignal },
-  ) => Promise<void>
+  ) => Promise<void> | void
+}
+
+interface WebMCPRegistrationState {
+  status: 'waiting' | 'registering' | 'ready' | 'error'
+  surface: 'document' | 'navigator' | 'none'
+  registered: number
+  total: number
+  toolNames: string[]
+  failedTools: Array<{ name: string; error: string }>
 }
 
 interface Document {
@@ -31,4 +40,5 @@ interface Navigator {
 
 interface Window {
   __newtupleWebMCPToolsRegistered?: boolean
+  __newtupleWebMCPRegistration?: WebMCPRegistrationState
 }
