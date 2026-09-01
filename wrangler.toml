@@ -1,4 +1,7 @@
 name = "web-mcp-demo"
-pages_build_output_dir = "./out"
 compatibility_date = "2026-09-01"
 compatibility_flags = ["nodejs_compat", "enable_nodejs_http_modules"]
+keep_vars = true
+
+[assets]
+directory = "./out"
