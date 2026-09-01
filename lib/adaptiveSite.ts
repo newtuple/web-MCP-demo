@@ -202,7 +202,7 @@ export function generateAdaptiveSiteVariant(context: VisitorContext): AdaptiveSi
       intent: 'general',
       isPersonalized: false,
       adaptationSummary: '',
-      reasonForVisitor: 'No visitor context set yet — this is the neutral entry screen.',
+      reasonForVisitor: 'No visitor context set yet. This is the neutral entry screen.',
       navigation: [
         { label: 'Services', href: '/newtuple-agents' },
         { label: 'Products', href: '/genai-accelerators' },
@@ -211,7 +211,7 @@ export function generateAdaptiveSiteVariant(context: VisitorContext): AdaptiveSi
         { label: 'Contact', href: '/contactus' },
       ],
       hero: {
-        eyebrow: 'A website that rebuilds itself for every visitor',
+        eyebrow: 'An AI-native website',
         title: 'What are you trying to improve?',
         description: 'Tell Newtuple what you need, and watch the page reshape itself around your goals in seconds.',
       },
@@ -243,7 +243,7 @@ export function generateAdaptiveSiteVariant(context: VisitorContext): AdaptiveSi
       hero: {
         eyebrow: 'Careers',
         title: 'Find your place on the Newtuple team.',
-        description: 'Candidate intent detected — open roles and team culture are the priority for this visit.',
+        description: 'Candidate intent detected. Open roles and team culture are the priority for this visit.',
       },
       primaryCta: { label: 'View open roles', href: '/careers' },
       secondaryCta: { label: 'See life at Newtuple', href: '/life-at-newtuple' },
@@ -274,7 +274,7 @@ export function generateAdaptiveSiteVariant(context: VisitorContext): AdaptiveSi
       hero: {
         eyebrow: `Products for ${audience}`,
         title: 'Explore Newtuple products for AI apps, agents, workflows, and evaluations.',
-        description: `Product interest detected${systemsLabel ? ` around ${systemsLabel}` : ''} — leading with accelerators and platforms that fit ${normalizedContext.goal}.`,
+        description: `Product interest detected${systemsLabel ? ` around ${systemsLabel}` : ''}, leading with accelerators and platforms that fit ${normalizedContext.goal}.`,
       },
       primaryCta: { label: 'Explore AI apps', href: '/newtuple-ai-apps' },
       secondaryCta: { label: 'Book a demo', href: '/contactus' },
@@ -314,7 +314,7 @@ export function generateAdaptiveSiteVariant(context: VisitorContext): AdaptiveSi
       ? {
           eyebrow: `Retail services${systemsLabel ? ` for ${systemsLabel}` : ''}`,
           title: 'Improve merchandising, supplier onboarding, and product-data operations with AI.',
-          description: `${roleName(normalizedContext.role)} context detected — prioritizing ${normalizedContext.goal}${systemsLabel ? ` and ${systemsLabel} integration` : ''}.`,
+          description: `${roleName(normalizedContext.role)} context detected, prioritizing ${normalizedContext.goal}${systemsLabel ? ` and ${systemsLabel} integration` : ''}.`,
         }
       : {
           eyebrow: `Services for ${audience}`,

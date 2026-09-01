@@ -12,6 +12,7 @@ import {
 import { demoAppStore } from '@/lib/demoApp/store'
 import DemoAppLauncher from './DemoAppLauncher'
 import { createDemoAppTools, createDemoBuilderTools } from './demoAppTools'
+import { createNavigateTools } from './navigateTools'
 import { useVisitorContext } from './useVisitorContext'
 
 const ACCENT_VARS: Record<VisitorIntent, Record<string, string>> = {
@@ -115,7 +116,7 @@ export default function WebMCPProvider() {
           properties: {
             visitor_statement: {
               type: 'string',
-              description: 'What the visitor or their agent says they are trying to improve, for example "I run digital transformation for a large retailer using SAP."',
+              description: 'What brings the visitor (or the agent acting for them) to Newtuple, for example "I run digital transformation for a large retailer using SAP."',
             },
           },
           required: ['visitor_statement'],
@@ -178,6 +179,11 @@ export default function WebMCPProvider() {
 
       // Always possible: building a demo app needs nothing to be true first.
       createDemoBuilderTools().forEach((tool) => void register(tool))
+
+      // Also always possible: routing to a real page needs nothing to be
+      // true first either. Its own session lives client-side only, see
+      // lib/navigate/session.ts.
+      createNavigateTools(replaceContext).forEach((tool) => void register(tool))
 
       return true
     }

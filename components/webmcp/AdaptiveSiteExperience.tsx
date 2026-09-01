@@ -2,10 +2,13 @@
 
 import { FormEvent, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import { ArrowRight, Bot, Briefcase, Building2, HelpCircle, PackageCheck, Send } from 'lucide-react'
-import Button from '@/components/ui/Button'
+import { useRouter } from 'next/navigation'
+import { ArrowRight, Bot, Briefcase, Building2, HelpCircle, Loader2, PackageCheck, Send } from 'lucide-react'
 import Container from '@/components/ui/Container'
 import { inferVisitorContext, type VisitorIntent } from '@/lib/adaptiveSite'
+import { buildDemoApp } from '@/lib/demoApp/store'
+import { askNavigator } from '@/lib/navigate/client'
+import { pageHref } from '@/lib/navigate/schema'
 import { useVisitorContext } from './useVisitorContext'
 
 interface CaseStudySummary {
@@ -22,7 +25,13 @@ const intentIcon: Record<VisitorIntent, typeof Bot> = {
   careers: Briefcase,
 }
 
+// This list is always-on tools only. build_demo_app's own demo_app_* tools
+// are deliberately excluded - they only exist while a generated demo page is
+// actually open, so listing them here would claim something not true yet.
 const agentTools = [
+  'navigate_site',
+  'list_site_pages',
+  'build_demo_app',
   'infer_visitor_context',
   'set_visitor_context',
   'update_visitor_profile',
@@ -83,10 +92,13 @@ const accents: Record<VisitorIntent, {
 const cx = (...classes: Array<string | false | undefined>) => classes.filter(Boolean).join(' ')
 
 export default function AdaptiveSiteExperience({ caseStudies }: { caseStudies: CaseStudySummary[] }) {
+  const router = useRouter()
   const { variant, replaceContext } = useVisitorContext()
   const [statement, setStatement] = useState('')
   const [showWhy, setShowWhy] = useState(false)
   const [showAgentPanel, setShowAgentPanel] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [assistantNote, setAssistantNote] = useState<string | null>(null)
   const accent = accents[variant.intent]
   const IntentIcon = intentIcon[variant.intent]
 
@@ -95,20 +107,55 @@ export default function AdaptiveSiteExperience({ caseStudies }: { caseStudies: C
     [caseStudies, variant.caseStudySlugs]
   )
 
-  const adaptFromStatement = (value = statement) => {
-    if (!value.trim()) return
-    replaceContext(inferVisitorContext(value))
-  }
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  // Same handler the navigate_site WebMCP tool runs - typing here and an
+  // agent calling that tool go through the identical decision, so a human
+  // and an agent get the same outcome for the same words.
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    adaptFromStatement()
+    const value = statement.trim()
+    if (!value || busy) return
+
+    setAssistantNote(null)
+    setBusy(true)
+
+    const result = await askNavigator(value)
+
+    if (!result.ok || !result.decision) {
+      setAssistantNote(result.error ?? 'Something went wrong. Try again.')
+      setBusy(false)
+      return
+    }
+
+    const { decision } = result
+
+    if (decision.decision === 'navigate' && decision.page) {
+      router.push(pageHref(decision.page))
+      setBusy(false)
+      return
+    }
+
+    if (decision.decision === 'build_demo') {
+      setBusy(false)
+      void buildDemoApp(value, 'human')
+      return
+    }
+
+    if (decision.decision === 'personalize') {
+      replaceContext(inferVisitorContext(value))
+      setStatement('')
+      setBusy(false)
+      return
+    }
+
+    setAssistantNote(decision.question || 'Could you say more about what you are looking for?')
+    setBusy(false)
   }
 
   useEffect(() => {
     if (!variant.isPersonalized) {
       setStatement('')
       setShowWhy(false)
+      setAssistantNote(null)
     }
   }, [variant.isPersonalized])
 
@@ -150,43 +197,39 @@ export default function AdaptiveSiteExperience({ caseStudies }: { caseStudies: C
 
           <form onSubmit={handleSubmit} className="mx-auto mt-8 max-w-2xl overflow-hidden rounded-lg border border-gray-200 bg-white p-2 shadow-premium">
             <label htmlFor="adaptive-context-input" className="sr-only">
-              What are you trying to improve?
+              What brings you to Newtuple?
             </label>
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
               <textarea
                 id="adaptive-context-input"
                 value={statement}
                 onChange={(event) => setStatement(event.target.value)}
-                placeholder="What are you trying to improve?"
+                placeholder="What brings you to Newtuple?"
+                disabled={busy}
                 className={cx(
-                  'min-h-20 flex-1 resize-none rounded-md border border-gray-200 bg-gray-50 p-4 text-left text-base leading-7 text-gray-950 outline-none transition-colors placeholder:text-gray-400 focus:bg-white focus:ring-2',
+                  'min-h-20 flex-1 resize-none rounded-md border border-gray-200 bg-gray-50 p-4 text-left text-base leading-7 text-gray-950 outline-none transition-colors placeholder:text-gray-400 focus:bg-white focus:ring-2 disabled:opacity-60',
                   accent.ring
                 )}
               />
               <button
                 type="submit"
+                disabled={busy || !statement.trim()}
                 className={cx(
-                  'inline-flex h-12 items-center justify-center gap-2 rounded-md px-5 text-sm font-semibold text-white transition-colors focus-visible:outline-none focus-visible:ring-2',
+                  'inline-flex h-12 items-center justify-center gap-2 rounded-md px-5 text-sm font-semibold text-white transition-colors focus-visible:outline-none focus-visible:ring-2 disabled:opacity-60',
                   accent.buttonClass
                 )}
               >
-                <Send className="h-4 w-4" />
-                Rebuild
+                {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                Send
               </button>
             </div>
           </form>
 
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <Button href={variant.primaryCta.href} size="lg">
-              <span className="inline-flex items-center gap-2">
-                {variant.primaryCta.label}
-                <ArrowRight className="h-4 w-4" />
-              </span>
-            </Button>
-            <Button href={variant.secondaryCta.href} variant="outline" size="lg">
-              {variant.secondaryCta.label}
-            </Button>
-          </div>
+          {assistantNote && (
+            <div className="mx-auto mt-4 max-w-2xl rounded-md border border-gray-200 bg-white px-4 py-3 text-sm leading-6 text-gray-700">
+              {assistantNote}
+            </div>
+          )}
 
           {relevantCaseStudies.length > 0 && (
             <div key={`cases-${variant.intent}`} className="mt-14 grid grid-cols-1 gap-4 text-left sm:grid-cols-3">
