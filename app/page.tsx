@@ -7,7 +7,7 @@ const caseStudies = getAllCaseStudies()
 export const metadata = createMetadata({
   title: 'The website that rebuilds itself for every visitor',
   description:
-    'Tell Newtuple what you are trying to improve and the homepage rebuilds around you — the same context is exposed to agents through WebMCP.',
+    'Tell Newtuple what you are trying to improve and the homepage rebuilds around you, live.',
   path: '/',
 })
 

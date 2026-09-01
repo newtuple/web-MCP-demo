@@ -213,7 +213,7 @@ export function generateAdaptiveSiteVariant(context: VisitorContext): AdaptiveSi
       hero: {
         eyebrow: 'A website that rebuilds itself for every visitor',
         title: 'What are you trying to improve?',
-        description: 'Tell Newtuple what you need. The page rebuilds around you, and the same context is exposed to agents through WebMCP.',
+        description: 'Tell Newtuple what you need, and watch the page reshape itself around your goals in seconds.',
       },
       primaryCta: { label: 'Talk to Newtuple', href: '/contactus' },
       secondaryCta: { label: 'See open roles', href: '/careers' },
