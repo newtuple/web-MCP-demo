@@ -27,7 +27,7 @@ const writeStoredContext = (context: VisitorContext) => {
   try {
     window.sessionStorage.setItem(VISITOR_CONTEXT_STORAGE_KEY, JSON.stringify(context))
   } catch {
-    // sessionStorage unavailable — context still works for this render
+    // sessionStorage unavailable, context still works for this render
   }
 }
 
