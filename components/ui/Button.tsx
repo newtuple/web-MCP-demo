@@ -15,20 +15,20 @@ interface ButtonProps {
 
 const variants = {
   primary: {
-    button: 'bg-cobalt-900 text-white shadow-premium hover:shadow-premium-lg',
-    fill: 'bg-cobalt-800',
+    button: 'bg-[var(--accent-900,#0047AB)] text-white shadow-premium hover:shadow-premium-lg',
+    fill: 'bg-[var(--accent-800,#1e2eaf)]',
   },
   secondary: {
     button: 'bg-cyan-500 text-white shadow-premium hover:shadow-premium-lg',
     fill: 'bg-cyan-600',
   },
   outline: {
-    button: 'border-2 border-cobalt-900 text-cobalt-900 hover:text-white',
-    fill: 'bg-cobalt-900',
+    button: 'border-2 border-[var(--accent-900,#0047AB)] text-[var(--accent-900,#0047AB)] hover:text-white',
+    fill: 'bg-[var(--accent-900,#0047AB)]',
   },
   ghost: {
-    button: 'text-cobalt-900',
-    fill: 'bg-cobalt-100',
+    button: 'text-[var(--accent-900,#0047AB)]',
+    fill: 'bg-[var(--accent-100,#dbe6fe)]',
   },
 }
 
@@ -51,7 +51,7 @@ export default function Button({
 }: ButtonProps) {
   const variantStyles = variants[variant]
   const fillClass = fillClassName || variantStyles.fill
-  const baseClasses = `group/btn relative isolate inline-flex items-center justify-center rounded-full overflow-hidden font-medium transition-all duration-300 active:scale-[0.985] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cobalt-400/60 ${variantStyles.button} ${sizes[size]} ${className}`
+  const baseClasses = `group/btn relative isolate inline-flex items-center justify-center rounded-full overflow-hidden font-medium transition-all duration-300 active:scale-[0.985] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-400,#6090fa)]/60 ${variantStyles.button} ${sizes[size]} ${className}`
   const innerContent = (
     <>
       <span

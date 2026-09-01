@@ -22,11 +22,11 @@ export default function NewsletterForm({ className }: { className?: string }) {
             name={emailFieldName}
             required
             placeholder="you@company.com"
-            className="flex-1 rounded-lg border border-gray-300 px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-cobalt-400"
+            className="flex-1 rounded-lg border border-gray-300 px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[var(--accent-400)]"
           />
           <button
             type="submit"
-            className="rounded-lg bg-cobalt-700 text-white px-6 py-3 font-semibold hover:bg-cobalt-800 transition-colors"
+            className="rounded-lg bg-[var(--accent-700)] text-white px-6 py-3 font-semibold hover:bg-[var(--accent-800)] transition-colors"
           >
             {submitLabel}
           </button>

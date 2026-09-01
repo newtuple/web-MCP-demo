@@ -245,13 +245,13 @@ export default function CareersContent({ data }: { data: CareersData }) {
     <>
       <section className="relative overflow-hidden bg-white">
         <div className="pointer-events-none absolute inset-0 bg-grid" />
-        <div className="pointer-events-none absolute -top-24 left-[8%] h-72 w-72 rounded-full bg-cobalt-100/65 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-20 right-[6%] h-64 w-64 rounded-full bg-cobalt-50 blur-3xl" />
+        <div className="pointer-events-none absolute -top-24 left-[8%] h-72 w-72 rounded-full bg-[var(--accent-100)]/65 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-20 right-[6%] h-64 w-64 rounded-full bg-[var(--accent-50)] blur-3xl" />
         <Container className="relative z-10 pt-28 pb-16 md:pt-36 md:pb-20">
           <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] gap-10 lg:gap-12 items-center">
             <FadeIn>
               <div className="max-w-2xl">
-                <span className="inline-flex items-center gap-2 rounded-full border border-cobalt-100 bg-cobalt-50/80 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-cobalt-900 mb-7">
+                <span className="inline-flex items-center gap-2 rounded-full border border-[var(--accent-100)] bg-[var(--accent-50)]/80 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--accent-900)] mb-7">
                   <Sparkles className="h-3.5 w-3.5" />
                   {data.hero.badge}
                 </span>
@@ -262,13 +262,13 @@ export default function CareersContent({ data }: { data: CareersData }) {
                   {data.hero.description}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3.5">
-                  <Button href="#open-roles" size="lg" className="bg-gray-950 text-white hover:text-white" fillClassName="bg-cobalt-900">
+                  <Button href="#open-roles" size="lg" className="bg-gray-950 text-white hover:text-white" fillClassName="bg-[var(--accent-900)]">
                     <span className="inline-flex items-center gap-2 whitespace-nowrap">
                       Browse Open Roles
                       <ArrowRight className="h-4 w-4" />
                     </span>
                   </Button>
-                  <Button href="/contactus" variant="outline" size="lg" className="border-gray-300 text-gray-900 hover:text-white" fillClassName="bg-cobalt-900">
+                  <Button href="/contactus" variant="outline" size="lg" className="border-gray-300 text-gray-900 hover:text-white" fillClassName="bg-[var(--accent-900)]">
                     Talk to Hiring Team
                   </Button>
                 </div>
@@ -277,8 +277,8 @@ export default function CareersContent({ data }: { data: CareersData }) {
 
             <FadeIn delay={0.08}>
               <article className="group relative overflow-hidden rounded-3xl border border-gray-200/90 bg-white p-6 md:p-7 shadow-[0_24px_46px_-30px_rgba(15,23,42,0.35)]">
-                <div className="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-cobalt-400 to-transparent -translate-x-[110%] transition-transform duration-700 group-hover:translate-x-0" />
-                <p className="text-[11px] uppercase tracking-[0.16em] text-cobalt-900 font-semibold mb-5">
+                <div className="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-[var(--accent-400)] to-transparent -translate-x-[110%] transition-transform duration-700 group-hover:translate-x-0" />
+                <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--accent-900)] font-semibold mb-5">
                   Hiring Snapshot
                 </p>
                 <div className="grid grid-cols-2 gap-3 md:gap-4">
@@ -299,8 +299,8 @@ export default function CareersContent({ data }: { data: CareersData }) {
                     <p className="text-xs uppercase tracking-[0.12em] text-gray-500 mt-1">Junior roles</p>
                   </div>
                 </div>
-                <div className="mt-5 rounded-2xl border border-cobalt-100 bg-cobalt-50/60 p-4">
-                  <p className="text-sm text-cobalt-900 font-medium leading-relaxed">
+                <div className="mt-5 rounded-2xl border border-[var(--accent-100)] bg-[var(--accent-50)]/60 p-4">
+                  <p className="text-sm text-[var(--accent-900)] font-medium leading-relaxed">
                     We hire for impact, ownership, and strong execution in production AI.
                   </p>
                 </div>
@@ -313,7 +313,7 @@ export default function CareersContent({ data }: { data: CareersData }) {
       <Section className="py-14 md:py-16 bg-white">
         <FadeIn>
           <div className="max-w-3xl mx-auto text-center">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-cobalt-900 font-semibold mb-2">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--accent-900)] font-semibold mb-2">
               Why Join
             </p>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{data.whyJoin.title}</h2>
@@ -325,7 +325,7 @@ export default function CareersContent({ data }: { data: CareersData }) {
       <Section className="py-14 md:py-16 bg-gray-50">
         <FadeIn>
           <div className="text-center mb-10 md:mb-12">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-cobalt-900 font-semibold mb-2">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--accent-900)] font-semibold mb-2">
               Employee Value
             </p>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900">{data.benefits.sectionTitle}</h2>
@@ -336,10 +336,10 @@ export default function CareersContent({ data }: { data: CareersData }) {
             const Icon = resolveIcon(benefit.icon)
             return (
               <StaggerItem key={benefit.title}>
-                <article className="group relative h-full min-h-[220px] overflow-hidden rounded-2xl border border-gray-200/90 bg-white p-5 md:p-6 shadow-[0_14px_28px_-22px_rgba(15,23,42,0.3)] transition-all duration-300 hover:-translate-y-1 hover:border-cobalt-300 hover:shadow-[0_24px_40px_-26px_rgba(0,71,171,0.38)]">
-                  <div className="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-cobalt-400 to-transparent -translate-x-[110%] transition-transform duration-700 group-hover:translate-x-0" />
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-cobalt-100 bg-cobalt-50 mb-4">
-                    <Icon className="h-5 w-5 text-cobalt-900" strokeWidth={1.5} />
+                <article className="group relative h-full min-h-[220px] overflow-hidden rounded-2xl border border-gray-200/90 bg-white p-5 md:p-6 shadow-[0_14px_28px_-22px_rgba(15,23,42,0.3)] transition-all duration-300 hover:-translate-y-1 hover:border-[var(--accent-300)] hover:shadow-[0_24px_40px_-26px_rgba(0,71,171,0.38)]">
+                  <div className="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-[var(--accent-400)] to-transparent -translate-x-[110%] transition-transform duration-700 group-hover:translate-x-0" />
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-[var(--accent-100)] bg-[var(--accent-50)] mb-4">
+                    <Icon className="h-5 w-5 text-[var(--accent-900)]" strokeWidth={1.5} />
                   </div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">{benefit.title}</h3>
                   <p className="text-sm text-gray-600 font-light leading-relaxed">{benefit.description}</p>
@@ -353,7 +353,7 @@ export default function CareersContent({ data }: { data: CareersData }) {
       <Section id="open-roles" className="py-14 md:py-16 bg-white">
         <FadeIn>
           <div className="text-center mb-10 md:mb-12">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-cobalt-900 font-semibold mb-2">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--accent-900)] font-semibold mb-2">
               Job Portal
             </p>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{data.positions.sectionTitle}</h2>
@@ -366,7 +366,7 @@ export default function CareersContent({ data }: { data: CareersData }) {
         <div className="grid grid-cols-1 xl:grid-cols-[300px_minmax(0,1fr)] gap-6 xl:gap-7">
           <FadeIn delay={0.05}>
             <aside className="xl:sticky xl:top-24 h-fit rounded-2xl border border-gray-200 bg-white p-4 md:p-5 shadow-[0_14px_28px_-24px_rgba(15,23,42,0.28)]">
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-cobalt-900 mb-3">Filter roles</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--accent-900)] mb-3">Filter roles</p>
               <label className="relative block mb-4">
                 <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                 <input
@@ -374,7 +374,7 @@ export default function CareersContent({ data }: { data: CareersData }) {
                   value={filters.query}
                   onChange={(event) => setFilters((prev) => ({ ...prev, query: event.target.value }))}
                   placeholder="Search by role or keyword"
-                  className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-3 text-sm text-gray-700 outline-none transition-colors focus:border-cobalt-300"
+                  className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-3 text-sm text-gray-700 outline-none transition-colors focus:border-[var(--accent-300)]"
                 />
               </label>
 
@@ -409,7 +409,7 @@ export default function CareersContent({ data }: { data: CareersData }) {
                 }}
                 className={`mt-3 w-full rounded-xl border px-3 py-2 text-sm font-medium transition-colors ${
                   hasFilters
-                    ? 'border-cobalt-200 bg-cobalt-50 text-cobalt-900 hover:bg-cobalt-100'
+                    ? 'border-[var(--accent-200)] bg-[var(--accent-50)] text-[var(--accent-900)] hover:bg-[var(--accent-100)]'
                     : 'border-gray-200 text-gray-400 cursor-not-allowed'
                 }`}
                 disabled={!hasFilters}
@@ -442,16 +442,16 @@ export default function CareersContent({ data }: { data: CareersData }) {
                   const isExpanded = expandedJob === pos.id
                   const hasJd = Boolean(pos.jdContent)
                   return (
-                    <article key={pos.id} className="group relative overflow-hidden rounded-2xl border border-gray-200/90 bg-white transition-all duration-300 hover:border-cobalt-300 hover:shadow-[0_22px_36px_-26px_rgba(0,71,171,0.42)]">
-                      <div className="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-cobalt-400 to-transparent -translate-x-[110%] transition-transform duration-700 group-hover:translate-x-0" />
+                    <article key={pos.id} className="group relative overflow-hidden rounded-2xl border border-gray-200/90 bg-white transition-all duration-300 hover:border-[var(--accent-300)] hover:shadow-[0_22px_36px_-26px_rgba(0,71,171,0.42)]">
+                      <div className="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-[var(--accent-400)] to-transparent -translate-x-[110%] transition-transform duration-700 group-hover:translate-x-0" />
                       <div
                         className={`flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-4 md:p-5 ${hasJd ? 'cursor-pointer' : ''}`}
                         onClick={() => hasJd && setExpandedJob(isExpanded ? null : pos.id)}
                       >
                         <div className="min-w-0">
                           <div className="flex items-start gap-3">
-                            <div className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-lg border border-cobalt-100 bg-cobalt-50">
-                              <Briefcase className="h-4 w-4 text-cobalt-900" strokeWidth={1.5} />
+                            <div className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--accent-100)] bg-[var(--accent-50)]">
+                              <Briefcase className="h-4 w-4 text-[var(--accent-900)]" strokeWidth={1.5} />
                             </div>
                             <div className="min-w-0">
                               <h3 className="text-lg font-semibold text-gray-900 leading-tight">{pos.title}</h3>
@@ -488,7 +488,7 @@ export default function CareersContent({ data }: { data: CareersData }) {
                             variant="outline"
                             size="sm"
                             className="border-gray-300 text-gray-900 hover:text-white"
-                            fillClassName="bg-cobalt-900"
+                            fillClassName="bg-[var(--accent-900)]"
                           >
                             <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
                               Apply now
@@ -507,7 +507,7 @@ export default function CareersContent({ data }: { data: CareersData }) {
                               variant="outline"
                               size="sm"
                               className="border-gray-300 text-gray-900 hover:text-white"
-                              fillClassName="bg-cobalt-900"
+                              fillClassName="bg-[var(--accent-900)]"
                             >
                               <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
                                 Apply for this role
@@ -529,7 +529,7 @@ export default function CareersContent({ data }: { data: CareersData }) {
       <Section id="career-application-form" className="py-14 md:py-16 bg-gray-50 border-t border-gray-200">
         <FadeIn>
           <div className="max-w-3xl mx-auto text-center mb-8">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-cobalt-900 font-semibold mb-2">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--accent-900)] font-semibold mb-2">
               Application Form
             </p>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Apply to Newtuple</h2>
@@ -564,7 +564,7 @@ export default function CareersContent({ data }: { data: CareersData }) {
                   value={application.name}
                   onChange={(event) => setApplication((prev) => ({ ...prev, name: event.target.value }))}
                   required
-                  className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-800 outline-none transition-colors focus:border-cobalt-300"
+                  className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-800 outline-none transition-colors focus:border-[var(--accent-300)]"
                 />
               </label>
 
@@ -575,7 +575,7 @@ export default function CareersContent({ data }: { data: CareersData }) {
                   value={application.email}
                   onChange={(event) => setApplication((prev) => ({ ...prev, email: event.target.value }))}
                   required
-                  className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-800 outline-none transition-colors focus:border-cobalt-300"
+                  className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-800 outline-none transition-colors focus:border-[var(--accent-300)]"
                 />
               </label>
 
@@ -587,7 +587,7 @@ export default function CareersContent({ data }: { data: CareersData }) {
                   onChange={(event) => setApplication((prev) => ({ ...prev, role: event.target.value }))}
                   required
                   placeholder="Example: Senior Frontend Developer"
-                  className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-800 outline-none transition-colors focus:border-cobalt-300"
+                  className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-800 outline-none transition-colors focus:border-[var(--accent-300)]"
                 />
               </label>
 
@@ -598,7 +598,7 @@ export default function CareersContent({ data }: { data: CareersData }) {
                   value={application.level}
                   onChange={(event) => setApplication((prev) => ({ ...prev, level: event.target.value }))}
                   placeholder="Senior / Junior"
-                  className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-800 outline-none transition-colors focus:border-cobalt-300"
+                  className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-800 outline-none transition-colors focus:border-[var(--accent-300)]"
                 />
               </label>
 
@@ -612,7 +612,7 @@ export default function CareersContent({ data }: { data: CareersData }) {
                   }
                   required
                   placeholder="https://..."
-                  className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-800 outline-none transition-colors focus:border-cobalt-300"
+                  className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-800 outline-none transition-colors focus:border-[var(--accent-300)]"
                 />
               </label>
 
@@ -624,7 +624,7 @@ export default function CareersContent({ data }: { data: CareersData }) {
                   required
                   rows={5}
                   placeholder="Share your relevant experience and why you'd like to join."
-                  className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-800 outline-none transition-colors focus:border-cobalt-300"
+                  className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-800 outline-none transition-colors focus:border-[var(--accent-300)]"
                 />
               </label>
             </div>
@@ -634,7 +634,7 @@ export default function CareersContent({ data }: { data: CareersData }) {
                 type="checkbox"
                 checked={application.consent}
                 onChange={(event) => setApplication((prev) => ({ ...prev, consent: event.target.checked }))}
-                className="mt-1 h-4 w-4 rounded border-gray-300 text-cobalt-900 focus:ring-cobalt-500"
+                className="mt-1 h-4 w-4 rounded border-gray-300 text-[var(--accent-900)] focus:ring-[var(--accent-500)]"
                 required
               />
               <span>I consent to being contacted by the Newtuple hiring team regarding this application.</span>
@@ -658,7 +658,7 @@ export default function CareersContent({ data }: { data: CareersData }) {
               <button
                 type="submit"
                 disabled={applicationState === 'submitting'}
-                className="inline-flex items-center gap-2 rounded-full bg-gray-950 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-cobalt-900 disabled:cursor-not-allowed disabled:opacity-70"
+                className="inline-flex items-center gap-2 rounded-full bg-gray-950 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[var(--accent-900)] disabled:cursor-not-allowed disabled:opacity-70"
               >
                 {applicationState === 'submitting' ? (
                   <>
@@ -681,7 +681,7 @@ export default function CareersContent({ data }: { data: CareersData }) {
       <section className="py-16 md:py-20 bg-white border-t border-gray-200">
         <Container className="text-center">
           <FadeIn>
-            <p className="text-[11px] uppercase tracking-[0.16em] text-cobalt-900 font-semibold mb-3">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--accent-900)] font-semibold mb-3">
               Career Conversation
             </p>
             <h2 className="text-3xl md:text-4xl lg:text-5xl text-gray-900 leading-tight mb-4">
@@ -690,7 +690,7 @@ export default function CareersContent({ data }: { data: CareersData }) {
             <p className="text-lg text-gray-600 font-light max-w-2xl mx-auto mb-8">
               {data.cta.description}
             </p>
-            <Button href="#career-application-form" size="lg" className="bg-gray-950 text-white hover:text-white" fillClassName="bg-cobalt-900">
+            <Button href="#career-application-form" size="lg" className="bg-gray-950 text-white hover:text-white" fillClassName="bg-[var(--accent-900)]">
               <span className="inline-flex items-center gap-2 whitespace-nowrap">
                 Send your application
                 <ArrowRight className="h-4 w-4" />
@@ -726,7 +726,7 @@ function FilterCapsuleGroup({
             aria-pressed={value === option}
             className={`rounded-full border px-2.5 py-1 text-xs font-medium transition-colors ${
               value === option
-                ? 'border-cobalt-300 bg-cobalt-50 text-cobalt-900'
+                ? 'border-[var(--accent-300)] bg-[var(--accent-50)] text-[var(--accent-900)]'
                 : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:text-gray-900'
             }`}
           >

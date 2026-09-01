@@ -44,7 +44,7 @@ export default function Hero({
             <div>
               {badge && (
                 <FadeIn>
-                  <span className="inline-flex items-center rounded-full bg-cobalt-50 px-4 py-1.5 text-sm font-medium text-cobalt-900 mb-6">
+                  <span className="inline-flex items-center rounded-full bg-[var(--accent-50)] px-4 py-1.5 text-sm font-medium text-[var(--accent-900)] mb-6">
                     {badge}
                   </span>
                 </FadeIn>
@@ -68,19 +68,19 @@ export default function Hero({
             <FadeIn direction="right" delay={0.2}>
               <div>
                 {visual || (
-                  <div className="aspect-[4/3] rounded-2xl bg-gradient-to-br from-cobalt-50 to-cobalt-100/80 border border-cobalt-200/50 flex items-center justify-center p-8">
+                  <div className="aspect-[4/3] rounded-2xl bg-gradient-to-br from-[var(--accent-50)] to-[var(--accent-100)]/80 border border-[var(--accent-200)]/50 flex items-center justify-center p-8">
                     <div className="w-full space-y-3 opacity-60">
                       <div className="flex items-center gap-2 mb-4">
-                        <div className="w-2.5 h-2.5 rounded-full bg-cobalt-300/50" />
-                        <div className="w-2.5 h-2.5 rounded-full bg-cobalt-300/30" />
-                        <div className="w-2.5 h-2.5 rounded-full bg-cobalt-300/20" />
+                        <div className="w-2.5 h-2.5 rounded-full bg-[var(--accent-300)]/50" />
+                        <div className="w-2.5 h-2.5 rounded-full bg-[var(--accent-300)]/30" />
+                        <div className="w-2.5 h-2.5 rounded-full bg-[var(--accent-300)]/20" />
                       </div>
-                      <div className="w-3/4 h-2.5 rounded bg-cobalt-200/40" />
-                      <div className="w-full h-2.5 rounded bg-cobalt-200/30" />
-                      <div className="w-2/3 h-2.5 rounded bg-cobalt-200/35" />
+                      <div className="w-3/4 h-2.5 rounded bg-[var(--accent-200)]/40" />
+                      <div className="w-full h-2.5 rounded bg-[var(--accent-200)]/30" />
+                      <div className="w-2/3 h-2.5 rounded bg-[var(--accent-200)]/35" />
                       <div className="mt-4 grid grid-cols-2 gap-3">
-                        <div className="h-16 rounded-lg bg-cobalt-200/25" />
-                        <div className="h-16 rounded-lg bg-cobalt-200/20" />
+                        <div className="h-16 rounded-lg bg-[var(--accent-200)]/25" />
+                        <div className="h-16 rounded-lg bg-[var(--accent-200)]/20" />
                       </div>
                     </div>
                   </div>
@@ -100,7 +100,7 @@ export default function Hero({
         <div className="max-w-4xl mx-auto text-center">
           {badge && (
             <FadeIn>
-              <span className="inline-flex items-center rounded-full bg-cobalt-50 px-4 py-1.5 text-sm font-medium text-cobalt-900 mb-6">
+              <span className="inline-flex items-center rounded-full bg-[var(--accent-50)] px-4 py-1.5 text-sm font-medium text-[var(--accent-900)] mb-6">
                 {badge}
               </span>
             </FadeIn>

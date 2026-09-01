@@ -44,7 +44,7 @@ const STATUS_CLASS: Record<Status, string> = {
   ok: 'text-emerald-700 bg-emerald-50 border-emerald-200',
   warn: 'text-amber-700 bg-amber-50 border-amber-200',
   bad: 'text-rose-700 bg-rose-50 border-rose-200',
-  info: 'text-cobalt-900 bg-cobalt-50 border-cobalt-200',
+  info: 'text-[var(--accent-900)] bg-[var(--accent-50)] border-[var(--accent-200)]',
   mut: 'text-gray-600 bg-gray-50 border-gray-200',
 }
 
@@ -62,7 +62,7 @@ function CanvasCard({ label, children }: { label?: string; children: React.React
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-premium">
       {label && (
-        <div className="mb-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-cobalt-900">{label}</div>
+        <div className="mb-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--accent-900)]">{label}</div>
       )}
       {children}
     </div>
@@ -331,7 +331,7 @@ export default function WorkspaceDemo() {
       {/* ---------- header ---------- */}
       <header className="flex flex-wrap items-center gap-3 border-b border-gray-200 px-4 py-3 sm:px-5">
         <div className="flex items-center gap-2">
-          <span className="h-2.5 w-2.5 rounded-full bg-cobalt-900" />
+          <span className="h-2.5 w-2.5 rounded-full bg-[var(--accent-900)]" />
           <b className="text-sm font-semibold tracking-tight text-gray-950">Flowtuple</b>
         </div>
         <span className="hidden rounded-full border border-gray-200 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider text-gray-400 sm:inline">
@@ -345,7 +345,7 @@ export default function WorkspaceDemo() {
               onClick={() => selectPersona(p)}
               aria-pressed={p.id === personaId}
               className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors sm:px-4 ${
-                p.id === personaId ? 'bg-cobalt-900 text-white' : 'text-gray-600 hover:text-gray-950'
+                p.id === personaId ? 'bg-[var(--accent-900)] text-white' : 'text-gray-600 hover:text-gray-950'
               }`}
             >
               {p.label}
@@ -353,7 +353,7 @@ export default function WorkspaceDemo() {
           ))}
         </div>
 
-        <div className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 bg-gray-100 text-[11px] font-semibold text-cobalt-900">
+        <div className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 bg-gray-100 text-[11px] font-semibold text-[var(--accent-900)]">
           {persona.me}
         </div>
       </header>
@@ -368,7 +368,7 @@ export default function WorkspaceDemo() {
             <div key={k} className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-[13px] text-gray-600">
               <CheckCircle2 className="h-4 w-4" strokeWidth={1.6} />
               {k}
-              <span className="ml-auto rounded-full bg-cobalt-900 px-1.5 py-0.5 text-[10px] font-semibold text-white">
+              <span className="ml-auto rounded-full bg-[var(--accent-900)] px-1.5 py-0.5 text-[10px] font-semibold text-white">
                 {persona.badges[k]}
               </span>
             </div>
@@ -382,12 +382,12 @@ export default function WorkspaceDemo() {
               key={id}
               onClick={() => runScenario(id)}
               className={`group flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-left text-[13px] transition-colors hover:bg-gray-50 ${
-                scenarioId === id ? 'text-cobalt-900' : 'text-gray-600'
+                scenarioId === id ? 'text-[var(--accent-900)]' : 'text-gray-600'
               }`}
             >
               <span
                 className={`h-1.5 w-1.5 shrink-0 rounded-full ${
-                  scenarioId === id ? 'bg-cobalt-900' : 'bg-gray-300 group-hover:bg-cobalt-900'
+                  scenarioId === id ? 'bg-[var(--accent-900)]' : 'bg-gray-300 group-hover:bg-[var(--accent-900)]'
                 }`}
               />
               {label}
@@ -411,7 +411,7 @@ export default function WorkspaceDemo() {
                 </div>
               ) : (
                 <div key={m.id} className="flex gap-2.5">
-                  <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cobalt-900">
+                  <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--accent-900)]">
                     <Sparkles className="h-3 w-3 text-white" strokeWidth={2} />
                   </span>
                   <p className="text-[13px] leading-relaxed text-gray-700">{m.text}</p>
@@ -420,7 +420,7 @@ export default function WorkspaceDemo() {
             )}
             {typing && (
               <div className="flex gap-2.5">
-                <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cobalt-900">
+                <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--accent-900)]">
                   <Sparkles className="h-3 w-3 text-white" strokeWidth={2} />
                 </span>
                 <span className="flex items-center gap-1 pt-2">
@@ -445,7 +445,7 @@ export default function WorkspaceDemo() {
                   className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
                     c.back
                       ? 'border-gray-200 text-gray-600 hover:border-gray-400 hover:bg-gray-50'
-                      : 'border-cobalt-900/25 bg-cobalt-900/5 text-cobalt-900 hover:border-cobalt-900 hover:bg-cobalt-900/10'
+                      : 'border-[var(--accent-900)]/25 bg-[var(--accent-900)]/5 text-[var(--accent-900)] hover:border-[var(--accent-900)] hover:bg-[var(--accent-900)]/10'
                   }`}
                 >
                   {c.label.replace(/\{co\}/g, focal ?? 'supplier')}
@@ -459,7 +459,7 @@ export default function WorkspaceDemo() {
                 className="min-w-0 flex-1 bg-transparent py-1.5 text-[13px] text-gray-950 outline-none placeholder:text-gray-400"
                 aria-label="Chat input (use the quick actions above)"
               />
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-cobalt-900 text-white">
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--accent-900)] text-white">
                 <Send className="h-3.5 w-3.5" strokeWidth={1.8} />
               </span>
             </div>
@@ -474,8 +474,8 @@ export default function WorkspaceDemo() {
           <div className="shrink-0 border-b border-gray-200 bg-white px-4 py-3 sm:px-5">
             <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
               {composing ? (
-                <b className="flex items-center gap-2 text-[13px] font-semibold text-cobalt-900">
-                  <span className="h-3 w-3 animate-spin rounded-full border-[1.5px] border-cobalt-200 border-t-cobalt-900" />
+                <b className="flex items-center gap-2 text-[13px] font-semibold text-[var(--accent-900)]">
+                  <span className="h-3 w-3 animate-spin rounded-full border-[1.5px] border-[var(--accent-200)] border-t-[var(--accent-900)]" />
                   Composing this surface…
                 </b>
               ) : (
@@ -495,7 +495,7 @@ export default function WorkspaceDemo() {
                     key={p.id}
                     className={`rounded-full border px-2 py-0.5 text-[10px] font-medium transition-colors duration-500 ${
                       on
-                        ? 'border-cobalt-200 bg-cobalt-50 text-cobalt-900'
+                        ? 'border-[var(--accent-200)] bg-[var(--accent-50)] text-[var(--accent-900)]'
                         : 'border-gray-200 bg-white text-gray-300'
                     }`}
                   >
@@ -604,7 +604,7 @@ function ActionButtons({
             className={`rounded-full px-3 py-1 text-[11px] font-semibold transition-colors ${
               a.ghost
                 ? 'border border-gray-200 text-gray-600 hover:border-gray-400 hover:bg-gray-50'
-                : 'bg-cobalt-900 text-white hover:bg-cobalt-800'
+                : 'bg-[var(--accent-900)] text-white hover:bg-[var(--accent-800)]'
             }`}
           >
             {a.label}
@@ -631,7 +631,7 @@ function ListRow({
   return (
     <div className="flex items-start gap-3 border-t border-gray-100 py-2.5 first:border-t-0 first:pt-0">
       {row.ini && (
-        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-cobalt-50 text-[10px] font-semibold text-cobalt-900">
+        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--accent-50)] text-[10px] font-semibold text-[var(--accent-900)]">
           {row.ini}
         </span>
       )}
@@ -749,7 +749,7 @@ function CardRenderer(props: RenderProps) {
                       s.state === 'done'
                         ? 'bg-emerald-500'
                         : s.state === 'run'
-                          ? 'bg-cobalt-900 ring-4 ring-cobalt-100'
+                          ? 'bg-[var(--accent-900)] ring-4 ring-[var(--accent-100)]'
                           : s.state === 'warn'
                             ? 'bg-amber-500'
                             : 'bg-gray-300'
@@ -776,7 +776,7 @@ function CardRenderer(props: RenderProps) {
               <div key={b.l} className="flex flex-1 flex-col items-center gap-1.5">
                 <b className="text-[11px] font-semibold text-gray-950">{b.v}</b>
                 <div
-                  className={`w-full rounded-t-md transition-all ${b.warn ? 'bg-amber-400' : 'bg-cobalt-900'}`}
+                  className={`w-full rounded-t-md transition-all ${b.warn ? 'bg-amber-400' : 'bg-[var(--accent-900)]'}`}
                   style={{ height: `${Math.max(6, (b.h / max) * 92)}px` }}
                 />
                 <span className="text-[10px] text-gray-500">{b.l}</span>
@@ -799,7 +799,7 @@ function CardRenderer(props: RenderProps) {
                 <span className="mb-1 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
                   {f.label}
                   {f.prefilled && (
-                    <span className="rounded-full bg-cobalt-50 px-1.5 py-0.5 text-[9px] font-semibold normal-case tracking-normal text-cobalt-900">
+                    <span className="rounded-full bg-[var(--accent-50)] px-1.5 py-0.5 text-[9px] font-semibold normal-case tracking-normal text-[var(--accent-900)]">
                       agent-filled
                     </span>
                   )}
@@ -810,7 +810,7 @@ function CardRenderer(props: RenderProps) {
                     rows={2}
                     defaultValue={f.value}
                     placeholder="Add a note…"
-                    className="w-full resize-none rounded-lg border border-gray-200 bg-white px-3 py-2 text-[12px] leading-relaxed text-gray-950 outline-none focus:border-cobalt-900"
+                    className="w-full resize-none rounded-lg border border-gray-200 bg-white px-3 py-2 text-[12px] leading-relaxed text-gray-950 outline-none focus:border-[var(--accent-900)]"
                   />
                 ) : (
                   <div
@@ -834,7 +834,7 @@ function CardRenderer(props: RenderProps) {
             ) : (
               <button
                 onClick={() => onAction(key, card.submit)}
-                className="rounded-full bg-cobalt-900 px-3.5 py-1.5 text-[11px] font-semibold text-white transition-colors hover:bg-cobalt-800"
+                className="rounded-full bg-[var(--accent-900)] px-3.5 py-1.5 text-[11px] font-semibold text-white transition-colors hover:bg-[var(--accent-800)]"
               >
                 {card.submit.label}
               </button>
@@ -857,7 +857,7 @@ function CardRenderer(props: RenderProps) {
       return (
         <CanvasCard label="Candidate">
           <div className="flex items-center gap-3">
-            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-cobalt-50 text-sm font-semibold text-cobalt-900">
+            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[var(--accent-50)] text-sm font-semibold text-[var(--accent-900)]">
               {CANDIDATE.initials}
             </span>
             <div>
@@ -870,14 +870,14 @@ function CardRenderer(props: RenderProps) {
               <span
                 key={r.label}
                 className={`rounded-full border px-2.5 py-1 text-[11px] font-medium ${
-                  r.done ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-cobalt-200 bg-cobalt-50 text-cobalt-900'
+                  r.done ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-[var(--accent-200)] bg-[var(--accent-50)] text-[var(--accent-900)]'
                 }`}
               >
                 {r.label} {r.done && '✓'}
               </span>
             ))}
           </div>
-          <p className="mt-3 border-l-2 border-cobalt-900 pl-3 text-[12px] leading-relaxed text-gray-600">
+          <p className="mt-3 border-l-2 border-[var(--accent-900)] pl-3 text-[12px] leading-relaxed text-gray-600">
             {CANDIDATE.synthesis}
           </p>
           <ActionButtons
@@ -893,14 +893,14 @@ function CardRenderer(props: RenderProps) {
       return (
         <CanvasCard label="Task view · attachment">
           <div className="mb-3 flex items-center gap-2 rounded-lg bg-gray-50 px-3 py-2 text-[11.5px] text-gray-950">
-            <Paperclip className="h-3.5 w-3.5 shrink-0 text-cobalt-900" strokeWidth={1.6} />
+            <Paperclip className="h-3.5 w-3.5 shrink-0 text-[var(--accent-900)]" strokeWidth={1.6} />
             <b className="font-semibold">Meera_Krishnan_Resume.pdf</b>
             <span className="text-gray-500">· 2 pages · parsed by the intake agent</span>
           </div>
           <div className="rounded-xl border border-gray-200 bg-white p-4 text-[11.5px] leading-relaxed">
             <div className="text-base font-semibold text-gray-950">Meera Krishnan</div>
             <div className="text-gray-500">Senior Backend Engineer · Seattle, WA · meera.krishnan@mail.com</div>
-            <div className="mt-3 border-b border-gray-200 pb-1 text-[10px] font-semibold uppercase tracking-wider text-cobalt-900">
+            <div className="mt-3 border-b border-gray-200 pb-1 text-[10px] font-semibold uppercase tracking-wider text-[var(--accent-900)]">
               Experience
             </div>
             <div className="mt-2 flex items-baseline justify-between">
@@ -918,7 +918,7 @@ function CardRenderer(props: RenderProps) {
             <ul className="mt-1 list-disc space-y-0.5 pl-4 text-gray-600">
               <li>Built order-routing services · 40M requests/day at 99.98% availability</li>
             </ul>
-            <div className="mt-3 border-b border-gray-200 pb-1 text-[10px] font-semibold uppercase tracking-wider text-cobalt-900">
+            <div className="mt-3 border-b border-gray-200 pb-1 text-[10px] font-semibold uppercase tracking-wider text-[var(--accent-900)]">
               Skills
             </div>
             <div className="mt-2 flex flex-wrap gap-1.5">
@@ -977,7 +977,7 @@ function FlowBoard({
                     <div
                       key={c.name}
                       className={`rounded-lg border bg-white px-2 py-1.5 transition-all ${
-                        c.name === focal ? 'border-cobalt-900 shadow-premium' : 'border-gray-200'
+                        c.name === focal ? 'border-[var(--accent-900)] shadow-premium' : 'border-gray-200'
                       }`}
                     >
                       <b className="block truncate text-[11px] font-semibold text-gray-950">{c.name}</b>
@@ -1020,14 +1020,14 @@ function DocIntel({ docs }: { docs: Record<DocId, DocState> }) {
           return (
             <div key={id} className="rounded-xl border border-gray-200 p-2.5">
               <div className="flex items-center gap-2.5">
-                <FileText className="h-4 w-4 shrink-0 text-cobalt-900" strokeWidth={1.6} />
+                <FileText className="h-4 w-4 shrink-0 text-[var(--accent-900)]" strokeWidth={1.6} />
                 <div className="min-w-0 flex-1">
                   <b className="block truncate text-[11.5px] font-semibold text-gray-950">{m.file}</b>
                   <span className="text-[10px] text-gray-400">{m.type}</span>
                 </div>
                 {state === 'reading' && (
-                  <span className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-cobalt-900">
-                    <span className="h-2.5 w-2.5 animate-spin rounded-full border-[1.5px] border-cobalt-200 border-t-cobalt-900" />
+                  <span className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-[var(--accent-900)]">
+                    <span className="h-2.5 w-2.5 animate-spin rounded-full border-[1.5px] border-[var(--accent-200)] border-t-[var(--accent-900)]" />
                     Reading
                   </span>
                 )}
@@ -1072,7 +1072,7 @@ function Timeline({ events }: { events: TimelineEvent[] }) {
                       ? 'bg-emerald-50 text-emerald-700'
                       : e.kind === 'edit'
                         ? 'bg-gray-100 text-gray-500'
-                        : 'bg-cobalt-50 text-cobalt-900'
+                        : 'bg-[var(--accent-50)] text-[var(--accent-900)]'
                 }`}
               >
                 {e.kind === 'block' ? (
@@ -1095,7 +1095,7 @@ function Timeline({ events }: { events: TimelineEvent[] }) {
                       {e.who}
                       <code className="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] text-gray-600">{e.from}</code>
                       <span className="text-gray-400">→</span>
-                      <code className="rounded bg-cobalt-50 px-1.5 py-0.5 text-[10px] text-cobalt-900">{e.to}</code>
+                      <code className="rounded bg-[var(--accent-50)] px-1.5 py-0.5 text-[10px] text-[var(--accent-900)]">{e.to}</code>
                     </div>
                   </>
                 )}

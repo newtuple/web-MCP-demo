@@ -29,7 +29,7 @@ export default function CTASection({
           </h2>
         </FadeIn>
         <FadeIn delay={0.1}>
-          <p className="text-lg text-cobalt-100 font-light max-w-2xl mx-auto mb-8">
+          <p className="text-lg text-[var(--accent-100)] font-light max-w-2xl mx-auto mb-8">
             {description}
           </p>
         </FadeIn>

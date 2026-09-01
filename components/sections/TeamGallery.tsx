@@ -74,12 +74,12 @@ export default function TeamGallery() {
     <>
       <FadeIn>
         <div className="text-center mb-12">
-          <p className="text-sm font-medium text-cobalt-600 uppercase tracking-wider mb-3">
+          <p className="text-sm font-medium text-[var(--accent-600)] uppercase tracking-wider mb-3">
             Meet the Team
           </p>
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
             The people behind{' '}
-            <span className="bg-gradient-to-r from-cobalt-900 to-cyan-500 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[var(--accent-900)] to-cyan-500 bg-clip-text text-transparent">
               Newtuple
             </span>
           </h2>
@@ -104,7 +104,7 @@ export default function TeamGallery() {
                 alt={image.alt}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-cobalt-950/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[var(--accent-950)]/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="absolute bottom-0 left-0 right-0 p-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out">
                 <p className="text-white text-sm font-medium">{image.alt}</p>
               </div>
@@ -120,7 +120,7 @@ export default function TeamGallery() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-cobalt-950/95 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--accent-950)]/95 backdrop-blur-sm"
             onClick={closeLightbox}
           >
             <button

@@ -183,7 +183,7 @@ const components: Components = {
   ),
   a: ({ children, href }) => (
     <a
-      className="text-cobalt-700 underline underline-offset-4 hover:text-cobalt-900 transition-colors font-normal"
+      className="text-[var(--accent-700)] underline underline-offset-4 hover:text-[var(--accent-900)] transition-colors font-normal"
       href={href}
     >
       {children}
@@ -228,7 +228,7 @@ const components: Components = {
       )
     }
     return (
-      <blockquote className="border-l-4 border-cobalt-200 pl-4 italic text-gray-600 mb-5 font-normal antialiased">
+      <blockquote className="border-l-4 border-[var(--accent-200)] pl-4 italic text-gray-600 mb-5 font-normal antialiased">
         {children}
       </blockquote>
     )

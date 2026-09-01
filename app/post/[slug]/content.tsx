@@ -36,8 +36,8 @@ function RelatedPostCard({ post }: { post: BlogPostSummary }) {
             />
           </div>
         ) : (
-          <div className="aspect-[16/9] bg-gradient-to-br from-cobalt-50 to-cobalt-100/80 flex items-center justify-center">
-            <div className="w-12 h-12 rounded-2xl bg-cobalt-200/40" />
+          <div className="aspect-[16/9] bg-gradient-to-br from-[var(--accent-50)] to-[var(--accent-100)]/80 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-2xl bg-[var(--accent-200)]/40" />
           </div>
         )}
         <div className="p-6">
@@ -48,7 +48,7 @@ function RelatedPostCard({ post }: { post: BlogPostSummary }) {
               {post.readingTime} min read
             </span>
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 group-hover:text-cobalt-800 transition-colors line-clamp-2">
+          <h3 className="text-lg font-semibold text-gray-900 group-hover:text-[var(--accent-800)] transition-colors line-clamp-2">
             {post.title}
           </h3>
         </div>
@@ -75,7 +75,7 @@ export default function BlogPostContent({
           <FadeIn>
             <Link
               href="/blog"
-              className="inline-flex items-center gap-2 text-sm text-cobalt-700 hover:text-cobalt-900 mb-8 transition-colors font-medium"
+              className="inline-flex items-center gap-2 text-sm text-[var(--accent-700)] hover:text-[var(--accent-900)] mb-8 transition-colors font-medium"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to Blog
@@ -130,7 +130,7 @@ export default function BlogPostContent({
                             href={author.linkedin}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="hover:underline hover:text-cobalt-700 transition-colors font-medium text-gray-700"
+                            className="hover:underline hover:text-[var(--accent-700)] transition-colors font-medium text-gray-700"
                           >
                             {author.name}
                           </a>

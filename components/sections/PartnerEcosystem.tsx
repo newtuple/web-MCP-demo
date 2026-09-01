@@ -37,8 +37,8 @@ function PartnerMark({ partner, featured = false }: { partner: PartnerItem; feat
     <div
       className={`group relative flex h-[116px] flex-col items-center justify-center rounded-2xl border px-5 py-4 text-center transition-all duration-300 md:h-[120px] ${
         featured
-          ? 'border-cobalt-300 bg-white shadow-[0_18px_36px_-22px_rgba(0,71,171,0.5)] hover:-translate-y-1 hover:border-cobalt-500'
-          : 'border-gray-200 bg-white/80 hover:-translate-y-0.5 hover:border-cobalt-200 hover:bg-white'
+          ? 'border-[var(--accent-300)] bg-white shadow-[0_18px_36px_-22px_rgba(0,71,171,0.5)] hover:-translate-y-1 hover:border-[var(--accent-500)]'
+          : 'border-gray-200 bg-white/80 hover:-translate-y-0.5 hover:border-[var(--accent-200)] hover:bg-white'
       }`}
     >
       {partner.logo && !logoFailed ? (
@@ -49,19 +49,19 @@ function PartnerMark({ partner, featured = false }: { partner: PartnerItem; feat
           className={`object-contain ${featured ? 'h-auto w-full max-w-[160px]' : 'h-10 max-w-[170px]'}`}
         />
       ) : (
-        <span className={`text-lg font-semibold tracking-tight ${featured ? 'text-cobalt-900' : 'text-gray-800'}`}>
+        <span className={`text-lg font-semibold tracking-tight ${featured ? 'text-[var(--accent-900)]' : 'text-gray-800'}`}>
           {partner.name}
         </span>
       )}
       {partner.badge && partner.badgeLogo && !badgeLogoFailed ? (
         <img src={partner.badgeLogo} alt={partner.badge} onError={() => setBadgeLogoFailed(true)} className="mt-1 h-7 max-w-[150px] object-contain" />
       ) : partner.badge ? (
-        <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-cobalt-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-cobalt-800">
+        <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-[var(--accent-50)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--accent-800)]">
           <Award className="h-3 w-3" />
           {partner.badge}
         </span>
       ) : null}
-      <span className="pointer-events-none absolute -bottom-px left-1/2 h-0.5 w-0 -translate-x-1/2 rounded-full bg-cobalt-500 transition-all duration-300 group-hover:w-10" />
+      <span className="pointer-events-none absolute -bottom-px left-1/2 h-0.5 w-0 -translate-x-1/2 rounded-full bg-[var(--accent-500)] transition-all duration-300 group-hover:w-10" />
     </div>
   )
 
@@ -81,7 +81,7 @@ export default function PartnerEcosystem({ groups }: { groups: PartnerGroup[] })
       <Container className="relative z-10">
         <FadeIn>
           <div className="mx-auto mb-12 max-w-3xl text-center">
-            <span className="mb-4 inline-flex items-center gap-2 rounded-full bg-cobalt-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-cobalt-900">
+            <span className="mb-4 inline-flex items-center gap-2 rounded-full bg-[var(--accent-50)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--accent-900)]">
               <Building2 className="h-3.5 w-3.5" />
               Platforms &amp; partnerships
             </span>
@@ -97,9 +97,9 @@ export default function PartnerEcosystem({ groups }: { groups: PartnerGroup[] })
             const Icon = icons[group.icon]
             return (
               <FadeIn key={group.title} delay={groupIndex * 0.08}>
-                <div className={`h-full rounded-3xl border p-5 md:p-6 ${group.icon === 'model' ? 'border-cobalt-200 bg-cobalt-50/45' : 'border-gray-200 bg-white/70'}`}>
+                <div className={`h-full rounded-3xl border p-5 md:p-6 ${group.icon === 'model' ? 'border-[var(--accent-200)] bg-[var(--accent-50)]/45' : 'border-gray-200 bg-white/70'}`}>
                   <div className="mb-5 flex items-start gap-3 lg:min-h-[132px]">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-cobalt-900 text-white">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--accent-900)] text-white">
                       <Icon className="h-5 w-5" />
                     </div>
                     <div>

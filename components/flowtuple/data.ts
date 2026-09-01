@@ -119,9 +119,9 @@ export interface Scenario {
  * ------------------------------------------------------------------ */
 
 export const STAGES = [
-  { k: 'INVITED', s: 'Invited', c: 'bg-cobalt-900' },
-  { k: 'INTAKE_SUBMITTED', s: 'Intake', c: 'bg-cobalt-600' },
-  { k: 'UNDER_VETTING', s: 'Vetting', c: 'bg-cobalt-400' },
+  { k: 'INVITED', s: 'Invited', c: 'bg-[var(--accent-900)]' },
+  { k: 'INTAKE_SUBMITTED', s: 'Intake', c: 'bg-[var(--accent-600)]' },
+  { k: 'UNDER_VETTING', s: 'Vetting', c: 'bg-[var(--accent-400)]' },
   { k: 'DOCS_VALIDATION', s: 'Docs', c: 'bg-cyan-500' },
   { k: 'PENDING_APPROVALS', s: 'Approvals', c: 'bg-cyan-500' },
   { k: 'BANKING_VERIFICATION', s: 'Banking', c: 'bg-cyan-600' },

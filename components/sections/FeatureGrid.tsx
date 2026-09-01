@@ -28,7 +28,7 @@ export default function FeatureGrid({
   features,
   columns = 3,
   className = '',
-  iconColor = 'text-cobalt-900',
+  iconColor = 'text-[var(--accent-900)]',
 }: FeatureGridProps) {
   return (
     <StaggerChildren className={`grid grid-cols-1 ${gridCols[columns]} gap-6 md:gap-8 ${className}`}>

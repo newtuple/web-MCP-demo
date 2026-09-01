@@ -85,11 +85,11 @@ export default function ToolCallAnimation({
 
   const labelColor = dark ? 'text-gray-300' : 'text-gray-700'
   const headerColor = dark ? 'text-gray-500' : 'text-gray-500'
-  const sparkleColor = dark ? 'text-cobalt-400' : 'text-cobalt-900'
+  const sparkleColor = dark ? 'text-[var(--accent-400)]' : 'text-[var(--accent-900)]'
   const resultColor = dark ? 'text-emerald-400/80' : 'text-emerald-600'
   const barBg = dark ? 'bg-gray-800' : 'bg-gray-200'
-  const cursorColor = dark ? 'bg-cobalt-400/40' : 'bg-cobalt-900/30'
-  const promptColor = dark ? 'text-cobalt-400/50' : 'text-cobalt-900/40'
+  const cursorColor = dark ? 'bg-[var(--accent-400)]/40' : 'bg-[var(--accent-900)]/30'
+  const promptColor = dark ? 'text-[var(--accent-400)]/50' : 'text-[var(--accent-900)]/40'
 
   const isTerminalFlow = flow === 'terminal'
   const terminalVisibleIndices = isTerminalFlow

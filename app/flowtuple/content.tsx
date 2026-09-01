@@ -74,11 +74,11 @@ function Eyebrow({ children, dark = false }: { children: string; dark?: boolean 
   return (
     <>
       <div
-        className={`text-xs font-medium uppercase tracking-[0.22em] ${dark ? 'text-white/45' : 'text-cobalt-900'}`}
+        className={`text-xs font-medium uppercase tracking-[0.22em] ${dark ? 'text-white/45' : 'text-[var(--accent-900)]'}`}
       >
         {children}
       </div>
-      <span className={`mt-5 mb-7 block h-0.5 w-9 rounded-full ${dark ? 'bg-cyan-500' : 'bg-cobalt-900'}`} />
+      <span className={`mt-5 mb-7 block h-0.5 w-9 rounded-full ${dark ? 'bg-cyan-500' : 'bg-[var(--accent-900)]'}`} />
     </>
   )
 }
@@ -105,7 +105,7 @@ export default function FlowtupleContent({ data }: { data: FlowtupleData }) {
       <section className="relative overflow-hidden bg-white px-6 pb-20 pt-36 md:pt-40 lg:px-8">
         <div
           aria-hidden
-          className="pointer-events-none absolute -left-24 -top-32 h-80 w-80 rounded-full bg-cobalt-100/55 blur-3xl"
+          className="pointer-events-none absolute -left-24 -top-32 h-80 w-80 rounded-full bg-[var(--accent-100)]/55 blur-3xl"
         />
         <div
           aria-hidden
@@ -113,15 +113,15 @@ export default function FlowtupleContent({ data }: { data: FlowtupleData }) {
         />
         <Container className="relative">
           <FadeIn>
-            <div className="text-xs font-medium uppercase tracking-[0.22em] text-cobalt-900">{hero.badge}</div>
-            <span className="mt-5 mb-7 block h-0.5 w-9 rounded-full bg-cobalt-900" />
+            <div className="text-xs font-medium uppercase tracking-[0.22em] text-[var(--accent-900)]">{hero.badge}</div>
+            <span className="mt-5 mb-7 block h-0.5 w-9 rounded-full bg-[var(--accent-900)]" />
           </FadeIn>
 
           <FadeIn delay={0.1}>
             <h1 className="max-w-[14em] text-4xl font-extralight leading-[1.12] tracking-tight text-gray-950 sm:text-5xl lg:text-7xl">
               {hero.titleLead}
               <br />
-              <span className="font-light text-cobalt-900">{hero.titleAccent}</span>
+              <span className="font-light text-[var(--accent-900)]">{hero.titleAccent}</span>
             </h1>
           </FadeIn>
 
@@ -132,7 +132,7 @@ export default function FlowtupleContent({ data }: { data: FlowtupleData }) {
           </FadeIn>
 
           <FadeIn delay={0.3}>
-            <p className="mt-6 max-w-2xl border-l-2 border-cobalt-200 pl-4 text-sm font-light leading-relaxed text-gray-500 md:text-[15px]">
+            <p className="mt-6 max-w-2xl border-l-2 border-[var(--accent-200)] pl-4 text-sm font-light leading-relaxed text-gray-500 md:text-[15px]">
               {hero.kicker}
             </p>
           </FadeIn>
@@ -143,7 +143,7 @@ export default function FlowtupleContent({ data }: { data: FlowtupleData }) {
                 href="/contactus"
                 size="lg"
                 className="bg-gray-950 text-white hover:text-white"
-                fillClassName="bg-cobalt-900"
+                fillClassName="bg-[var(--accent-900)]"
               >
                 {hero.primaryCta}
               </Button>
@@ -168,7 +168,7 @@ export default function FlowtupleContent({ data }: { data: FlowtupleData }) {
           <h2 className="max-w-[18em] text-3xl font-extralight leading-[1.18] tracking-tight text-gray-950 md:text-5xl">
             {problem.title}
             <br />
-            <span className="text-cobalt-900">{problem.titleAccent}</span>
+            <span className="text-[var(--accent-900)]">{problem.titleAccent}</span>
           </h2>
           <p className="mt-6 max-w-[38em] text-base font-light leading-relaxed text-gray-600 md:text-lg">
             {problem.description}
@@ -179,7 +179,7 @@ export default function FlowtupleContent({ data }: { data: FlowtupleData }) {
           {problem.vignettes.map((v) => (
             <StaggerItem key={v.label}>
               <div className="h-full rounded-3xl border border-gray-200 bg-white p-6">
-                <div className="mb-4 text-[10.5px] font-medium uppercase tracking-[0.2em] text-cobalt-900">
+                <div className="mb-4 text-[10.5px] font-medium uppercase tracking-[0.2em] text-[var(--accent-900)]">
                   {v.label}
                 </div>
                 <p className="text-sm font-light leading-relaxed text-gray-600">{v.body}</p>
@@ -212,7 +212,7 @@ export default function FlowtupleContent({ data }: { data: FlowtupleData }) {
           <h2 className="max-w-[18em] text-3xl font-extralight leading-[1.18] tracking-tight text-gray-950 md:text-5xl">
             {how.title}
             <br />
-            <span className="text-cobalt-900">{how.titleAccent}</span>
+            <span className="text-[var(--accent-900)]">{how.titleAccent}</span>
           </h2>
         </FadeIn>
 
@@ -221,8 +221,8 @@ export default function FlowtupleContent({ data }: { data: FlowtupleData }) {
             <StaggerItem key={s.num}>
               <div className="h-full rounded-3xl border border-gray-200 bg-white p-8">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-semibold tracking-widest text-cobalt-900">{s.num}</span>
-                  <s.Icon className="h-6 w-6 text-cobalt-900" strokeWidth={1.5} />
+                  <span className="text-sm font-semibold tracking-widest text-[var(--accent-900)]">{s.num}</span>
+                  <s.Icon className="h-6 w-6 text-[var(--accent-900)]" strokeWidth={1.5} />
                 </div>
                 <h3 className="mt-5 text-xl font-semibold text-gray-950">{s.title}</h3>
                 <p className="mt-3 text-sm font-light leading-relaxed text-gray-600">{s.description}</p>
@@ -239,7 +239,7 @@ export default function FlowtupleContent({ data }: { data: FlowtupleData }) {
             {how.primitives.map((p) => (
               <span
                 key={p}
-                className="rounded-full border border-cobalt-900/30 bg-cobalt-900/5 px-4 py-1.5 text-[12.5px] font-medium text-cobalt-900"
+                className="rounded-full border border-[var(--accent-900)]/30 bg-[var(--accent-900)]/5 px-4 py-1.5 text-[12.5px] font-medium text-[var(--accent-900)]"
               >
                 {p}
               </span>
@@ -257,13 +257,13 @@ export default function FlowtupleContent({ data }: { data: FlowtupleData }) {
               <h2 className="text-3xl font-extralight leading-[1.18] tracking-tight text-gray-950 md:text-5xl">
                 {experience.title}
                 <br />
-                <span className="text-cobalt-900">{experience.titleAccent}</span>
+                <span className="text-[var(--accent-900)]">{experience.titleAccent}</span>
               </h2>
             </div>
             <div className="flex flex-col gap-6">
               {expFeatures.map((f) => (
                 <div key={f.title} className="flex gap-4">
-                  <f.Icon className="mt-0.5 h-5 w-5 shrink-0 text-cobalt-900" strokeWidth={1.5} />
+                  <f.Icon className="mt-0.5 h-5 w-5 shrink-0 text-[var(--accent-900)]" strokeWidth={1.5} />
                   <div>
                     <b className="block text-[15px] font-semibold text-gray-950">{f.title}</b>
                     <p className="mt-1 text-sm font-light leading-relaxed text-gray-600">{f.description}</p>
@@ -323,7 +323,7 @@ export default function FlowtupleContent({ data }: { data: FlowtupleData }) {
           <h2 className="max-w-[18em] text-3xl font-extralight leading-[1.18] tracking-tight text-gray-950 md:text-5xl">
             {workflows.title}
             <br />
-            <span className="text-cobalt-900">{workflows.titleAccent}</span>
+            <span className="text-[var(--accent-900)]">{workflows.titleAccent}</span>
           </h2>
           <p className="mt-6 max-w-[38em] text-base font-light leading-relaxed text-gray-600 md:text-lg">
             {workflows.description}
@@ -333,8 +333,8 @@ export default function FlowtupleContent({ data }: { data: FlowtupleData }) {
         <StaggerChildren className="mt-14 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {workflows.items.map((w) => (
             <StaggerItem key={w.title}>
-              <div className="h-full rounded-3xl border border-gray-200 bg-white p-7 transition-all hover:-translate-y-0.5 hover:border-cobalt-300 hover:shadow-premium-lg">
-                <span className="inline-flex rounded-full border border-cobalt-200 bg-cobalt-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-cobalt-900">
+              <div className="h-full rounded-3xl border border-gray-200 bg-white p-7 transition-all hover:-translate-y-0.5 hover:border-[var(--accent-300)] hover:shadow-premium-lg">
+                <span className="inline-flex rounded-full border border-[var(--accent-200)] bg-[var(--accent-50)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-[var(--accent-900)]">
                   {w.sector}
                 </span>
                 <h3 className="mt-4 text-[17px] font-semibold text-gray-950">{w.title}</h3>
@@ -383,7 +383,7 @@ export default function FlowtupleContent({ data }: { data: FlowtupleData }) {
                 href="/contactus"
                 size="lg"
                 className="bg-gray-950 text-white hover:text-white shadow-premium hover:shadow-premium-lg"
-                fillClassName="bg-cobalt-900"
+                fillClassName="bg-[var(--accent-900)]"
               >
                 Get in touch
               </Button>

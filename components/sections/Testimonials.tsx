@@ -37,14 +37,14 @@ export default function Testimonials({
           {testimonials.map((t) => (
             <StaggerItem key={t.name + t.industry}>
               <Card className="h-full p-6 md:p-8 flex flex-col" hover={false}>
-                <Quote className="w-8 h-8 text-cobalt-200 mb-4 flex-shrink-0" strokeWidth={1.5} />
+                <Quote className="w-8 h-8 text-[var(--accent-200)] mb-4 flex-shrink-0" strokeWidth={1.5} />
                 <blockquote className="text-gray-600 font-light leading-relaxed text-sm flex-1 mb-6">
                   &ldquo;{t.quote}&rdquo;
                 </blockquote>
                 <div className="border-t border-gray-100 pt-4 mt-auto">
                   <div className="font-semibold text-gray-900 text-sm">{t.name}</div>
                   <div className="text-xs text-gray-500">{t.attribution}</div>
-                  <span className="inline-block mt-2 text-xs font-medium text-cobalt-700 bg-cobalt-50 rounded-full px-2.5 py-0.5">
+                  <span className="inline-block mt-2 text-xs font-medium text-[var(--accent-700)] bg-[var(--accent-50)] rounded-full px-2.5 py-0.5">
                     {t.industry}
                   </span>
                 </div>

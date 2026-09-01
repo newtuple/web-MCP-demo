@@ -8,9 +8,9 @@ interface BadgeProps {
 
 const badgeVariants = {
   default: 'bg-gray-100 text-gray-700',
-  cobalt: 'bg-cobalt-50 text-cobalt-900',
+  cobalt: 'bg-[var(--accent-50)] text-[var(--accent-900)]',
   cyan: 'bg-cyan-500/10 text-cyan-600',
-  outline: 'border border-cobalt-200 text-cobalt-700',
+  outline: 'border border-[var(--accent-200)] text-[var(--accent-700)]',
 }
 
 export default function Badge({ children, variant = 'default', className = '' }: BadgeProps) {

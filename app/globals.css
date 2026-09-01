@@ -5,6 +5,17 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    --accent-50: #eff4ff;
+    --accent-100: #dbe6fe;
+    --accent-200: #bfd3fe;
+    --accent-300: #93b4fd;
+    --accent-400: #6090fa;
+    --accent-500: #3b6cf6;
+    --accent-600: #254beb;
+    --accent-700: #1d38d8;
+    --accent-800: #1e2eaf;
+    --accent-900: #0047AB;
+    --accent-950: #001a45;
   }
 
   body {

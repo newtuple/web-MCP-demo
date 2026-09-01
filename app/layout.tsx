@@ -1,10 +1,12 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
+import ChromeGate from '@/components/layout/ChromeGate'
 import Navigation from '@/components/layout/Navigation'
 import Footer from '@/components/layout/Footer'
 import Analytics from '@/components/analytics/Analytics'
 import CookieConsent from '@/components/analytics/CookieConsent'
+import WebMCPProvider from '@/components/webmcp/WebMCPProvider'
 import { SITE_NAME, SITE_URL, SITE_DESCRIPTION, COMPANY } from '@/lib/constants'
 
 const inter = Inter({
@@ -70,11 +72,12 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans bg-white">
-        <Navigation />
+        <ChromeGate><Navigation /></ChromeGate>
         <main className="min-h-screen">{children}</main>
-        <Footer />
+        <ChromeGate><Footer /></ChromeGate>
         <Analytics />
         <CookieConsent />
+        <WebMCPProvider />
       </body>
     </html>
   )
