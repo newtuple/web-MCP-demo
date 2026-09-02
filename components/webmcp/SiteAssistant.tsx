@@ -19,7 +19,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { ArrowUpRight, Loader2, Send, Sparkles, X } from 'lucide-react'
 import Turnstile, { TurnstileRef } from '@/components/ui/Turnstile'
 import { registerAssistant, type AssistantCommand } from '@/lib/assistant/store'
-import { inferVisitorContext } from '@/lib/adaptiveSite'
+import { inferVisitorContext, productSlugForGoal } from '@/lib/adaptiveSite'
 import { resolveContactRegarding, setContactRegarding } from '@/lib/contactRegarding'
 import { askNavigator } from '@/lib/navigate/client'
 import { setSiteNavigator } from '@/lib/navigate/router'
@@ -163,7 +163,18 @@ export default function SiteAssistant() {
 
       if (decision.decision === 'personalize') {
         const context = replaceContext(inferVisitorContext(value))
-        pushTurn('assistant', `Done - the site is now shaped around: ${context.goal}. Look around, or keep telling me what you need.`)
+        // When the profile clearly points at one product, don't just re-theme -
+        // bring that product's view up on this screen too.
+        const productSlug = productSlugForGoal(context.goal)
+        if (productSlug) {
+          openPageView(productSlug)
+          pushTurn(
+            'assistant',
+            `Done - the site is now shaped around ${context.goal}, and ${pageTitle(productSlug)} is on your screen right now. Keep telling me what you need, or say "go back".`,
+          )
+        } else {
+          pushTurn('assistant', `Done - the site is now shaped around: ${context.goal}. Look around, or keep telling me what you need.`)
+        }
         setBusy(false)
         return
       }

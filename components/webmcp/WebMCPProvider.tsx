@@ -9,6 +9,7 @@ import {
   type VisitorContext,
   type VisitorIntent,
 } from '@/lib/adaptiveSite'
+import { getContactRegarding } from '@/lib/contactRegarding'
 import { PAGE_CATALOG } from '@/lib/navigate/schema'
 import { closePageView, contextPatchForSlug, openPageView, pageViewStore } from '@/lib/pageView/store'
 import SiteAssistant from './SiteAssistant'
@@ -102,6 +103,29 @@ export default function WebMCPProvider() {
       }
 
       const readContext = () => contextRef.current
+
+      // Read-before-act entry point: one call tells an agent everything about
+      // the tab it is driving, so it never has to guess or "look" at pixels.
+      void register({
+        name: 'get_site_state',
+        description:
+          'Read the complete current state of newtuple.com in this tab: URL path, which in-place page view is open (if any), the visitor context, whether the site is personalized, the adaptive navigation and hero being rendered, and what a contact request would currently be regarding. Call this first to orient. Changes nothing.',
+        annotations: { readOnlyHint: true },
+        execute: () => {
+          const current = generateAdaptiveSiteVariant(readContext())
+          return {
+            path: window.location.pathname,
+            openPageView: pageViewStore.getSnapshot().slug,
+            visitorContext: readContext(),
+            isPersonalized: current.isPersonalized,
+            adaptationSummary: current.adaptationSummary,
+            navigation: current.navigation,
+            hero: current.hero,
+            primaryCta: current.primaryCta,
+            contactRegarding: getContactRegarding() || null,
+          }
+        },
+      })
 
       void register({
         name: 'infer_visitor_context',
