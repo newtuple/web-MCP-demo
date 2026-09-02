@@ -10,7 +10,7 @@ tags:
 heroImage: "/blog/comparing-reasoning-models-deepseek-vs-gemini-vs-oai/e72193_0c663993683547578d03d4f5b09886d6_mv2.png"
 comments: true
 ---
-DeepSeek R1 has made a powerful impact in the AI world, proving that LLMs are no longer just text generators—they can now tackle complex problems, including coding and reasoning challenges. This blog talks about comparing reasoning models; how five prominent LLMs—DeepSeek R1, o1, o1-mini, Gemini 1.5 Pro, and Gemini 2.0 Flash—perform when tasked with solving three coding problems of varying difficulty. The problems range from easy to hard, and the models are evaluated based on their ability to start with a brute force approach, optimize the solution step-by-step, and deliver clean, efficient, and correct code in C++. The results were surprising!
+DeepSeek R1 has made a powerful impact in the AI world, proving that LLMs are no longer just text generators-they can now tackle complex problems, including coding and reasoning challenges. This blog talks about comparing reasoning models; how five prominent LLMs-DeepSeek R1, o1, o1-mini, Gemini 1.5 Pro, and Gemini 2.0 Flash-perform when tasked with solving three coding problems of varying difficulty. The problems range from easy to hard, and the models are evaluated based on their ability to start with a brute force approach, optimize the solution step-by-step, and deliver clean, efficient, and correct code in C++. The results were surprising!
 
 ## The Coding Problems and the Performance of the Models
 

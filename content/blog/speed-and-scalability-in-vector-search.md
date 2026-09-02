@@ -50,7 +50,7 @@ The speed of ingesting the data into each database was around 10-15 minutes.
 
     *   DuckDB - 4.34 GB
 
-Note : The different sizes of the databases—Postgres (1067 MB), ChromaDB (10 GB), and DuckDB (4.34 GB)—stem from variations in storage formats, indexing, and overhead. Postgres uses efficient row-based storage with minimal overhead through the pgvector extension, which helps keep the size low. ChromaDB, specialized for vector operations, incurs more overhead due to its flexible storage and additional indexing structures, leading to its larger size. DuckDB, with its columnar storage and the use of HNSW indexing for vector searches, adds overhead from indexing and in-memory structures, making it larger than Postgres but smaller than ChromaDB. Each database balances storage space and performance differently based on its design focus.
+Note : The different sizes of the databases-Postgres (1067 MB), ChromaDB (10 GB), and DuckDB (4.34 GB)-stem from variations in storage formats, indexing, and overhead. Postgres uses efficient row-based storage with minimal overhead through the pgvector extension, which helps keep the size low. ChromaDB, specialized for vector operations, incurs more overhead due to its flexible storage and additional indexing structures, leading to its larger size. DuckDB, with its columnar storage and the use of HNSW indexing for vector searches, adds overhead from indexing and in-memory structures, making it larger than Postgres but smaller than ChromaDB. Each database balances storage space and performance differently based on its design focus.
 
 ## Testing Metrics and Methodology
 

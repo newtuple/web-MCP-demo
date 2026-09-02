@@ -54,19 +54,19 @@ Let's first look at costs for all completion and chat models, the ones that we w
 | OpenAI | GPT-5.6 Terra | 1.05M | $2.00 | $0.20 | $12.00 | Standard API rate |
 | OpenAI | GPT-5.6 Luna | 1.05M | $0.20 | $0.02 | $1.20 | Standard API rate |
 | OpenAI | GPT-5.5 | 1.05M | $5.00 | $0.50 | $30.00 | Requests above 272k input tokens use higher long-context rates |
-| OpenAI | GPT-5.5 Pro | 1.05M | $30.00 | — | $180.00 | Pro model |
+| OpenAI | GPT-5.5 Pro | 1.05M | $30.00 | - | $180.00 | Pro model |
 | OpenAI | GPT-5.4 | 1.05M | $2.50 | $0.25 | $15.00 | Requests above 272k input tokens use higher long-context rates |
 | OpenAI | GPT-5.4 mini | 400k | $0.75 | $0.075 | $4.50 | Standard API rate |
 | OpenAI | GPT-5.4 nano | 400k | $0.20 | $0.02 | $1.25 | Standard API rate |
 | OpenAI | GPT-5.3 Codex | 400k | $1.75 | $0.175 | $14.00 | Specialized coding model |
 | OpenAI | GPT-5.2 | 400k | $1.75 | $0.175 | $14.00 | Previous model |
-| OpenAI | GPT-5.2 Pro | 400k | $21.00 | — | $168.00 | Previous Pro model |
+| OpenAI | GPT-5.2 Pro | 400k | $21.00 | - | $168.00 | Previous Pro model |
 | OpenAI | GPT-5 | 400k | $1.25 | $0.125 | $10.00 | Previous model |
 | OpenAI | GPT-5 mini | 400k | $0.25 | $0.025 | $2.00 | Previous mini model |
 | OpenAI | GPT-5 nano | 400k | $0.05 | $0.005 | $0.40 | Previous nano model |
-| OpenAI | GPT-5 Pro | 400k | $15.00 | — | $120.00 | Previous Pro model |
+| OpenAI | GPT-5 Pro | 400k | $15.00 | - | $120.00 | Previous Pro model |
 | OpenAI | o3 | 200k | $2.00 | $0.50 | $8.00 | Reasoning model |
-| OpenAI | o3-pro | 200k | $20.00 | — | $80.00 | Pro reasoning model |
+| OpenAI | o3-pro | 200k | $20.00 | - | $80.00 | Pro reasoning model |
 | OpenAI | GPT-4.1 | 1.05M | $2.00 | $0.50 | $8.00 | Previous non-reasoning model |
 | OpenAI | GPT-4.1 mini | 1.05M | $0.40 | $0.10 | $1.60 | Previous non-reasoning model |
 | OpenAI | GPT-4.1 nano | 1.05M | $0.10 | $0.025 | $0.40 | Previous non-reasoning model |
@@ -108,34 +108,34 @@ Let's first look at costs for all completion and chat models, the ones that we w
 | Mistral | Ministral 3 14B | See model card | $0.20 | $0.02 | $0.20 | Direct Mistral API |
 | Mistral | Ministral 3 8B | See model card | $0.15 | $0.015 | $0.15 | Direct Mistral API |
 | Mistral | Ministral 3 3B | See model card | $0.10 | $0.01 | $0.10 | Direct Mistral API |
-| Mistral | Devstral 2 | See model card | $0.40 | — | $2.00 | Coding model |
-| Mistral | Devstral Small 2 | See model card | $0.10 | — | $0.30 | Labs coding model |
+| Mistral | Devstral 2 | See model card | $0.40 | - | $2.00 | Coding model |
+| Mistral | Devstral Small 2 | See model card | $0.10 | - | $0.30 | Labs coding model |
 | Mistral | Codestral | See model card | $0.30 | $0.03 | $0.90 | Direct Mistral API |
-| Mistral | Magistral Medium | See model card | $2.00 | — | $5.00 | Reasoning model |
-| Mistral | Magistral Small | See model card | $0.50 | — | $1.50 | Reasoning model |
-| Mistral | Voxtral Small | See model card | $0.10 | — | $0.40 | Text-token rate; audio input is $0.004 per minute |
+| Mistral | Magistral Medium | See model card | $2.00 | - | $5.00 | Reasoning model |
+| Mistral | Magistral Small | See model card | $0.50 | - | $1.50 | Reasoning model |
+| Mistral | Voxtral Small | See model card | $0.10 | - | $0.40 | Text-token rate; audio input is $0.004 per minute |
 | Mistral | Leanstral 1.5 | See model card | Free | Free | Free | Experimental model; limited-period free endpoint |
-| Cohere | Command A | 256k | $2.50 | — | $10.00 | Current Command A model family |
-| Cohere | Command R+ | 128k | $2.50 | — | $10.00 | Model ID command-r-plus-08-2024 |
-| Cohere | Command R | 128k | $0.15 | — | $0.60 | Model ID command-r-08-2024 |
-| Cohere | Aya Expanse 32B | 128k | $0.50 | — | $1.50 | Research model API rate |
-| Cohere | Aya Expanse 8B | 128k | $0.50 | — | $1.50 | Research model API rate |
-| Cohere | Command R+ 04-2024 | 128k | $3.00 | — | $15.00 | Legacy model |
-| Cohere | Command R 03-2024 | 128k | $0.50 | — | $1.50 | Legacy model |
-| Cohere | Command | See model card | $1.00 | — | $2.00 | Legacy model for existing customers |
-| Cohere | Command-light | See model card | $0.30 | — | $0.60 | Legacy model for existing customers |
-| Perplexity | Sonar | 128k | $1.00 | — | $1.00 | A separate $5–$12 per 1,000 requests fee applies |
-| Perplexity | Sonar Pro | 200k | $3.00 | — | $15.00 | A separate $6–$14 per 1,000 requests fee applies |
-| Perplexity | Sonar Reasoning Pro | 128k | $2.00 | — | $8.00 | A separate $6–$14 per 1,000 requests fee applies |
-| Perplexity | Sonar Deep Research | 128k | $2.00 | — | $8.00 | Citation, reasoning-token, and search-query fees also apply |
-| Groq | Llama 3.1 8B Instant | 131k | $0.05 | — | $0.08 | Production model |
-| Groq | Llama 3.3 70B Versatile | 131k | $0.59 | — | $0.79 | Production model |
-| Groq | GPT OSS 120B | 131k | $0.15 | — | $0.60 | Production model |
-| Groq | GPT OSS 20B | 131k | $0.075 | — | $0.30 | Production model |
-| Groq | Qwen 3.6 27B | 131k | $0.60 | — | $3.00 | Preview model |
-| Groq | Safety GPT OSS 20B | 131k | $0.075 | — | $0.30 | Preview safeguard model |
-| Groq | Llama Prompt Guard 2 22M | 512 | $0.03 | — | $0.03 | Preview safeguard model |
-| Groq | Llama Prompt Guard 2 86M | 512 | $0.04 | — | $0.04 | Preview safeguard model |
+| Cohere | Command A | 256k | $2.50 | - | $10.00 | Current Command A model family |
+| Cohere | Command R+ | 128k | $2.50 | - | $10.00 | Model ID command-r-plus-08-2024 |
+| Cohere | Command R | 128k | $0.15 | - | $0.60 | Model ID command-r-08-2024 |
+| Cohere | Aya Expanse 32B | 128k | $0.50 | - | $1.50 | Research model API rate |
+| Cohere | Aya Expanse 8B | 128k | $0.50 | - | $1.50 | Research model API rate |
+| Cohere | Command R+ 04-2024 | 128k | $3.00 | - | $15.00 | Legacy model |
+| Cohere | Command R 03-2024 | 128k | $0.50 | - | $1.50 | Legacy model |
+| Cohere | Command | See model card | $1.00 | - | $2.00 | Legacy model for existing customers |
+| Cohere | Command-light | See model card | $0.30 | - | $0.60 | Legacy model for existing customers |
+| Perplexity | Sonar | 128k | $1.00 | - | $1.00 | A separate $5–$12 per 1,000 requests fee applies |
+| Perplexity | Sonar Pro | 200k | $3.00 | - | $15.00 | A separate $6–$14 per 1,000 requests fee applies |
+| Perplexity | Sonar Reasoning Pro | 128k | $2.00 | - | $8.00 | A separate $6–$14 per 1,000 requests fee applies |
+| Perplexity | Sonar Deep Research | 128k | $2.00 | - | $8.00 | Citation, reasoning-token, and search-query fees also apply |
+| Groq | Llama 3.1 8B Instant | 131k | $0.05 | - | $0.08 | Production model |
+| Groq | Llama 3.3 70B Versatile | 131k | $0.59 | - | $0.79 | Production model |
+| Groq | GPT OSS 120B | 131k | $0.15 | - | $0.60 | Production model |
+| Groq | GPT OSS 20B | 131k | $0.075 | - | $0.30 | Production model |
+| Groq | Qwen 3.6 27B | 131k | $0.60 | - | $3.00 | Preview model |
+| Groq | Safety GPT OSS 20B | 131k | $0.075 | - | $0.30 | Preview safeguard model |
+| Groq | Llama Prompt Guard 2 22M | 512 | $0.03 | - | $0.03 | Preview safeguard model |
+| Groq | Llama Prompt Guard 2 86M | 512 | $0.04 | - | $0.04 | Preview safeguard model |
 | DeepSeek | DeepSeek V4 Flash | 1M | $0.14 | $0.0028 | $0.28 | Cache-miss input rate shown |
 | DeepSeek | DeepSeek V4 Pro | 1M | $0.435 | $0.003625 | $0.87 | Cache-miss input rate shown |
 

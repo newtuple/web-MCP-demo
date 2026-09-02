@@ -23,7 +23,7 @@ comments: true
 
 **Data engineers use dbt to facilitate analytics workflows. More specifically, teams use dbt to write transformations as SQL queries, version control the code, and deploy transformations incrementally.**
 
-**dbt also happens to be an incredibly handy tool for running many data quality tests. You can use dbt to validate the accuracy, freshness, and reliability of your data and data models, ideally identifying any issues before they cause downstream impacts on analytics and decision-making. And since source data changes often — sometimes multiple times per day — most teams use dbt testing continually as part of their production pipelines.**
+**dbt also happens to be an incredibly handy tool for running many data quality tests. You can use dbt to validate the accuracy, freshness, and reliability of your data and data models, ideally identifying any issues before they cause downstream impacts on analytics and decision-making. And since source data changes often - sometimes multiple times per day - most teams use dbt testing continually as part of their production pipelines.**
 
 **If you've not installed dbt already, you can refer to this article and** [**setup dbt-core on your machine in 5 minutes or less!**](https://www.newtuple.com/post/setup-dbt-core-on-your-machine-in-5-minutes-or-less)
 
@@ -105,7 +105,7 @@ $ dbt test
 $ dbt test
 ```
 
-**This will direct dbt to run all of the tests — both generic inside schema file and singular tests — and return results.**
+**This will direct dbt to run all of the tests - both generic inside schema file and singular tests - and return results.**
 
 **Note that, if you elect to store test failures:**
 

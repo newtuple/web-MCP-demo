@@ -67,12 +67,12 @@ comments: true
 **भारत का राजपत्र The Gazette of India**
 **सं.प्रा.सं.-ज.-16032022-234254 CG-DL-E-16032022-234254**
 **असाधारण EXTRAORDINARY**
-**भाग II—खण्ड 3—उपखण्ड (i) PART II—Section 3—Sub-section (i)**
+**भाग II-खण्ड 3-उपखण्ड (i) PART II-Section 3-Sub-section (i)**
 **प्राधिकारी से प्रकाशित PUBLISHED BY AUTHORITY**
 **\[सं. 208\] नई दिल्ली, बुधवार, मार्च 16, 2022/फाल्गुन 25, 1943 No. 208\] NEW DELHI, WEDNESDAY, MARCH 16, 2022/PHALGUNA 25, 1943**
 **सत्ताक परिवर्तन और राजपत्रीय संवादन**
 **अधिसूचना नई दिल्ली, 16 मार्च, 2022**
-**सं.एफ.नं. 211(बी).—मोटर यान अधिनियम, 1988 (1988 की 59) की धारा 139 की उपधारा (1) के प्रयोग (क) और (ग) पूर्व उल्लिखित अधिनियम की धारा 230 के प्रावधानों को लागू करने के निमित्तार्थ जारी की गया अधिसूचना संख्या एसओ 212 (ई) दिनांक (1) वर्ष तयारीनामा उसके खांचे तयारीनामा तयारी किसी तयारीनामा की प्रावधानों के लिए अभिस्वीकृत किया जाता था के आदेश तयारीनामा खींचा जाता है कि उस उल्लेख परिपत्रों पर उस आवेदन पर उस आवेदन पर उस आवेदन पर उस आवेदन पर उस अभिस्वीकृति की प्रतिलिपि, भारत से राजपत्र में न्यायवादीरों, उन आदेशों को जनता के संज्ञान में लाने के लिए तीन माह की समयावधि के भीतर विभिन्न प्रिंट जाएगा।**
+**सं.एफ.नं. 211(बी).-मोटर यान अधिनियम, 1988 (1988 की 59) की धारा 139 की उपधारा (1) के प्रयोग (क) और (ग) पूर्व उल्लिखित अधिनियम की धारा 230 के प्रावधानों को लागू करने के निमित्तार्थ जारी की गया अधिसूचना संख्या एसओ 212 (ई) दिनांक (1) वर्ष तयारीनामा उसके खांचे तयारीनामा तयारी किसी तयारीनामा की प्रावधानों के लिए अभिस्वीकृत किया जाता था के आदेश तयारीनामा खींचा जाता है कि उस उल्लेख परिपत्रों पर उस आवेदन पर उस आवेदन पर उस आवेदन पर उस आवेदन पर उस अभिस्वीकृति की प्रतिलिपि, भारत से राजपत्र में न्यायवादीरों, उन आदेशों को जनता के संज्ञान में लाने के लिए तीन माह की समयावधि के भीतर विभिन्न प्रिंट जाएगा।**
 **(इस आवेदन प्रपत्रों के संदर्भ में आम जन सुझाव, अभि मत नहीं है, संदेह-स्पष्ट (संपादन, परिवर्तन, टिप्पणी, संदेह परिवर्तन और राजपत्रीय संवादन, परिवर्तन संवाद, समर्थ संभव, नई दिल्ली-110001 की ओर उसका अपना comments-month@gov.in; एंटी-वीरिंग लिया जा सकेगा।**
 **प्राधिकार नियमन**
 **अंतिम नाम और पत्राचार- (1) वास्तव की अंतिमतरीके-परिस्थिति सात दिवस, 2022 सत्ता का प्रशासन है
@@ -125,13 +125,13 @@ CHICI
 **The Gazette of India**
 **REGD. No. D. L.-33004/99**
 **Government of India CG-DL-E-16032022-234254**
-**EXTRAORDINARY PART II—Section 3—Sub-section (i)**
+**EXTRAORDINARY PART II-Section 3-Sub-section (i)**
 **Published by Authority**
 **No. 208\] NEW DELHI, WEDNESDAY, MARCH 16, 2022/PHALGUNA 25, 1943**
 **HEALTH AND FAMILY WELFARE DEPARTMENT**
 **Notification**
 **New Delhi, 16 March, 2022**
-**G.S.R. 211(E).—In exercise of the powers conferred by sub-section (1) of section 139 of the Motor Vehicles Act, 1988 (59 of 1988), read with clause (h) of sub-section (1) and clause (a) of sub-section (2) of the said section and in suppression of the Ministry of Road Transport and Highways Notification No. G.S.R. 212(E) dated the 15th April 1989, except as respects things done or omitted to be done before such supersession, the Central Government hereby specifies biometric identity service for the purposes of sub-section (1) of section 139 of the said Act. An individual shall furnish the biometric identity as may be prescribed for availing any service or meet any requirement under the said Act.**
+**G.S.R. 211(E).-In exercise of the powers conferred by sub-section (1) of section 139 of the Motor Vehicles Act, 1988 (59 of 1988), read with clause (h) of sub-section (1) and clause (a) of sub-section (2) of the said section and in suppression of the Ministry of Road Transport and Highways Notification No. G.S.R. 212(E) dated the 15th April 1989, except as respects things done or omitted to be done before such supersession, the Central Government hereby specifies biometric identity service for the purposes of sub-section (1) of section 139 of the said Act. An individual shall furnish the biometric identity as may be prescribed for availing any service or meet any requirement under the said Act.**
 **The draft of the above rules shall be taken into consideration on or after the expiry of a period of thirty days from the date on which the copies of the Gazette of India, in which this notification is published, are made available to the public.**
 **Objections or suggestions, which may be received from any person with respect to the said draft before the expiry of the period specified above, will be considered by the Central Government.**
 **Any such objections or suggestions should be addressed to the Secretary to the Government of India, Ministry of Road Transport and Highways, Transport Bhawan, 1, Parliament Street, New Delhi-110001 or emailed at comments-moth@gov.in; and ought to be made in writing.**

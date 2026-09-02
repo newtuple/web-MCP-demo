@@ -4,7 +4,7 @@
 
 A full security review of the codebase identified **one actionable vulnerability**: the two public contact endpoints had no abuse protection, exposing paid infrastructure (Resend email and LiteLLM) to uncontrolled consumption.
 
-All other areas — secret handling, XSS surface, path traversal, SSRF, injection vectors, dependency security — were verified clean. No fabricated or theoretical issues; only the rate limiting gap warranted a code change.
+All other areas - secret handling, XSS surface, path traversal, SSRF, injection vectors, dependency security - were verified clean. No fabricated or theoretical issues; only the rate limiting gap warranted a code change.
 
 ## Vulnerability
 
@@ -30,7 +30,7 @@ A small, reusable in-memory rate limiter:
 - Enforces a configurable maximum number of requests per time window.
 - Returns structured results including an optional `Retry-After` value.
 - Configuration is environment-driven with safe defaults:
-  - `RATE_LIMIT_WINDOW_MS` (default: `60000` — 60 seconds)
+  - `RATE_LIMIT_WINDOW_MS` (default: `60000` - 60 seconds)
   - `RATE_LIMIT_MAX_REQUESTS` (default: `20` requests per window)
 
 ### 2. Modified: `_api_serverless/contact/submit/route.ts`
@@ -53,7 +53,7 @@ The following were explicitly investigated and confirmed safe:
 |---|---|
 | Secrets in source | No `.env` files committed; all secrets use `process.env` |
 | XSS via `dangerouslySetInnerHTML` | Used only for static JSON-LD and an empty `customHtml` config value |
-| Markdown rendering | `ReactMarkdown` without `rehypeRaw` — raw HTML in markdown is not rendered |
+| Markdown rendering | `ReactMarkdown` without `rehypeRaw` - raw HTML in markdown is not rendered |
 | Email header injection | Resend uses a REST API, not raw SMTP; subject/body are JSON fields with no known injection vectors |
 | Path traversal | Slugs are validated against `PAGE_REGISTRY` whitelist before reaching `fs` calls |
 | SSRF | Chat endpoint fetches from `process.env.LITELLM_BASE_URL` (server-controlled, not user input) |

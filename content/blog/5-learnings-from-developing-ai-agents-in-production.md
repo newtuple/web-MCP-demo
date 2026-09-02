@@ -211,7 +211,7 @@ Second, **users expect learning**: they naturally assume the system will remembe
 
 *   **Working memory (per session)**: a compact, structured scratchpad that captures facts, goals, assumptions, decisions, and pending actions. Summarize aggressively after important steps; store the *state*, not the transcript.
 
-*   **Long‑term memory (cross session)**: durable facts about people, policies, and artifacts—preferences, templates, canonical documents, prior outcomes. Retrieve them through **typed functions** (e.g., get\_user\_pref(timezone) or fetch\_policy('leave')) rather than blind semantic search, so you always know *why* something was loaded.
+*   **Long‑term memory (cross session)**: durable facts about people, policies, and artifacts-preferences, templates, canonical documents, prior outcomes. Retrieve them through **typed functions** (e.g., get\_user\_pref(timezone) or fetch\_policy('leave')) rather than blind semantic search, so you always know *why* something was loaded.
 
 **Diving a bit more into the weeds**
 
@@ -239,7 +239,7 @@ Used this way, episodic/semantic layers keep day‑to‑day conversations crisp,
 
 5.  Decide escalation early: when to ask the user, when to defer, and when to hand off to a human.
 
-Design memory like you’d design a database schema: name the entities, define ownership, and be explicit about lifetimes. Do that, and your assistant will feel sharper in long conversations and genuinely more aware over time—without pretending the model itself remembers anything at all.
+Design memory like you’d design a database schema: name the entities, define ownership, and be explicit about lifetimes. Do that, and your assistant will feel sharper in long conversations and genuinely more aware over time-without pretending the model itself remembers anything at all.
 
 ## Learning 5: Evaluations are key to better AI assistants
 

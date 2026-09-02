@@ -10,7 +10,7 @@
 import { useEffect, useSyncExternalStore } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { ArrowRight, ArrowUpRight, Bot, MessageCircle, X } from 'lucide-react'
+import { ArrowRight, ArrowUpRight, MessageCircle } from 'lucide-react'
 import Container from '@/components/ui/Container'
 import { openAssistant } from '@/lib/assistant/store'
 import { setContactRegarding } from '@/lib/contactRegarding'
@@ -75,22 +75,7 @@ export default function PageView() {
       <div className="pointer-events-none absolute inset-0 bg-grid" />
       <Container className="relative z-10">
         <div className="mx-auto max-w-3xl">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--accent-200)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--accent-900)]">
-              <Bot className="h-3.5 w-3.5" />
-              Rendered in place by WebMCP - no page load
-            </span>
-            <button
-              type="button"
-              onClick={closePageView}
-              className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-600 transition-colors hover:border-gray-300 hover:text-gray-900"
-            >
-              <X className="h-3.5 w-3.5" />
-              Back to this page
-            </button>
-          </div>
-
-          <div className="mt-8 animate-fade-up">
+          <div className="animate-fade-up">
             {product && (
               <div className={`text-xs font-semibold uppercase tracking-[0.14em] ${product.accent.text}`}>{product.tagline}</div>
             )}

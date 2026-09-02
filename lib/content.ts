@@ -157,7 +157,7 @@ function stripLeadingRedundantContent(body: string): string {
       i++
       continue
     }
-    // Single leading image block (duplicate hero image) — image is one line ![...](url)
+    // Single leading image block (duplicate hero image) - image is one line ![...](url)
     if (trimmed.startsWith('![')) {
       i++
       while (i < lines.length && lines[i]?.trim() === '') i++
