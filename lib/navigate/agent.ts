@@ -1,5 +1,4 @@
-// Server side of site navigation. Workers runtime, so fetch/Response/Map only -
-// same constraint lib/demoApp/generate.ts already documents and follows.
+// Server side of site navigation. Workers runtime, so fetch/Response/Map only.
 //
 // No database, no server-side session. The full conversation transcript
 // (AgentInputItem[]) round-trips as a plain request field on every call; the
@@ -82,10 +81,9 @@ export async function runNavigation(message: string, history: AgentInputItem[], 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } })
 
-// Same shape as lib/demoApp/generate.ts's allowDemoAppRequest: a module-scope
-// Map, fixed one-minute window, per isolate. Not persisted, not shared across
-// isolates - a best-effort throttle, not a source of truth, which is the
-// correct level of rigor for this and matches the sibling feature exactly.
+// A module-scope Map, fixed one-minute window, per isolate. Not persisted,
+// not shared across isolates - a best-effort throttle, not a source of truth,
+// which is the correct level of rigor for this.
 const buckets = new Map<string, number[]>()
 
 function allowNavigateRequest(identifier: string, max: number): boolean {

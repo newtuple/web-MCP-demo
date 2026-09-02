@@ -1,8 +1,8 @@
 'use client'
 
 // Single client-side entry point to the navigator, shared by the WebMCP tool
-// (components/webmcp/navigateTools.ts) and the human-facing popover
-// (components/webmcp/DemoAppLauncher.tsx), so there is exactly one place that
+// (components/webmcp/navigateTools.ts) and the human-facing chatbot
+// (components/webmcp/SiteAssistant.tsx), so there is exactly one place that
 // knows how to read/write the session and call /api/navigate - not two copies
 // of the same fetch call quietly drifting apart.
 

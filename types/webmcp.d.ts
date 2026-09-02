@@ -48,5 +48,4 @@ interface Navigator {
 
 interface Window {
   __newtupleWebMCPToolsRegistered?: boolean
-  __newtupleDemoAppToolCount?: number
 }

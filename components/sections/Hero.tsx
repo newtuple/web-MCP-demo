@@ -1,8 +1,25 @@
 'use client'
 
 import { ReactNode } from 'react'
+import { Bot } from 'lucide-react'
 import Container from '@/components/ui/Container'
 import FadeIn from '@/components/motion/FadeIn'
+import { useVisitorContext } from '@/components/webmcp/useVisitorContext'
+
+/** Shown on every page hero once the visitor context is personalized, so the
+ * adaptation is visible on the whole site, not only the homepage. */
+function AdaptiveChip() {
+  const { variant } = useVisitorContext()
+  if (!variant.isPersonalized) return null
+  return (
+    <FadeIn>
+      <span className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-[var(--accent-200)] bg-white/80 px-3 py-1 text-xs font-semibold text-[var(--accent-900)]">
+        <Bot className="h-3.5 w-3.5" />
+        {variant.hero.eyebrow} · {variant.context.goal}
+      </span>
+    </FadeIn>
+  )
+}
 
 interface HeroProps {
   badge?: string
@@ -42,6 +59,7 @@ export default function Hero({
         <Container className="relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
+              <AdaptiveChip />
               {badge && (
                 <FadeIn>
                   <span className="inline-flex items-center rounded-full bg-[var(--accent-50)] px-4 py-1.5 text-sm font-medium text-[var(--accent-900)] mb-6">
@@ -98,6 +116,7 @@ export default function Hero({
       {gradient && <div className="absolute inset-0 bg-grid" />}
       <Container className="relative z-10">
         <div className="max-w-4xl mx-auto text-center">
+          <AdaptiveChip />
           {badge && (
             <FadeIn>
               <span className="inline-flex items-center rounded-full bg-[var(--accent-50)] px-4 py-1.5 text-sm font-medium text-[var(--accent-900)] mb-6">
