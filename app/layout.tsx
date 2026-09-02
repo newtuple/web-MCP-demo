@@ -10,6 +10,14 @@ import AdaptiveRecommendations from '@/components/webmcp/AdaptiveRecommendations
 import PageView from '@/components/webmcp/PageView'
 import WebMCPProvider from '@/components/webmcp/WebMCPProvider'
 import { SITE_NAME, SITE_URL, SITE_DESCRIPTION, COMPANY } from '@/lib/constants'
+import { getPageContent } from '@/lib/content'
+import { rolesFromPositions, type CareersPositionItem } from '@/lib/careers/roles'
+
+// Loaded once at build/render time so the WebMCP careers tools work from any
+// page, not only after the visitor has opened /careers.
+const careersRoles = rolesFromPositions(
+  getPageContent<{ positions?: { items?: CareersPositionItem[] } }>('careers').data.positions?.items ?? [],
+)
 
 const inter = Inter({
   subsets: ['latin'],
@@ -82,7 +90,7 @@ export default function RootLayout({
         <Footer />
         <Analytics />
         <CookieConsent />
-        <WebMCPProvider />
+        <WebMCPProvider careersRoles={careersRoles} />
       </body>
     </html>
   )
