@@ -23,7 +23,8 @@ import { inferVisitorContext } from '@/lib/adaptiveSite'
 import { resolveContactRegarding, setContactRegarding } from '@/lib/contactRegarding'
 import { askNavigator } from '@/lib/navigate/client'
 import { setSiteNavigator } from '@/lib/navigate/router'
-import { PAGE_CATALOG, pageHref } from '@/lib/navigate/schema'
+import { PAGE_CATALOG } from '@/lib/navigate/schema'
+import { closePageView, openPageView } from '@/lib/pageView/store'
 import { regardingForPath } from '@/lib/products'
 import { useVisitorContext } from './useVisitorContext'
 
@@ -119,6 +120,14 @@ export default function SiteAssistant() {
 
       pushTurn('user', value)
       setMessage('')
+
+      // Local shortcut: closing the in-place page view needs no model call.
+      if (/^(go back|back|close( the (page|view))?|close it)$/i.test(value)) {
+        closePageView()
+        pushTurn('assistant', 'Closed the page view - you are back on the original page.')
+        return
+      }
+
       setBusy(true)
 
       const result = await askNavigator(value)
@@ -132,8 +141,16 @@ export default function SiteAssistant() {
       const { decision } = result
 
       if (decision.decision === 'navigate' && decision.page) {
-        pushTurn('assistant', `Taking you to ${pageTitle(decision.page)}.`)
-        router.push(pageHref(decision.page))
+        // WebMCP-native: morph the current screen into the page instead of
+        // routing. Only "home" routes for real - it means the site itself.
+        if (decision.page === 'home') {
+          closePageView()
+          pushTurn('assistant', 'Taking you back to the homepage.')
+          router.push('/')
+        } else {
+          openPageView(decision.page)
+          pushTurn('assistant', `Showing ${pageTitle(decision.page)} right here - no page reload. Say "go back" or close the view to return.`)
+        }
         setBusy(false)
         return
       }

@@ -55,6 +55,17 @@
   }
 }
 
+/* WebMCP in-place page rendering (render_page_view): while a page view is
+   open, the current route's own content steps aside and the morphed view
+   (components/webmcp/PageView.tsx) renders in its place - pure CSS, no route
+   change. The product subnav belongs to the hidden route, so it hides too. */
+html[data-page-view] main {
+  display: none;
+}
+html[data-page-view] [data-product-subnav] {
+  display: none;
+}
+
 @layer utilities {
   /* All of these read the --accent-* variables WebMCPProvider swaps per
      visitor intent, so a personalization repaints every page - hero

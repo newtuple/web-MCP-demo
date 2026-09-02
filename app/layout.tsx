@@ -7,6 +7,7 @@ import Footer from '@/components/layout/Footer'
 import Analytics from '@/components/analytics/Analytics'
 import CookieConsent from '@/components/analytics/CookieConsent'
 import AdaptiveRecommendations from '@/components/webmcp/AdaptiveRecommendations'
+import PageView from '@/components/webmcp/PageView'
 import WebMCPProvider from '@/components/webmcp/WebMCPProvider'
 import { SITE_NAME, SITE_URL, SITE_DESCRIPTION, COMPANY } from '@/lib/constants'
 
@@ -76,6 +77,7 @@ export default function RootLayout({
         <Navigation />
         <ProductSubnav />
         <main className="min-h-screen">{children}</main>
+        <PageView />
         <AdaptiveRecommendations />
         <Footer />
         <Analytics />
