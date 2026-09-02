@@ -25,6 +25,8 @@ type LeadState = {
   name: string
   email: string
   phone: string
+  phoneDigits: string
+  countryIso: string
   intent: string
   intentType: 'job' | 'services' | ''
   regarding: string
@@ -60,6 +62,20 @@ const DETAIL_PROMPTS: Record<string, string> = {
   services: "Tell us what you're hoping to build or explore.",
 }
 
+type Country = { iso: string; name: string; dial: string; digits: number }
+
+const COUNTRIES: Country[] = [
+  { iso: 'IN', name: 'India', dial: '+91', digits: 10 },
+  { iso: 'US', name: 'United States', dial: '+1', digits: 10 },
+  { iso: 'CA', name: 'Canada', dial: '+1', digits: 10 },
+  { iso: 'GB', name: 'United Kingdom', dial: '+44', digits: 10 },
+  { iso: 'AU', name: 'Australia', dial: '+61', digits: 9 },
+  { iso: 'DE', name: 'Germany', dial: '+49', digits: 10 },
+  { iso: 'FR', name: 'France', dial: '+33', digits: 9 },
+  { iso: 'SG', name: 'Singapore', dial: '+65', digits: 8 },
+  { iso: 'AE', name: 'United Arab Emirates', dial: '+971', digits: 9 },
+]
+
 export default function ConversationalContact({
   title,
   titleHighlight = 'AI experts',
@@ -73,6 +89,7 @@ export default function ConversationalContact({
   const [nameInput, setNameInput] = useState('')
   const [emailInput, setEmailInput] = useState('')
   const [phoneInput, setPhoneInput] = useState('')
+  const [countryIso, setCountryIso] = useState('IN')
   const [consentChecked, setConsentChecked] = useState(false)
   const [resumeInput, setResumeInput] = useState('')
   const [intentInput, setIntentInput] = useState('')
@@ -91,6 +108,8 @@ export default function ConversationalContact({
     name: '',
     email: '',
     phone: '',
+    phoneDigits: '',
+    countryIso: 'IN',
     intent: '',
     intentType: '',
     regarding: '',
@@ -113,9 +132,22 @@ export default function ConversationalContact({
   const promptRef = useRef<number | null>(null)
   const scrollRef = useRef<HTMLDivElement | null>(null)
   const inputRef = useRef<HTMLInputElement | null>(null)
+  const phoneRef = useRef<HTMLInputElement | null>(null)
   const promptTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const currentStep = STEPS[stepIndex]
+  const selectedCountry = COUNTRIES.find((c) => c.iso === countryIso) ?? COUNTRIES[0]
+
+  // Scrolling over a number input changes its value in Chrome/Firefox; block it.
+  // preventDefault on wheel requires a non-passive listener, which React's
+  // onWheel prop doesn't give us, so attach one directly to the element.
+  useEffect(() => {
+    const el = phoneRef.current
+    if (!el) return
+    const blockWheel = (e: WheelEvent) => e.preventDefault()
+    el.addEventListener('wheel', blockWheel, { passive: false })
+    return () => el.removeEventListener('wheel', blockWheel)
+  }, [currentStep])
 
   useEffect(() => {
     if (submitted || !currentStep) return
@@ -194,7 +226,7 @@ export default function ConversationalContact({
   const isValidEmail = (value: string) =>
     /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/.test(value)
 
-  const isValidPhone = (value: string) => !value || /^[+]?[\d\s()-]{7,20}$/.test(value)
+  const isValidPhone = (value: string, country: Country) => !value || value.length === country.digits
 
   const advanceStep = () => {
     setStepIndex((prev) => prev + 1)
@@ -218,7 +250,8 @@ export default function ConversationalContact({
     if (stepId === 'name') setNameInput(lead.name)
     if (stepId === 'contact') {
       setEmailInput(lead.email)
-      setPhoneInput(lead.phone)
+      setPhoneInput(lead.phoneDigits)
+      setCountryIso(lead.countryIso)
       setConsentChecked(lead.consent)
     }
     if (stepId === 'intent-choice') {
@@ -294,16 +327,17 @@ export default function ConversationalContact({
       setError('Please enter a valid email address.')
       return
     }
-    if (phone && !isValidPhone(phone)) {
-      setError('Please enter a valid phone number.')
+    if (phone && !isValidPhone(phone, selectedCountry)) {
+      setError(`Please enter a valid ${selectedCountry.digits}-digit phone number for ${selectedCountry.name}.`)
       return
     }
     if (!consentChecked) {
       setError('Please agree to be contacted.')
       return
     }
-    addMessage('user', phone ? `${email} · ${phone}` : email, false, 'contact')
-    setLead((prev) => ({ ...prev, email, phone, consent: true }))
+    const fullPhone = phone ? `${selectedCountry.dial} ${phone}` : ''
+    addMessage('user', fullPhone ? `${email} · ${fullPhone}` : email, false, 'contact')
+    setLead((prev) => ({ ...prev, email, phone: fullPhone, phoneDigits: phone, countryIso, consent: true }))
     setEmailInput('')
     setPhoneInput('')
     advanceStep()
@@ -440,11 +474,13 @@ export default function ConversationalContact({
 
   return (
     <section
-      className="h-screen overflow-hidden bg-gradient-hero flex flex-col lg:flex-row"
-      onClick={() => {
+      className="h-[calc(100vh-4rem)] md:h-[calc(100vh-5rem)] mt-16 md:mt-20 overflow-hidden bg-gradient-hero flex flex-col lg:flex-row"
+      onClick={(e) => {
         if (submitted) return
         if (currentStep?.kind === 'choice') return
         if (currentStep?.id === 'details') return
+        const target = e.target as HTMLElement
+        if (target.closest('input, textarea, select, button, label, a')) return
         inputRef.current?.focus()
       }}
     >
@@ -577,26 +613,43 @@ export default function ConversationalContact({
                 {/* Step: Contact (email + phone + consent) */}
                 {currentStep?.id === 'contact' && (
                   <form onSubmit={handleContactSubmit} className="w-full space-y-4">
-                    <div className="flex flex-col sm:flex-row gap-3">
-                      <div className="flex-1 border-b border-gray-300/90 pb-2">
-                        <input
-                          ref={inputRef}
-                          type="email"
-                          value={emailInput}
-                          onChange={(e) => setEmailInput(e.target.value)}
-                          placeholder="Email address *"
-                          className="w-full bg-transparent text-lg md:text-xl text-gray-900 focus:outline-none text-center placeholder:text-gray-300"
+                    <div className="border-b border-gray-300/90 pb-2">
+                      <input
+                        ref={inputRef}
+                        type="email"
+                        value={emailInput}
+                        onChange={(e) => setEmailInput(e.target.value)}
+                        placeholder="Email address *"
+                        className="w-full bg-transparent text-lg md:text-xl text-gray-900 focus:outline-none text-center placeholder:text-gray-300"
+                        disabled={isStreaming}
+                        aria-label="Email address"
+                      />
+                    </div>
+                    <div className="flex flex-row gap-3">
+                      <div className="w-36 border-b border-gray-300/90 pb-2">
+                        <select
+                          value={countryIso}
+                          onChange={(e) => setCountryIso(e.target.value)}
+                          className="w-full bg-transparent text-lg md:text-xl text-gray-900 focus:outline-none text-center"
                           disabled={isStreaming}
-                          aria-label="Email address"
-                        />
+                          aria-label="Country code"
+                        >
+                          {COUNTRIES.map((c) => (
+                            <option key={c.iso} value={c.iso}>
+                              {c.name} ({c.dial})
+                            </option>
+                          ))}
+                        </select>
                       </div>
                       <div className="flex-1 border-b border-gray-300/90 pb-2">
                         <input
-                          type="tel"
+                          ref={phoneRef}
+                          type="number"
+                          inputMode="numeric"
                           value={phoneInput}
                           onChange={(e) => setPhoneInput(e.target.value)}
-                          placeholder="Phone (optional)"
-                          className="w-full bg-transparent text-lg md:text-xl text-gray-900 focus:outline-none text-center placeholder:text-gray-300"
+                          placeholder={`Phone (optional, ${selectedCountry.digits} digits)`}
+                          className="w-full bg-transparent text-lg md:text-xl text-gray-900 focus:outline-none text-center placeholder:text-gray-300 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           disabled={isStreaming}
                           aria-label="Phone number"
                         />

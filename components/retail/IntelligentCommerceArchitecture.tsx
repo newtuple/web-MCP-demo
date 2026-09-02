@@ -121,7 +121,7 @@ const intelligentOutcomes: OutcomeItem[] = [
   {
     icon: MessageSquare,
     title: 'Retail Operations Copilot',
-    description: 'Ask any store question — get the next action',
+    description: 'Ask any store question - get the next action',
   },
   {
     icon: Bot,
@@ -352,7 +352,7 @@ export default function IntelligentCommerceArchitecture({ className = '' }: { cl
               Intelligent Commerce Architecture
             </h1>
             <p style={{ fontSize: 15, color: colors.muted, margin: 0, fontWeight: 300 }}>
-              Higher shelf availability, lower store cost, and a winning digital shelf — governed AI across your existing stack.
+              Higher shelf availability, lower store cost, and a winning digital shelf - governed AI across your existing stack.
             </p>
           </div>
 
@@ -517,7 +517,7 @@ export default function IntelligentCommerceArchitecture({ className = '' }: { cl
                     marginRight: 'auto',
                   }}
                 >
-                  Reads your operational data, reasons over it, and acts through governed agents — with human-in-the-loop. No system is replaced.
+                  Reads your operational data, reasons over it, and acts through governed agents - with human-in-the-loop. No system is replaced.
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', marginBottom: 10 }}>
@@ -731,7 +731,7 @@ export default function IntelligentCommerceArchitecture({ className = '' }: { cl
             Intelligent Commerce Architecture
           </h2>
           <p style={{ fontSize: 11.5, color: colors.muted, margin: 0, fontWeight: 300, lineHeight: 1.45 }}>
-            Higher shelf availability, lower store cost, and a winning digital shelf — governed AI across your existing stack.
+            Higher shelf availability, lower store cost, and a winning digital shelf - governed AI across your existing stack.
           </p>
         </div>
 
@@ -852,7 +852,7 @@ export default function IntelligentCommerceArchitecture({ className = '' }: { cl
                 Orchestration Core
               </div>
               <div style={{ fontSize: 10, color: colors.muted, fontWeight: 300, lineHeight: 1.4, marginBottom: 12 }}>
-                Reads your operational data, reasons over it, and acts through governed agents — with human-in-the-loop. No system is replaced.
+                Reads your operational data, reasons over it, and acts through governed agents - with human-in-the-loop. No system is replaced.
               </div>
 
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', gap: 6, marginBottom: 10 }}>

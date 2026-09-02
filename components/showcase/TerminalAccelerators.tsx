@@ -282,7 +282,7 @@ function AcceleratorsSection({ accelerators }: { accelerators: GenAIAccelerators
           ))}
         </div>
 
-        {/* Active accelerator — terminal session */}
+        {/* Active accelerator - terminal session */}
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -298,7 +298,7 @@ function AcceleratorsSection({ accelerators }: { accelerators: GenAIAccelerators
                   <div className="w-3 h-3 rounded-full bg-red-500/70" />
                   <div className="w-3 h-3 rounded-full bg-yellow-500/70" />
                   <div className="w-3 h-3 rounded-full bg-green-500/70" />
-                  <span className="text-gray-600 text-xs ml-2">newtuple — {accelerators.items[activeTab].name.toLowerCase()}</span>
+                  <span className="text-gray-600 text-xs ml-2">newtuple - {accelerators.items[activeTab].name.toLowerCase()}</span>
                 </div>
                 <div className="p-5 text-sm leading-relaxed min-h-[240px]">
                   <TerminalLines lines={accelerators.items[activeTab].terminal} />
@@ -404,11 +404,11 @@ function FAQSection() {
   const faqs = [
     { q: 'How quickly can I deploy an accelerator?', a: 'Most accelerators deploy in under 30 minutes via docker compose. Terraform and Helm artifacts support production-grade cloud deployments on AWS, GCP, or Azure.' },
     { q: 'Can I use accelerators with my existing infrastructure?', a: 'Yes. All accelerators communicate over clean REST and event-driven APIs. They integrate with your existing databases, message queues, and CI/CD pipelines. No vendor lock-in.' },
-    { q: 'Do I get access to the source code?', a: 'Absolutely. You receive 100% of the source code. Fork it, extend it, brand it — the codebase is fully yours.' },
+    { q: 'Do I get access to the source code?', a: 'Absolutely. You receive 100% of the source code. Fork it, extend it, brand it - the codebase is fully yours.' },
     { q: 'What support options are available?', a: 'Every licence includes onboarding guidance. Optional monthly support plans are available with guaranteed response times, architecture reviews, and dedicated Slack channels.' },
     // Previous copy when Omnituple was active:
-    // { q: 'Can I use just one accelerator or do I need all four?', a: 'Each accelerator is independently licensable. Deploy one or combine several — they work standalone or together through composable APIs.' },
-    { q: 'Can I use just one accelerator or do I need the full suite?', a: 'Each accelerator is independently licensable. Deploy one or combine several — they work standalone or together through composable APIs.' },
+    // { q: 'Can I use just one accelerator or do I need all four?', a: 'Each accelerator is independently licensable. Deploy one or combine several - they work standalone or together through composable APIs.' },
+    { q: 'Can I use just one accelerator or do I need the full suite?', a: 'Each accelerator is independently licensable. Deploy one or combine several - they work standalone or together through composable APIs.' },
   ]
 
   return (
