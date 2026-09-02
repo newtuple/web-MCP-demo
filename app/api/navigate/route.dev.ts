@@ -1,10 +1,10 @@
 // Dev-only handler for /api/navigate.
 //
-// Mirrors app/api/demo-app/route.dev.ts exactly: functions/api/navigate.ts is
-// the real, deployed Cloudflare Pages Function; `next dev` does not serve
-// Pages Functions, so this stands in locally. The `.dev.ts` extension is only
-// in pageExtensions when NODE_ENV is development (see next.config.mjs), so
-// `next build` never sees this file and `output: 'export'` keeps working.
+// functions/api/navigate.ts is the real, deployed Cloudflare Pages Function;
+// `next dev` does not serve Pages Functions, so this stands in locally. The
+// `.dev.ts` extension is only in pageExtensions when NODE_ENV is development
+// (see next.config.mjs), so `next build` never sees this file and
+// `output: 'export'` keeps working.
 
 import { handleNavigateRequest } from '@/lib/navigate/agent'
 

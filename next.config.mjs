@@ -3,7 +3,7 @@ const isDev = process.env.NODE_ENV === 'development'
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Static export is a production concern. `next dev` runs as a normal Next
-  // server so app/api/**/route.dev.ts can serve /api/demo-app locally, standing
+  // server so app/api/**/route.dev.ts can serve /api/navigate locally, standing
   // in for the Cloudflare Pages Function that serves it in production.
   ...(isDev ? {} : { output: 'export' }),
   // `.dev.ts` route files exist only for `next dev`; the production export never

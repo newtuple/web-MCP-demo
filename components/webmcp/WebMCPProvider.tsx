@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { useEffect, useRef } from 'react'
 import {
   generateAdaptiveSiteVariant,
   inferVisitorContext,
@@ -9,9 +9,8 @@ import {
   type VisitorContext,
   type VisitorIntent,
 } from '@/lib/adaptiveSite'
-import { demoAppStore } from '@/lib/demoApp/store'
-import DemoAppLauncher from './DemoAppLauncher'
-import { createDemoAppTools, createDemoBuilderTools } from './demoAppTools'
+import SiteAssistant from './SiteAssistant'
+import { createContactTools } from './contactTools'
 import { createNavigateTools } from './navigateTools'
 import { useVisitorContext } from './useVisitorContext'
 
@@ -66,10 +65,6 @@ const toolResult = (context: VisitorContext) => {
 export default function WebMCPProvider() {
   const { context, variant, replaceContext, updateContext, resetContext } = useVisitorContext()
   const contextRef = useRef(context)
-  // Held in state, not a ref, so the demo-app effect below re-runs the moment
-  // the browser hands us a modelContext.
-  const [modelContext, setModelContext] = useState<WebMCPModelContext | null>(null)
-  const demo = useSyncExternalStore(demoAppStore.subscribe, demoAppStore.getSnapshot, demoAppStore.getServerSnapshot)
 
   useEffect(() => {
     contextRef.current = context
@@ -93,7 +88,6 @@ export default function WebMCPProvider() {
 
       window.__newtupleWebMCPToolsRegistered = true
       controller = new AbortController()
-      setModelContext(modelContext)
 
       const register = async (tool: WebMCPToolDefinition) => {
         const signal = controller?.signal
@@ -177,13 +171,13 @@ export default function WebMCPProvider() {
         execute: () => toolResult(resetContext()),
       })
 
-      // Always possible: building a demo app needs nothing to be true first.
-      createDemoBuilderTools().forEach((tool) => void register(tool))
-
-      // Also always possible: routing to a real page needs nothing to be
-      // true first either. Its own session lives client-side only, see
-      // lib/navigate/session.ts.
+      // Routing to a real page needs nothing to be true first. Its own
+      // session lives client-side only, see lib/navigate/session.ts.
       createNavigateTools(replaceContext).forEach((tool) => void register(tool))
+
+      // Contact: opens the on-page flow for the human to complete - never
+      // submits on its own.
+      createContactTools().forEach((tool) => void register(tool))
 
       return true
     }
@@ -215,41 +209,5 @@ export default function WebMCPProvider() {
     contextRef.current = mergeVisitorContext(contextRef.current, context)
   }, [context])
 
-  // Dynamic registration, per the WebMCP pattern: the demo_app_* tools exist
-  // only while a demo app is on screen, and their action_id enums are built
-  // from that app. Closing the app aborts the controller, so the tools leave
-  // the agent's menu instead of failing when called.
-  const demoAppId = demo.session?.app.id ?? ''
-  // The page's own tool names are the tool surface, so they are the registration
-  // key: a newly generated page brings a different set.
-  const demoActionKey = demo.session?.app.tools.map((tool) => tool.name).join(',') ?? ''
-
-  useEffect(() => {
-    const session = demoAppStore.getSnapshot().session
-    if (!modelContext || !session) return
-
-    const controller = new AbortController()
-    const tools = createDemoAppTools(session)
-    let cancelled = false
-
-    void (async () => {
-      for (const tool of tools) {
-        if (cancelled || controller.signal.aborted) return
-        try {
-          await modelContext.registerTool(tool, { signal: controller.signal })
-        } catch {
-          // a browser that rejects one tool should not lose the rest
-        }
-      }
-      if (!cancelled) window.__newtupleDemoAppToolCount = tools.length
-    })()
-
-    return () => {
-      cancelled = true
-      controller.abort()
-      window.__newtupleDemoAppToolCount = 0
-    }
-  }, [modelContext, demoAppId, demoActionKey])
-
-  return <DemoAppLauncher />
+  return <SiteAssistant />
 }

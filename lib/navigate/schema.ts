@@ -46,11 +46,15 @@ export function pageHref(slug: string): string {
 }
 
 export const NavigationDecisionSchema = z.object({
-  decision: z.enum(['navigate', 'clarify', 'build_demo', 'personalize']),
+  decision: z.enum(['navigate', 'clarify', 'contact', 'personalize']),
   // Constrained to the real catalog, not a free string, so the model cannot
   // hallucinate a page that does not exist.
   page: z.enum(PAGE_SLUGS).nullable(),
   question: z.string().nullable(),
+  // For "contact": what the visitor wants to talk about, e.g. a product name
+  // or topic pulled from the conversation. Prefills the contact form's
+  // Regarding field.
+  regarding: z.string().nullable(),
   reason: z.string(),
 })
 
@@ -68,9 +72,9 @@ ${catalogAsText()}
 Decide:
 
 1. "navigate" - the request clearly matches exactly one page above. Set page to that page's slug.
-2. "clarify" - the request could reasonably match more than one page, or matches nothing above closely enough to be sure, and it is not a personalize or build_demo case either. Set question to one short, specific question that would resolve the ambiguity. Never guess. Never pick the closest page when you are not confident.
-3. "build_demo" - the visitor is asking to see something built, tried, or prototyped rather than asking to read an existing page - for example "build me a chatbot", "make a dashboard for this", "can I try a demo of X". This site has a separate tool for that; you only detect the intent, you do not build anything yourself.
-4. "personalize" - the visitor is describing themselves (their role, industry, systems, or goal) rather than asking to see a specific page or asking for something to be built - for example "I run digital transformation for a large retailer using SAP", "I'm a CTO evaluating vendors", "we're in financial services". This is the common case for a first message with no clear destination in mind. This site has a separate mechanism that reshapes the current page around that profile; you only detect that this is what the message is, you do not do the reshaping yourself.
+2. "clarify" - the request could reasonably match more than one page, or matches nothing above closely enough to be sure, and it is not a personalize or contact case either. Set question to one short, specific question that would resolve the ambiguity. Never guess. Never pick the closest page when you are not confident.
+3. "contact" - the visitor wants to get in touch with Newtuple: talk to the team or sales, book a demo, ask for a proposal or pricing, request a call, or leave a message - for example "I want to talk to someone", "book a demo of Flowtuple", "how do I get a quote". Prefer this over navigating to the contactus page: the site collects contact details in the conversation itself. Set regarding to the product or topic the visitor wants to discuss when the conversation makes it clear (for example "Flowtuple" or "retail AI automation"); otherwise leave regarding null.
+4. "personalize" - the visitor is describing themselves (their role, industry, systems, or goal) rather than asking to see a specific page or asking to get in touch - for example "I run digital transformation for a large retailer using SAP", "I'm a CTO evaluating vendors", "we're in financial services". This is the common case for a first message with no clear destination in mind. This site has a separate mechanism that reshapes the current page around that profile; you only detect that this is what the message is, you do not do the reshaping yourself.
 
 How to tell "personalize" apart from "clarify": if the message gives real signal about who the visitor is or what they are working on, even if it does not point at one specific page, that is "personalize" - do not ask a clarifying question just because no single page matches. Only use "clarify" when the message is too vague to act on at all, in any of the other three ways - for example a single ambiguous word, or "tell me more" with nothing to go on.
 

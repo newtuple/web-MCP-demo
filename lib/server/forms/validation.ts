@@ -135,6 +135,9 @@ export function validateContactSubmitPayload(payload: unknown): ValidationResult
   const intent = getString(lead, 'intent', { max: 1200, fieldLabel: 'Intent' })
   if (!intent.ok) return intent
 
+  const regarding = getString(lead, 'regarding', { max: 200, fieldLabel: 'Regarding' })
+  if (!regarding.ok) return regarding
+
   const resumeLink = getString(lead, 'resumeLink', { max: 600, fieldLabel: 'Resume link' })
   if (!resumeLink.ok) return resumeLink
   const validResume = ensureHttpUrl(resumeLink.data, 'Resume link', {
@@ -175,6 +178,7 @@ export function validateContactSubmitPayload(payload: unknown): ValidationResult
       phone: validPhone.data,
       intentType: intentType.data,
       intent: intent.data,
+      regarding: regarding.data,
       resumeLink: validResume.data,
       message: message.data,
       consent: consentValue,

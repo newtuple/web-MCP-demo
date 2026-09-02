@@ -5,6 +5,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { Loader2, Send, Sparkles } from 'lucide-react'
 import HighlightedText from '@/components/ui/HighlightedText'
 import Turnstile, { TurnstileRef } from '@/components/ui/Turnstile'
+import { resolveContactRegarding } from '@/lib/contactRegarding'
 
 type Message = {
   id: string
@@ -26,6 +27,7 @@ type LeadState = {
   phone: string
   intent: string
   intentType: 'job' | 'services' | ''
+  regarding: string
   resumeLink: string
   message: string
   consent: boolean
@@ -74,6 +76,7 @@ export default function ConversationalContact({
   const [consentChecked, setConsentChecked] = useState(false)
   const [resumeInput, setResumeInput] = useState('')
   const [intentInput, setIntentInput] = useState('')
+  const [regardingInput, setRegardingInput] = useState('')
   const [messageInput, setMessageInput] = useState('')
   const [isStreaming, setIsStreaming] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -90,10 +93,22 @@ export default function ConversationalContact({
     phone: '',
     intent: '',
     intentType: '',
+    regarding: '',
     resumeLink: '',
     message: '',
     consent: false,
   })
+
+  // Regarding is auto-filled from where the visitor came from: an explicit
+  // ?regarding= param (product subnav CTA / assistant) or the last product
+  // page they were on. Still editable at the details step.
+  useEffect(() => {
+    const regarding = resolveContactRegarding()
+    if (regarding) {
+      setLead((prev) => ({ ...prev, regarding }))
+      setRegardingInput(regarding)
+    }
+  }, [])
 
   const promptRef = useRef<number | null>(null)
   const scrollRef = useRef<HTMLDivElement | null>(null)
@@ -213,6 +228,7 @@ export default function ConversationalContact({
     if (stepId === 'details') {
       setResumeInput(lead.resumeLink)
       setIntentInput(lead.intent)
+      setRegardingInput(lead.regarding)
       setMessageInput(lead.message)
     }
 
@@ -332,7 +348,7 @@ export default function ConversationalContact({
         return
       }
       addMessage('user', `Resume: ${resume}${message ? `\n${message}` : ''}`)
-      const finalLead = { ...lead, resumeLink: resume, message }
+      const finalLead = { ...lead, resumeLink: resume, message, regarding: '' }
       setLead(finalLead)
       const transcript = buildTranscript([
         ...messages,
@@ -342,12 +358,13 @@ export default function ConversationalContact({
       if (didSubmit) setSubmitted(true)
     } else {
       const intent = intentInput.trim()
+      const regarding = regardingInput.trim()
       if (!intent && !message) {
         setError('Please tell us what you\'re looking for or leave a message.')
         return
       }
-      addMessage('user', intent + (message ? `\n${message}` : ''))
-      const finalLead = { ...lead, intent, message }
+      addMessage('user', (regarding ? `Regarding ${regarding}: ` : '') + intent + (message ? `\n${message}` : ''))
+      const finalLead = { ...lead, intent, message, regarding }
       setLead(finalLead)
       const transcript = buildTranscript([
         ...messages,
@@ -674,6 +691,17 @@ export default function ConversationalContact({
                       </>
                     ) : (
                       <>
+                        <div className="border-b border-gray-300/90 pb-2">
+                          <input
+                            type="text"
+                            value={regardingInput}
+                            onChange={(e) => setRegardingInput(e.target.value)}
+                            placeholder="Regarding (e.g. Flowtuple, retail AI)"
+                            className="w-full bg-transparent text-lg md:text-xl text-gray-900 focus:outline-none text-center placeholder:text-gray-300"
+                            disabled={isStreaming}
+                            aria-label="Regarding"
+                          />
+                        </div>
                         <div className="border-b border-gray-300/90 pb-2">
                           <input
                             ref={inputRef}

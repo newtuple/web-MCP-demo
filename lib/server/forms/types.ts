@@ -6,6 +6,8 @@ export type ContactLead = {
   phone: string
   intentType: IntentType
   intent: string
+  /** What the request is about - auto-filled from the page the visitor navigated from, editable by them. */
+  regarding: string
   resumeLink: string
   message: string
   consent: boolean

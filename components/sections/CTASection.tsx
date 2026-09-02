@@ -3,6 +3,7 @@
 import FadeIn from '@/components/motion/FadeIn'
 import Container from '@/components/ui/Container'
 import Button from '@/components/ui/Button'
+import { useVisitorContext } from '@/components/webmcp/useVisitorContext'
 
 interface CTASectionProps {
   title: string
@@ -12,13 +13,25 @@ interface CTASectionProps {
   className?: string
 }
 
+const DEFAULT_TEXT = 'Get in Touch'
+const DEFAULT_HREF = '/contactus'
+
 export default function CTASection({
   title,
   description,
-  buttonText = 'Get in Touch',
-  buttonHref = '/contactus',
+  buttonText = DEFAULT_TEXT,
+  buttonHref = DEFAULT_HREF,
   className = '',
 }: CTASectionProps) {
+  const { variant } = useVisitorContext()
+
+  // When the site is personalized and the page did not ask for a specific
+  // button, the CTA becomes the one chosen for this visitor - the same
+  // primaryCta the choose_cta WebMCP tool reports.
+  const usingDefaults = buttonText === DEFAULT_TEXT && buttonHref === DEFAULT_HREF
+  const finalText = variant.isPersonalized && usingDefaults ? variant.primaryCta.label : buttonText
+  const finalHref = variant.isPersonalized && usingDefaults ? variant.primaryCta.href : buttonHref
+
   return (
     <section className={`py-20 md:py-28 bg-gradient-cobalt relative overflow-hidden ${className}`}>
       <div className="absolute inset-0 bg-grid opacity-10" />
@@ -34,9 +47,14 @@ export default function CTASection({
           </p>
         </FadeIn>
         <FadeIn delay={0.2}>
-          <Button href={buttonHref} variant="secondary" size="lg">
-            {buttonText}
+          <Button href={finalHref} variant="secondary" size="lg">
+            {finalText}
           </Button>
+          {variant.isPersonalized && (
+            <p className="mt-4 text-xs font-medium uppercase tracking-wide text-[var(--accent-200)]">
+              {variant.adaptationSummary}
+            </p>
+          )}
         </FadeIn>
       </Container>
     </section>

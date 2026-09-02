@@ -56,26 +56,32 @@
 }
 
 @layer utilities {
+  /* All of these read the --accent-* variables WebMCPProvider swaps per
+     visitor intent, so a personalization repaints every page - hero
+     backgrounds, CTA bands, gradient text, the grid tint - not just the
+     homepage. */
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-cobalt-900 to-cyan-500;
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(to right, var(--accent-900), var(--accent-500));
   }
 
   .text-gradient-light {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-cobalt-600 to-cyan-500;
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(to right, var(--accent-600), var(--accent-400));
   }
 
   .bg-gradient-cobalt {
-    @apply bg-gradient-to-br from-cobalt-900 via-cobalt-800 to-cobalt-950;
+    background-image: linear-gradient(to bottom right, var(--accent-900), var(--accent-800), var(--accent-950));
   }
 
   .bg-gradient-hero {
-    @apply bg-gradient-to-br from-slate-50 via-white to-cobalt-50;
+    background-image: linear-gradient(to bottom right, #f8fafc, #ffffff, var(--accent-50));
   }
 
   .bg-grid {
     background-image:
-      linear-gradient(to right, rgba(0, 71, 171, 0.03) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(0, 71, 171, 0.03) 1px, transparent 1px);
+      linear-gradient(to right, color-mix(in srgb, var(--accent-900) 4%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in srgb, var(--accent-900) 4%, transparent) 1px, transparent 1px);
     background-size: 40px 40px;
   }
 

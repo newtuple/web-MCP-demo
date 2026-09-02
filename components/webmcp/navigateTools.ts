@@ -1,22 +1,22 @@
 // WebMCP surface for site navigation. Additive: these two tools sit alongside
-// every tool already registered in WebMCPProvider.tsx and the demo builder in
-// demoAppTools.ts. Nothing existing is touched.
+// every tool already registered in WebMCPProvider.tsx.
 //
 // list_site_pages is read-only and always safe: an agent unsure what exists
-// can check before guessing, same "read before act" shape as get_current_experience.
+// can check before guessing.
 //
 // navigate_site is the single, complete handler for "what brings you to
-// Newtuple"-shaped requests - exactly what the homepage's own Send button
-// does, so an agent gets the same four outcomes a human clicking Send does:
-// sent to a real page, told this is a build_demo_app case, the current page
-// personalized around their profile, or asked one clarifying question. The
-// decision itself happens server-side (lib/navigate/agent.ts); this file
-// only carries out whichever of the four it returns. Its session
-// (lib/navigate/session.ts) lives in this browser tab, expires after ten
-// minutes of inactivity, and is never sent anywhere but back to the same
-// endpoint on the next call.
+// Newtuple"-shaped requests - exactly what the site assistant chatbot does,
+// so an agent gets the same four outcomes a human typing there does: sent to
+// a real page, the current page personalized around their profile, the
+// in-chat contact flow opened (with Regarding prefilled), or asked one
+// clarifying question. The decision itself happens server-side
+// (lib/navigate/agent.ts); this file only carries out whichever of the four
+// it returns. Its session (lib/navigate/session.ts) lives in this browser
+// tab, expires after ten minutes of inactivity, and is never sent anywhere
+// but back to the same endpoint on the next call.
 
 import { inferVisitorContext, type VisitorContext } from '@/lib/adaptiveSite'
+import { openAssistant } from '@/lib/assistant/store'
 import { askNavigator } from '@/lib/navigate/client'
 import { goToSitePage } from '@/lib/navigate/router'
 import { PAGE_CATALOG, pageHref } from '@/lib/navigate/schema'
@@ -44,7 +44,7 @@ export function createNavigateTools(replaceContext: (input: Partial<VisitorConte
       name: 'navigate_site',
       title: 'Handle a "what brings you to Newtuple" request',
       description:
-        'The single, complete handler for a plain-language visitor request - exactly what the homepage\'s own Send button does. Depending on what the message actually is, this will: send the visitor to the one real newtuple.com page that matches it; personalize the current page around their role, industry or goal when the message is a profile statement rather than a request for one specific page; say this sounds like something to build instead (call build_demo_app with the same request, this tool never builds anything itself); or ask a single clarifying question when the message is too vague to act on any of those three ways. Remembers roughly the last ten minutes of this conversation in this browser tab; after that period of inactivity it starts over.',
+        'The single, complete handler for a plain-language visitor request - exactly what the site\'s own assistant chatbot does. Depending on what the message actually is, this will: send the visitor to the one real newtuple.com page that matches it; personalize the current page around their role, industry or goal when the message is a profile statement rather than a request for one specific page; open the on-page contact flow (with the Regarding field prefilled) when the visitor wants to talk to the Newtuple team; or ask a single clarifying question when the message is too vague to act on any of those three ways. Remembers roughly the last ten minutes of this conversation in this browser tab; after that period of inactivity it starts over.',
       inputSchema: {
         type: 'object',
         properties: {
@@ -72,9 +72,10 @@ export function createNavigateTools(replaceContext: (input: Partial<VisitorConte
           return reply(`Taking you to ${decision.page}.`, decision)
         }
 
-        if (decision.decision === 'build_demo') {
+        if (decision.decision === 'contact') {
+          openAssistant({ contact: true, regarding: decision.regarding ?? undefined })
           return reply(
-            'This sounds like something to build, not a page to visit. Call build_demo_app with the same request.',
+            'Opened the on-page contact flow so the visitor can leave their details. Use prepare_contact_request to prefill it further.',
             decision,
           )
         }
