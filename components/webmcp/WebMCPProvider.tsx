@@ -9,10 +9,12 @@ import {
   type VisitorContext,
   type VisitorIntent,
 } from '@/lib/adaptiveSite'
+import { type CareerRole } from '@/lib/careers/roles'
 import { getContactRegarding } from '@/lib/contactRegarding'
 import { PAGE_CATALOG } from '@/lib/navigate/schema'
 import { closePageView, contextPatchForSlug, openPageView, pageViewStore } from '@/lib/pageView/store'
 import SiteAssistant from './SiteAssistant'
+import { createCareersTools } from './careersTools'
 import { createContactTools } from './contactTools'
 import { createNavigateTools } from './navigateTools'
 import { useVisitorContext } from './useVisitorContext'
@@ -65,9 +67,11 @@ const toolResult = (context: VisitorContext) => {
   }
 }
 
-export default function WebMCPProvider() {
+export default function WebMCPProvider({ careersRoles = [] }: { careersRoles?: CareerRole[] }) {
   const { context, variant, replaceContext, updateContext, resetContext } = useVisitorContext()
   const contextRef = useRef(context)
+  const careersRolesRef = useRef(careersRoles)
+  careersRolesRef.current = careersRoles
 
   useEffect(() => {
     contextRef.current = context
@@ -248,9 +252,13 @@ export default function WebMCPProvider() {
       // session lives client-side only, see lib/navigate/session.ts.
       createNavigateTools(replaceContext).forEach((tool) => void register(tool))
 
-      // Contact: opens the on-page flow for the human to complete - never
-      // submits on its own.
+      // Contact: prepare opens the on-page flow; submit sends a lead
+      // directly with the visitor's consent.
       createContactTools().forEach((tool) => void register(tool))
+
+      // Careers: list roles, read JDs, and filter the careers page UI the
+      // way a human using the on-page controls would.
+      createCareersTools(careersRolesRef.current).forEach((tool) => void register(tool))
 
       return true
     }

@@ -1,6 +1,6 @@
 'use client'
 
-import { FormEvent, useCallback, useMemo, useRef, useState } from 'react'
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ArrowRight, Briefcase, Building2, CheckCircle2, ChevronDown, Loader2, MapPin, Search, Sparkles } from 'lucide-react'
 import MarkdownContent from '@/components/blog/MarkdownContent'
 import { resolveIcon } from '@/lib/icons'
@@ -10,6 +10,8 @@ import Button from '@/components/ui/Button'
 import FadeIn from '@/components/motion/FadeIn'
 import StaggerChildren, { StaggerItem } from '@/components/motion/StaggerChildren'
 import Turnstile, { TurnstileRef } from '@/components/ui/Turnstile'
+import { filterCareerRoles, type CareersFilters } from '@/lib/careers/roles'
+import { registerCareersFilterHandler } from '@/lib/careers/store'
 
 interface CareersData {
   title: string
@@ -103,32 +105,30 @@ export default function CareersContent({ data }: { data: CareersData }) {
     [jobs],
   )
 
+  // Same matcher the WebMCP careers tools use (lib/careers/roles.ts), so an
+  // agent's filter result and this visible list can never disagree.
   const filteredPositions = useMemo(
-    () => {
-      const q = normalizeValue(filters.query)
-      return jobs.filter((item) => {
-        const title = normalizeValue(item.title)
-        const level = normalizeValue(item.level)
-        const location = normalizeValue(item.location)
-        const type = normalizeValue(item.type)
-
-        const matchesQuery =
-          q.length === 0 ||
-          title.includes(q) ||
-          level.includes(q) ||
-          location.includes(q) ||
-          type.includes(q)
-
-        const matchesLevel = filters.level === 'All' || normalizeValue(filters.level) === level
-        const matchesType = filters.type === 'All' || normalizeValue(filters.type) === type
-        const matchesLocation =
-          filters.location === 'All' || normalizeValue(filters.location) === location
-
-        return matchesQuery && matchesLevel && matchesType && matchesLocation
-      })
-    },
+    () => filterCareerRoles(jobs, filters),
     [jobs, filters],
   )
+
+  // Agent-applied filters (filter_careers_page): land in the same state the
+  // on-page controls write, so the visitor watches the list narrow exactly as
+  // if they had used the filters themselves. Filters applied before this page
+  // mounted are replayed on mount by the store.
+  useEffect(() => {
+    return registerCareersFilterHandler((incoming: CareersFilters) => {
+      setFilters({
+        query: incoming.query ?? '',
+        level: incoming.level ?? 'All',
+        type: incoming.type ?? 'All',
+        location: incoming.location ?? 'All',
+      })
+      window.setTimeout(() => {
+        document.getElementById('open-roles')?.scrollIntoView({ behavior: 'smooth' })
+      }, 150)
+    })
+  }, [])
 
   const [expandedJob, setExpandedJob] = useState<string | null>(null)
 
