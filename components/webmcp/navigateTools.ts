@@ -15,7 +15,7 @@
 // tab, expires after ten minutes of inactivity, and is never sent anywhere
 // but back to the same endpoint on the next call.
 
-import { inferVisitorContext, type VisitorContext } from '@/lib/adaptiveSite'
+import { inferVisitorContext, productSlugForGoal, type VisitorContext } from '@/lib/adaptiveSite'
 import { openAssistant } from '@/lib/assistant/store'
 import { askNavigator } from '@/lib/navigate/client'
 import { goToSitePage } from '@/lib/navigate/router'
@@ -97,7 +97,14 @@ export function createNavigateTools(replaceContext: (input: Partial<VisitorConte
 
         if (decision.decision === 'personalize') {
           const context = replaceContext(inferVisitorContext(message))
-          return reply(`Personalized the current page around: ${context.goal}.`, { decision, context })
+          // A profile that clearly points at one product also brings that
+          // product's view onto the screen - same as the human chatbot path.
+          const productSlug = productSlugForGoal(context.goal)
+          if (productSlug) openPageView(productSlug)
+          return reply(
+            `Personalized the current page around: ${context.goal}.${productSlug ? ` Also rendered ${productSlug} in place on the current screen.` : ''}`,
+            { decision, context, renderedPageView: productSlug },
+          )
         }
 
         return reply(decision.question || 'Could you say more about what you are looking for?', decision)

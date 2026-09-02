@@ -1,16 +1,13 @@
 import { createMetadata } from '@/lib/metadata'
-import { getAllCaseStudies } from '@/lib/content'
 import AdaptiveSiteExperience from '@/components/webmcp/AdaptiveSiteExperience'
 
-const caseStudies = getAllCaseStudies()
-
 export const metadata = createMetadata({
-  title: 'The website that rebuilds itself for every visitor',
+  title: 'Build your agentic enterprise',
   description:
-    'Tell Newtuple what you are trying to improve and the homepage rebuilds around you, live.',
+    'Newtuple designs, ships, and operates production-grade AI. Tell the site who you are and it rebuilds itself around your goals in real time.',
   path: '/',
 })
 
 export default function HomePage() {
-  return <AdaptiveSiteExperience caseStudies={caseStudies} />
+  return <AdaptiveSiteExperience />
 }
