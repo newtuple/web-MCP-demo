@@ -19,7 +19,8 @@ import { inferVisitorContext, type VisitorContext } from '@/lib/adaptiveSite'
 import { openAssistant } from '@/lib/assistant/store'
 import { askNavigator } from '@/lib/navigate/client'
 import { goToSitePage } from '@/lib/navigate/router'
-import { PAGE_CATALOG, pageHref } from '@/lib/navigate/schema'
+import { PAGE_CATALOG } from '@/lib/navigate/schema'
+import { closePageView, openPageView } from '@/lib/pageView/store'
 
 const reply = (summary: string, data?: unknown) => ({
   content: [
@@ -68,8 +69,22 @@ export function createNavigateTools(replaceContext: (input: Partial<VisitorConte
         const decision = result.decision
 
         if (decision.decision === 'navigate' && decision.page) {
-          goToSitePage(pageHref(decision.page))
-          return reply(`Taking you to ${decision.page}.`, decision)
+          // WebMCP-native navigation: the current screen morphs into the
+          // requested page (render_page_view mechanics) instead of routing.
+          // "home" means the underlying site itself, so that one closes the
+          // view and routes for real.
+          if (decision.page === 'home') {
+            closePageView()
+            goToSitePage('/')
+            return reply('Taking you back to the homepage.', decision)
+          }
+          // PageView itself patches the visitor context (contextPatchForSlug)
+          // when the view opens, so theming follows without a second write here.
+          openPageView(decision.page)
+          return reply(
+            `Rendered ${decision.page} in place on the current screen - no page load, URL unchanged. close_page_view restores the underlying page.`,
+            decision,
+          )
         }
 
         if (decision.decision === 'contact') {

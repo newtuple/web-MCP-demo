@@ -33,6 +33,8 @@ const intentIcon: Record<VisitorIntent, typeof Bot> = {
 const agentTools = [
   'navigate_site',
   'list_site_pages',
+  'render_page_view',
+  'close_page_view',
   'prepare_contact_request',
   'infer_visitor_context',
   'set_visitor_context',

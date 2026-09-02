@@ -32,7 +32,7 @@ export default function ProductSubnav() {
   const top = variant.isPersonalized ? 'top-24 md:top-28' : 'top-16 md:top-20'
 
   return (
-    <div className={`fixed left-0 right-0 z-30 border-b bg-white/90 backdrop-blur-xl ${top} ${product.accent.border}`}>
+    <div data-product-subnav className={`fixed left-0 right-0 z-30 border-b bg-white/90 backdrop-blur-xl ${top} ${product.accent.border}`}>
       <Container>
         <div className="flex h-12 items-center justify-between gap-4">
           <div className="flex min-w-0 items-baseline gap-3">

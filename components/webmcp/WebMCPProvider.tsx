@@ -9,6 +9,8 @@ import {
   type VisitorContext,
   type VisitorIntent,
 } from '@/lib/adaptiveSite'
+import { PAGE_CATALOG } from '@/lib/navigate/schema'
+import { closePageView, contextPatchForSlug, openPageView, pageViewStore } from '@/lib/pageView/store'
 import SiteAssistant from './SiteAssistant'
 import { createContactTools } from './contactTools'
 import { createNavigateTools } from './navigateTools'
@@ -169,6 +171,53 @@ export default function WebMCPProvider() {
         name: 'reset_visitor_context',
         description: 'Reset Newtuple.com to its neutral, non-adapted state.',
         execute: () => toolResult(resetContext()),
+      })
+
+      // In-place rendering: the WebMCP-native way to "go" somewhere. The
+      // current screen morphs into the requested page with CSS (the route's
+      // own content is hidden, the view renders in its place) and the
+      // visitor-context theme re-paints to match - no page load, no route
+      // change, all other tools stay registered.
+      void register({
+        name: 'render_page_view',
+        description:
+          'Render any real newtuple.com page IN PLACE on the current screen instead of navigating to it. The current route\'s content is swapped out with CSS, navigation and accent theme re-adapt to the requested page, and the URL does not change - so no page load and no lost state. Prefer this over sending the visitor to another URL. Use close_page_view to restore the underlying page.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            page: {
+              type: 'string',
+              enum: PAGE_CATALOG.filter((p) => p.slug !== 'home').map((p) => p.slug),
+              description: 'The catalog page to render in place. Same slugs list_site_pages returns.',
+            },
+          },
+          required: ['page'],
+        },
+        annotations: { readOnlyHint: false },
+        execute: (input = {}) => {
+          const slug = String(input.page ?? '')
+          const opened = openPageView(slug)
+          if (!opened) return { ok: false, error: `Unknown page: ${slug}. Call list_site_pages for valid slugs.` }
+          const context = updateContext(contextPatchForSlug(slug))
+          const page = PAGE_CATALOG.find((p) => p.slug === slug)
+          return {
+            ok: true,
+            rendered: { slug, title: page?.title, description: page?.description },
+            note: 'Page rendered in place - the URL did not change. close_page_view restores the underlying page.',
+            adaptedContext: context,
+          }
+        },
+      })
+
+      void register({
+        name: 'close_page_view',
+        description:
+          'Close the in-place page view opened by render_page_view and restore the underlying page\'s own content. Does nothing when no view is open.',
+        execute: () => {
+          const wasOpen = pageViewStore.getSnapshot().slug
+          closePageView()
+          return { ok: true, closed: wasOpen ?? null }
+        },
       })
 
       // Routing to a real page needs nothing to be true first. Its own
