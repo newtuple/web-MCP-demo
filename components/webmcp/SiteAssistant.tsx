@@ -14,11 +14,12 @@
 // is what this panel calls (lib/navigate/client.ts), so a human typing here
 // and an agent calling the tool get identical behaviour.
 
-import { FormEvent, useCallback, useEffect, useRef, useState } from 'react'
+import { FormEvent, useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
-import { ArrowUpRight, Loader2, Send, Sparkles, X } from 'lucide-react'
+import { Activity, ArrowUpRight, Loader2, Send, Sparkles, X } from 'lucide-react'
 import Turnstile, { TurnstileRef } from '@/components/ui/Turnstile'
 import { registerAssistant, type AssistantCommand } from '@/lib/assistant/store'
+import { agentActivityVisibilityStore, logAgentActivity, toggleAgentActivityVisibility } from '@/lib/agentActivity/store'
 import { inferVisitorContext, productSlugForGoal } from '@/lib/adaptiveSite'
 import { resolveContactRegarding, setContactRegarding } from '@/lib/contactRegarding'
 import { askNavigator } from '@/lib/navigate/client'
@@ -124,6 +125,7 @@ export default function SiteAssistant() {
       // Local shortcut: closing the in-place page view needs no model call.
       if (/^(go back|back|close( the (page|view))?|close it)$/i.test(value)) {
         closePageView()
+        logAgentActivity('close_page_view', 'Assistant closed the in-place page view')
         pushTurn('assistant', 'Closed the page view - you are back on the original page.')
         return
       }
@@ -145,10 +147,12 @@ export default function SiteAssistant() {
         // routing. Only "home" routes for real - it means the site itself.
         if (decision.page === 'home') {
           closePageView()
+          logAgentActivity('close_page_view', 'Assistant took you back to the homepage')
           pushTurn('assistant', 'Taking you back to the homepage.')
           router.push('/')
         } else {
           openPageView(decision.page)
+          logAgentActivity('render_page_view', `Assistant opened "${decision.page}" in place, no reload`)
           pushTurn('assistant', `Showing ${pageTitle(decision.page)} right here - no page reload. Say "go back" or close the view to return.`)
         }
         setBusy(false)
@@ -157,17 +161,20 @@ export default function SiteAssistant() {
 
       if (decision.decision === 'contact') {
         startContactFlow(decision.regarding ?? undefined)
+        logAgentActivity('prepare_contact_request', 'Assistant staged a contact request for you to confirm')
         setBusy(false)
         return
       }
 
       if (decision.decision === 'personalize') {
         const context = replaceContext(inferVisitorContext(value))
+        logAgentActivity('set_visitor_context', `Assistant personalized the site for: ${context.goal}`)
         // When the profile clearly points at one product, don't just re-theme -
         // bring that product's view up on this screen too.
         const productSlug = productSlugForGoal(context.goal)
         if (productSlug) {
           openPageView(productSlug)
+          logAgentActivity('render_page_view', `Assistant opened "${productSlug}" in place, no reload`)
           pushTurn(
             'assistant',
             `Done - the site is now shaped around ${context.goal}, and ${pageTitle(productSlug)} is on your screen right now. Keep telling me what you need, or say "go back".`,
@@ -295,6 +302,7 @@ export default function SiteAssistant() {
       }
 
       pushTurn('user', shownMessage)
+      logAgentActivity('submit_contact_request', 'Assistant submitted a contact request (consent given)')
       pushTurn('assistant', "Thanks! Your message is with the team - we'll get back to you shortly. Anything else I can help with?")
       setContactStage('done')
       setLead(EMPTY_LEAD)
@@ -315,6 +323,12 @@ export default function SiteAssistant() {
 
   const contactActive = contactStage === 'name' || contactStage === 'reach' || contactStage === 'details'
 
+  const activityFeedVisible = useSyncExternalStore(
+    agentActivityVisibilityStore.subscribe,
+    agentActivityVisibilityStore.getSnapshot,
+    agentActivityVisibilityStore.getServerSnapshot,
+  )
+
   return (
     <div className="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-3 print:hidden">
       {open && (
@@ -324,9 +338,25 @@ export default function SiteAssistant() {
               <Sparkles className="h-3.5 w-3.5 text-[var(--accent-900,#0047AB)]" />
               Newtuple Assistant
             </span>
-            <button type="button" onClick={() => setOpen(false)} className="text-slate-400 transition hover:text-slate-700" aria-label="Close assistant">
-              <X className="h-4 w-4" />
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={toggleAgentActivityVisibility}
+                className={
+                  activityFeedVisible
+                    ? 'inline-flex items-center gap-1 rounded-full bg-[var(--accent-50,#eff4ff)] px-2 py-1 text-[11px] font-medium text-[var(--accent-700,#1d38d8)] transition'
+                    : 'inline-flex items-center gap-1 rounded-full px-2 py-1 text-[11px] font-medium text-slate-400 transition hover:text-slate-600'
+                }
+                aria-pressed={activityFeedVisible}
+                aria-label="Toggle the WebMCP tool activity feed"
+              >
+                <Activity className="h-3.5 w-3.5" />
+                Tool activity
+              </button>
+              <button type="button" onClick={() => setOpen(false)} className="text-slate-400 transition hover:text-slate-700" aria-label="Close assistant">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
           </div>
 
           <div ref={scrollRef} className="max-h-80 space-y-2 overflow-y-auto px-4 py-3">

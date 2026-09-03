@@ -14,15 +14,7 @@ import {
 } from '@/lib/careers/roles'
 import { applyCareersFilters } from '@/lib/careers/store'
 import { goToSitePage } from '@/lib/navigate/router'
-
-const reply = (summary: string, data?: unknown) => ({
-  content: [
-    {
-      type: 'text',
-      text: data === undefined ? summary : `${summary}\n\n${JSON.stringify(data, null, 2)}`,
-    },
-  ],
-})
+import { reply } from '@/lib/webmcpReply'
 
 const roleSummary = (role: CareerRole) => ({
   title: role.title,
@@ -105,12 +97,33 @@ export function createCareersTools(roles: CareerRole[]): WebMCPToolDefinition[] 
       name: 'filter_careers_page',
       title: 'Filter the careers page on screen',
       description:
-        'Apply filters to the careers page UI exactly as a human using the on-page controls would: the visible job list narrows to the matching roles. Navigates to the careers page first when the visitor is elsewhere, then applies the filters and scrolls the open-roles section into view. Returns the same matching roles the visitor now sees.',
+        'Apply filters to the careers page UI exactly as a human using the on-page controls would: the visible job list narrows to the matching roles. Navigates to the careers page first when the visitor is elsewhere, then applies the filters and scrolls the open-roles section into view. Returns the same matching roles the visitor now sees. If nothing matches, the page is left unchanged and the result carries needsClarification: true plus nearbyOptions - ask the visitor which of those they want, then call this again.',
       inputSchema: filterInputSchema(roles),
       annotations: { readOnlyHint: false },
       execute: (input = {}) => {
         const filters = filtersFromInput(input)
         const matches = filterCareerRoles(roles, filters)
+
+        // Bidirectional: a zero-match filter doesn't fail silently or blank
+        // the page. It leaves the visible list alone and hands the agent a
+        // real question to relay back verbatim, with the actual open roles
+        // spelled out right in the summary line - not just in the JSON below,
+        // where a summarizing agent might never look - so there is no way to
+        // collapse this into "0 results found" without also seeing the ask.
+        if (matches.length === 0) {
+          const available = availableRoleFilters(roles)
+          const openTitles = roles.map((r) => r.title).join(', ')
+          return reply(
+            `Nothing matches that filter. Careers page left unchanged - do NOT report zero results to the visitor, ask them this instead: "We don't have that exact role open right now, but we do have: ${openTitles}. Want me to show you any of these?" Then call filter_careers_page again with whichever they pick.`,
+            {
+              needsClarification: true,
+              applied: filters,
+              nearbyOptions: available,
+              allOpenRoles: roles.map(roleSummary),
+            },
+          )
+        }
+
         applyCareersFilters(filters)
         if (window.location.pathname !== '/careers') goToSitePage('/careers')
         return reply(

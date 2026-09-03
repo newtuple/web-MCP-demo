@@ -21,15 +21,7 @@ import { askNavigator } from '@/lib/navigate/client'
 import { goToSitePage } from '@/lib/navigate/router'
 import { PAGE_CATALOG } from '@/lib/navigate/schema'
 import { closePageView, openPageView } from '@/lib/pageView/store'
-
-const reply = (summary: string, data?: unknown) => ({
-  content: [
-    {
-      type: 'text',
-      text: data === undefined ? summary : `${summary}\n\n${JSON.stringify(data, null, 2)}`,
-    },
-  ],
-})
+import { reply } from '@/lib/webmcpReply'
 
 export function createNavigateTools(replaceContext: (input: Partial<VisitorContext>) => VisitorContext): WebMCPToolDefinition[] {
   return [

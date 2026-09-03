@@ -13,6 +13,9 @@ import { type CareerRole } from '@/lib/careers/roles'
 import { getContactRegarding } from '@/lib/contactRegarding'
 import { PAGE_CATALOG } from '@/lib/navigate/schema'
 import { closePageView, contextPatchForSlug, openPageView, pageViewStore } from '@/lib/pageView/store'
+import { describeToolCall } from '@/lib/agentActivity/describe'
+import { logAgentActivity } from '@/lib/agentActivity/store'
+import AgentActivityFeed from './AgentActivityFeed'
 import SiteAssistant from './SiteAssistant'
 import { createCareersTools } from './careersTools'
 import { createContactTools } from './contactTools'
@@ -99,8 +102,23 @@ export default function WebMCPProvider({ careersRoles = [] }: { careersRoles?: C
       const register = async (tool: WebMCPToolDefinition) => {
         const signal = controller?.signal
         if (!signal || signal.aborted) return
+        // Every tool call surfaces in the on-screen activity feed, so a human
+        // sharing the tab with an agent sees what it just did in plain
+        // language, not just the resulting UI change.
+        const observed: WebMCPToolDefinition = {
+          ...tool,
+          execute: async (input, options) => {
+            const result = await tool.execute(input, options)
+            try {
+              logAgentActivity(tool.name, describeToolCall(tool.name, input, result))
+            } catch {
+              // Never let a feed-formatting bug break the actual tool call.
+            }
+            return result
+          },
+        }
         try {
-          await modelContext.registerTool(tool, { signal })
+          await modelContext.registerTool(observed, { signal })
         } catch {
           if (!signal.aborted) window.__newtupleWebMCPToolsRegistered = false
         }
@@ -290,5 +308,10 @@ export default function WebMCPProvider({ careersRoles = [] }: { careersRoles?: C
     contextRef.current = mergeVisitorContext(contextRef.current, context)
   }, [context])
 
-  return <SiteAssistant />
+  return (
+    <>
+      <SiteAssistant />
+      <AgentActivityFeed />
+    </>
+  )
 }

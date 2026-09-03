@@ -11,6 +11,7 @@
 
 import { openAssistant } from '@/lib/assistant/store'
 import { getContactRegarding } from '@/lib/contactRegarding'
+import { reply } from '@/lib/webmcpReply'
 
 // The endpoint discards submissions "filled in" faster than a human could
 // have; anchoring the timestamp to page load reflects reality for an agent
@@ -19,15 +20,6 @@ const PAGE_LOADED_AT = Date.now()
 
 const isEmail = (value: string) =>
   /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/.test(value)
-
-const reply = (summary: string, data?: unknown) => ({
-  content: [
-    {
-      type: 'text',
-      text: data === undefined ? summary : `${summary}\n\n${JSON.stringify(data, null, 2)}`,
-    },
-  ],
-})
 
 export function createContactTools(): WebMCPToolDefinition[] {
   return [
