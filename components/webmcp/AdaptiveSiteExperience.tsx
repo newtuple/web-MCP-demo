@@ -24,7 +24,9 @@ const intentIcon: Record<VisitorIntent, typeof Bot> = {
 
 // Always-on WebMCP tools, shown so agent builders can see the surface.
 const agentTools = [
+  'how_can_newtuple_help',
   'get_site_state',
+  'get_page_details',
   'navigate_site',
   'list_site_pages',
   'render_page_view',
@@ -34,6 +36,8 @@ const agentTools = [
   'list_open_roles',
   'get_role_details',
   'filter_careers_page',
+  'get_personalization_questions',
+  'answer_personalization_questions',
   'infer_visitor_context',
   'set_visitor_context',
   'update_visitor_profile',

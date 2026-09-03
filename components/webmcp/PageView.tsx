@@ -15,11 +15,12 @@ import Container from '@/components/ui/Container'
 import { openAssistant } from '@/lib/assistant/store'
 import { setContactRegarding } from '@/lib/contactRegarding'
 import { PAGE_CATALOG, pageHref } from '@/lib/navigate/schema'
+import { type PageDetails } from '@/lib/pageView/details'
 import { closePageView, contextPatchForSlug, openPageView, pageViewStore } from '@/lib/pageView/store'
 import { PRODUCTS } from '@/lib/products'
 import { useVisitorContext } from './useVisitorContext'
 
-export default function PageView() {
+export default function PageView({ details = {} }: { details?: Record<string, PageDetails> }) {
   const { slug } = useSyncExternalStore(pageViewStore.subscribe, pageViewStore.getSnapshot, pageViewStore.getServerSnapshot)
   const pathname = usePathname()
   const { variant, updateContext } = useVisitorContext()
@@ -63,6 +64,7 @@ export default function PageView() {
   const page = PAGE_CATALOG.find((p) => p.slug === slug)
   if (!page) return null
 
+  const detail = details[slug]
   const product = PRODUCTS.find((p) => p.slug === slug) ?? null
   const related = product
     ? PRODUCTS.filter((p) => p.slug !== slug).map((p) => ({ label: p.name, slug: p.slug }))
@@ -79,8 +81,8 @@ export default function PageView() {
             {product && (
               <div className={`text-xs font-semibold uppercase tracking-[0.14em] ${product.accent.text}`}>{product.tagline}</div>
             )}
-            <h1 className="mt-2 text-4xl font-extralight tracking-tight text-gray-900 md:text-5xl">{page.title}</h1>
-            <p className="mt-5 max-w-2xl text-lg font-light leading-relaxed text-gray-600">{page.description}</p>
+            <h1 className="mt-2 text-4xl font-extralight tracking-tight text-gray-900 md:text-5xl">{detail?.heroTitle ?? page.title}</h1>
+            <p className="mt-5 max-w-2xl text-lg font-light leading-relaxed text-gray-600">{detail?.heroDescription ?? page.description}</p>
           </div>
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -103,6 +105,61 @@ export default function PageView() {
 
           {variant.isPersonalized && (
             <p className="mt-6 text-xs font-medium uppercase tracking-wide text-gray-400">{variant.adaptationSummary}</p>
+          )}
+
+          {detail && detail.whatWeDo.length > 0 && (
+            <div className="mt-12">
+              <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--accent-900)]">What we can do for you</h2>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                {detail.whatWeDo.map((item) => (
+                  <div key={item.title} className="rounded-xl border border-gray-200 bg-white/80 p-4">
+                    <h3 className="text-sm font-semibold text-gray-950">{item.title}</h3>
+                    <p className="mt-1.5 text-xs leading-5 text-gray-600">{item.description}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {detail?.caseStudy && (
+            <div className="mt-10 rounded-xl border border-[var(--accent-200)] bg-white p-5">
+              <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--accent-900)]">Proven in production</div>
+              <h3 className="mt-1.5 text-base font-semibold text-gray-950">{detail.caseStudy.title}</h3>
+              <ul className="mt-3 space-y-2">
+                {detail.caseStudy.bullets.map((bullet) => (
+                  <li key={bullet} className="flex items-start gap-2 text-sm leading-6 text-gray-600">
+                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--accent-500)]" />
+                    {bullet}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {detail?.testimonial && (
+            <blockquote className="mt-8 rounded-xl bg-[var(--accent-50)] p-5">
+              <p className="text-sm italic leading-6 text-gray-700">&ldquo;{detail.testimonial.quote}&rdquo;</p>
+              {(detail.testimonial.name || detail.testimonial.attribution) && (
+                <footer className="mt-3 text-xs font-semibold text-[var(--accent-900)]">
+                  {[detail.testimonial.name, detail.testimonial.attribution].filter(Boolean).join(' · ')}
+                </footer>
+              )}
+            </blockquote>
+          )}
+
+          {detail?.cta && (
+            <div className="mt-10 rounded-xl border border-gray-200 bg-white p-5">
+              <h3 className="text-base font-semibold text-gray-950">{detail.cta.title}</h3>
+              {detail.cta.description && <p className="mt-1.5 text-sm leading-6 text-gray-600">{detail.cta.description}</p>}
+              <button
+                type="button"
+                onClick={() => openAssistant({ contact: true, regarding: product ? product.name : page.title })}
+                className="mt-4 inline-flex h-10 items-center justify-center gap-2 rounded-md bg-[var(--accent-900)] px-4 text-sm font-semibold text-white transition-shadow hover:shadow-premium-lg"
+              >
+                <MessageCircle className="h-4 w-4" />
+                Start the conversation
+              </button>
+            </div>
           )}
 
           {related.length > 0 && (

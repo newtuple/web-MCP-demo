@@ -58,6 +58,7 @@ describe('navigation decision schema', () => {
       decision: 'contact',
       page: null,
       question: null,
+      options: null,
       regarding: 'Flowtuple',
       reason: 'visitor asked to book a demo',
     })
@@ -69,6 +70,7 @@ describe('navigation decision schema', () => {
       decision: 'build_demo',
       page: null,
       question: null,
+      options: null,
       regarding: null,
       reason: 'x',
     })
