@@ -36,7 +36,6 @@ Common fields used across content:
 - Static routes live under `app/`.
 - Dynamic page routing uses `app/[slug]/page.tsx` with a registry in `app/_pageRegistry.ts`.
 - Blog links open the blog at `https://www.newtuple.com/blog`.
-- The Cloudflare worker redirects old `/blog` and `/post/*` URLs to Newtuple.
 
 ## Components & Layout
 - Shared layout: `app/layout.tsx`
