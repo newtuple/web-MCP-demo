@@ -1,20 +1,28 @@
-import { handleDemoAppRequest, type DemoAppEnv } from './lib/demoApp/generate'
+import { handleNavigateRequest, type NavigateEnv } from './lib/navigate/agent'
+import { handleCareersSubmitRequest, handleContactSubmitRequest } from './lib/server/http/submitHandlers'
 
 interface AssetsBinding {
   fetch(request: Request): Promise<Response>
 }
 
-interface WorkerEnv extends DemoAppEnv {
+interface WorkerEnv extends NavigateEnv {
   ASSETS: AssetsBinding
 }
 
 export default {
   async fetch(request: Request, env: WorkerEnv): Promise<Response> {
-    const requestUrl = new URL(request.url)
-    const { pathname } = requestUrl
+    const { pathname } = new URL(request.url)
 
-    if (pathname === '/api/demo-app') {
-      return handleDemoAppRequest(request, env)
+    if (pathname === '/api/navigate') {
+      return handleNavigateRequest(request, env)
+    }
+
+    if (pathname === '/api/careers/submit') {
+      return handleCareersSubmitRequest(request, env as unknown as Record<string, string | undefined>)
+    }
+
+    if (pathname === '/api/contact/submit') {
+      return handleContactSubmitRequest(request, env as unknown as Record<string, string | undefined>)
     }
 
     return env.ASSETS.fetch(request)
