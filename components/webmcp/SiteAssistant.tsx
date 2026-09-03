@@ -19,8 +19,11 @@ import { usePathname, useRouter } from 'next/navigation'
 import { ArrowUpRight, Loader2, Send, Sparkles, X } from 'lucide-react'
 import Turnstile, { TurnstileRef } from '@/components/ui/Turnstile'
 import { registerAssistant, type AssistantCommand } from '@/lib/assistant/store'
-import { inferVisitorContext, productSlugForGoal } from '@/lib/adaptiveSite'
+import { inferVisitorContext, productSlugForGoal, type VisitorContext } from '@/lib/adaptiveSite'
+import { applyCareersFilters } from '@/lib/careers/store'
 import { resolveContactRegarding, setContactRegarding } from '@/lib/contactRegarding'
+import { applyPersonaAnswers, missingPersonaQuestions } from '@/lib/persona/questions'
+import { getPersonaAnswers, recordPersonaAnswers } from '@/lib/persona/store'
 import { askNavigator } from '@/lib/navigate/client'
 import { setSiteNavigator } from '@/lib/navigate/router'
 import { PAGE_CATALOG } from '@/lib/navigate/schema'
@@ -33,6 +36,13 @@ interface Turn {
   kind: TurnKind
   text: string
 }
+
+// Quick-reply chips under the chat: either a suggested free-text reply (from
+// the navigator's clarify options) or a persona-question answer that applies
+// directly, no model round-trip.
+type Chip =
+  | { kind: 'text'; label: string }
+  | { kind: 'answer'; label: string; questionId: string; value: string }
 
 type ContactStage = 'name' | 'reach' | 'details' | 'done'
 
@@ -61,12 +71,13 @@ const primaryButtonClass =
 export default function SiteAssistant() {
   const router = useRouter()
   const pathname = usePathname()
-  const { replaceContext } = useVisitorContext()
+  const { context: visitorContext, replaceContext, updateContext } = useVisitorContext()
 
   const [open, setOpen] = useState(false)
   const [message, setMessage] = useState('')
   const [turns, setTurns] = useState<Turn[]>([])
   const [busy, setBusy] = useState(false)
+  const [chips, setChips] = useState<Chip[]>([])
 
   const [contactStage, setContactStage] = useState<ContactStage | null>(null)
   const [lead, setLead] = useState<ContactLeadDraft>(EMPTY_LEAD)
@@ -94,11 +105,28 @@ export default function SiteAssistant() {
     setTurns((prev) => [...prev, { kind, text }])
   }, [])
 
+  // After a personalization step, ask the next persona question for this
+  // visitor's track as tappable chips - same question model the
+  // get/answer_personalization_questions WebMCP tools serve to agents.
+  const offerNextPersonaQuestion = useCallback(
+    (context: VisitorContext) => {
+      const [next] = missingPersonaQuestions(context, getPersonaAnswers())
+      if (!next) {
+        setChips([])
+        return
+      }
+      pushTurn('assistant', next.question)
+      setChips(next.options.map((option) => ({ kind: 'answer', label: option.label, questionId: next.id, value: option.value })))
+    },
+    [pushTurn],
+  )
+
   const startContactFlow = useCallback(
     (regarding?: string) => {
       const resolved =
         (regarding ?? '').trim() || regardingForPath(pathnameRef.current) || resolveContactRegarding()
       if (resolved) setContactRegarding(resolved)
+      setChips([])
       contactStartedAt.current = Date.now()
       setLead((prev) => ({ ...EMPTY_LEAD, ...prev, regarding: resolved }))
       setContactStage('name')
@@ -120,6 +148,7 @@ export default function SiteAssistant() {
 
       pushTurn('user', value)
       setMessage('')
+      setChips([])
 
       // Local shortcut: closing the in-place page view needs no model call.
       if (/^(go back|back|close( the (page|view))?|close it)$/i.test(value)) {
@@ -173,17 +202,50 @@ export default function SiteAssistant() {
             `Done - the site is now shaped around ${context.goal}, and ${pageTitle(productSlug)} is on your screen right now. Keep telling me what you need, or say "go back".`,
           )
         } else {
-          pushTurn('assistant', `Done - the site is now shaped around: ${context.goal}. Look around, or keep telling me what you need.`)
+          pushTurn('assistant', `Done - the site is now shaped around: ${context.goal}.`)
         }
+        // Follow up with the next persona question for this track, as chips.
+        offerNextPersonaQuestion(context)
         setBusy(false)
         return
       }
 
       pushTurn('assistant', decision.question || 'Could you say more about what you are looking for?')
+      // Clarify options become tappable suggested replies.
+      if (decision.decision === 'clarify' && decision.options && decision.options.length > 0) {
+        setChips(decision.options.slice(0, 4).map((label) => ({ kind: 'text', label })))
+      }
       setBusy(false)
     },
-    [busy, pushTurn, replaceContext, router, startContactFlow],
+    [busy, offerNextPersonaQuestion, pushTurn, replaceContext, router, startContactFlow],
   )
+
+  // Persona answer chips apply instantly - no model round-trip: record the
+  // answer, patch the context, run the answer's effect (product view or
+  // careers filter), then offer the track's next question.
+  const handleChip = (chip: Chip) => {
+    if (busy) return
+    if (chip.kind === 'text') {
+      void send(chip.label)
+      return
+    }
+    setChips([])
+    pushTurn('user', chip.label)
+    const result = applyPersonaAnswers({ [chip.questionId]: chip.value })
+    recordPersonaAnswers(result.applied)
+    const context = Object.keys(result.patch).length > 0 ? updateContext(result.patch) : visitorContext
+    if (result.pageViewSlug) {
+      openPageView(result.pageViewSlug)
+      pushTurn('assistant', `Showing ${pageTitle(result.pageViewSlug)} right here - no page reload.`)
+    } else if (result.careersFilters) {
+      applyCareersFilters(result.careersFilters)
+      if (pathname !== '/careers') router.push('/careers')
+      pushTurn('assistant', 'Filtered the open roles to match - take a look.')
+    } else {
+      pushTurn('assistant', 'Got it - tailoring the site.')
+    }
+    offerNextPersonaQuestion(context)
+  }
 
   // Commands from the rest of the site: hero prompt chips, product subnav
   // CTAs, and the prepare_contact_request WebMCP tool.
@@ -452,6 +514,22 @@ export default function SiteAssistant() {
                 </button>
               </div>
             </form>
+          )}
+
+          {!contactActive && chips.length > 0 && (
+            <div className="flex flex-wrap gap-2 border-t border-slate-100 px-3 pt-3">
+              {chips.map((chip) => (
+                <button
+                  key={`${chip.kind}-${chip.label}`}
+                  type="button"
+                  onClick={() => handleChip(chip)}
+                  disabled={busy}
+                  className="rounded-full border border-[var(--accent-200,#bfd3fe)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--accent-900,#0047AB)] transition-colors hover:border-[var(--accent-400,#6090fa)] hover:bg-[var(--accent-50,#eff4ff)] disabled:opacity-40"
+                >
+                  {chip.label}
+                </button>
+              ))}
+            </div>
           )}
 
           {!contactActive && (

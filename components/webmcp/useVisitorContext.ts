@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import { clearPersonaAnswers } from '@/lib/persona/store'
 import {
   DEFAULT_VISITOR_CONTEXT,
   VISITOR_CONTEXT_EVENT,
@@ -58,7 +59,12 @@ export function useVisitorContext() {
 
   const replaceContext = useCallback((next: Partial<VisitorContext>) => commit(normalizeVisitorContext(next)), [commit])
   const updateContext = useCallback((patch: Partial<VisitorContext>) => commit(mergeVisitorContext(readStoredContext(), patch)), [commit])
-  const resetContext = useCallback(() => commit(DEFAULT_VISITOR_CONTEXT), [commit])
+  const resetContext = useCallback(() => {
+    // Persona answers describe the same visitor the context does - a reset
+    // wipes both, so the elicitation flow starts fresh too.
+    clearPersonaAnswers()
+    return commit(DEFAULT_VISITOR_CONTEXT)
+  }, [commit])
 
   const variant = generateAdaptiveSiteVariant(context)
 

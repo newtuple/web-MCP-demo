@@ -1,6 +1,6 @@
 # Newtuple - The AI-Native Website (WebMCP Demo)
 
-**A website that both humans and AI agents can use as first-class visitors.** Humans browse, chat, and click. Agents discover 18 in-page [WebMCP](https://github.com/webmachinelearning/webmcp) tools and do everything a human can - navigate, personalize the whole site, filter job openings, and send leads - **without clicking a single pixel**.
+**A website that both humans and AI agents can use as first-class visitors.** Humans browse, chat, and click. Agents discover 22 in-page [WebMCP](https://github.com/webmachinelearning/webmcp) tools and do everything a human can - navigate, personalize the whole site, answer persona questions, filter job openings, and send leads - **without clicking a single pixel**.
 
 Built by [Newtuple Technologies](https://newtuple.com) as a hackathon submission.
 
@@ -44,13 +44,15 @@ npm run build             # static export to ./out
 
 Without `OPENAI_API_KEY`, everything works except the natural-language `navigate_site` classifier (the chatbot's routing). Without SES/Turnstile config, contact submissions log an error instead of sending email - fine for local demos.
 
-### The 18 WebMCP tools
+### The 22 WebMCP tools
 
 Registered site-wide by `components/webmcp/WebMCPProvider.tsx`:
 
 | Category | Tools |
 |---|---|
-| Orient (read) | `get_site_state`, `list_site_pages` |
+| Start here | `how_can_newtuple_help` - the site's guided prompt: elicit the persona, customize the site, ground answers in real experience, initiate contact |
+| Orient (read) | `get_site_state`, `list_site_pages`, `get_page_details` (real use cases, case studies, testimonials per page) |
+| Elicit the persona | `get_personalization_questions`, `answer_personalization_questions` - questions branch by track (careers / services / products), the site rebuilds from the answers |
 | Personalize | `infer_visitor_context`, `set_visitor_context`, `update_visitor_profile`, `reset_visitor_context` |
 | Read the adaptation | `generate_page_variant`, `reorder_navigation`, `select_case_studies`, `choose_cta` |
 | Navigate in place | `render_page_view`, `close_page_view`, `navigate_site` |
@@ -100,7 +102,7 @@ No WebMCP browser handy? Simulate one in DevTools before/after load:
 window.__tools = []
 navigator.modelContext = { registerTool: async (t) => window.__tools.push(t) }
 // wait ~1s, then:
-window.__tools.map(t => t.name)   // → 18 tool names
+window.__tools.map(t => t.name)   // → 22 tool names
 ```
 
 ---

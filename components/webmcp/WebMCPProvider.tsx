@@ -11,7 +11,12 @@ import {
 } from '@/lib/adaptiveSite'
 import { type CareerRole } from '@/lib/careers/roles'
 import { getContactRegarding } from '@/lib/contactRegarding'
+import { applyCareersFilters } from '@/lib/careers/store'
+import { goToSitePage } from '@/lib/navigate/router'
 import { PAGE_CATALOG } from '@/lib/navigate/schema'
+import { applyPersonaAnswers, missingPersonaQuestions, personaTrack } from '@/lib/persona/questions'
+import { getPersonaAnswers, recordPersonaAnswers } from '@/lib/persona/store'
+import { type PageDetails } from '@/lib/pageView/details'
 import { closePageView, contextPatchForSlug, openPageView, pageViewStore } from '@/lib/pageView/store'
 import SiteAssistant from './SiteAssistant'
 import { createCareersTools } from './careersTools'
@@ -67,11 +72,19 @@ const toolResult = (context: VisitorContext) => {
   }
 }
 
-export default function WebMCPProvider({ careersRoles = [] }: { careersRoles?: CareerRole[] }) {
+export default function WebMCPProvider({
+  careersRoles = [],
+  pageDetails = {},
+}: {
+  careersRoles?: CareerRole[]
+  pageDetails?: Record<string, PageDetails>
+}) {
   const { context, variant, replaceContext, updateContext, resetContext } = useVisitorContext()
   const contextRef = useRef(context)
   const careersRolesRef = useRef(careersRoles)
   careersRolesRef.current = careersRoles
+  const pageDetailsRef = useRef(pageDetails)
+  pageDetailsRef.current = pageDetails
 
   useEffect(() => {
     contextRef.current = context
@@ -116,17 +129,150 @@ export default function WebMCPProvider({ careersRoles = [] }: { careersRoles?: C
           'Read the complete current state of newtuple.com in this tab: URL path, which in-place page view is open (if any), the visitor context, whether the site is personalized, the adaptive navigation and hero being rendered, and what a contact request would currently be regarding. Call this first to orient. Changes nothing.',
         annotations: { readOnlyHint: true },
         execute: () => {
-          const current = generateAdaptiveSiteVariant(readContext())
+          const context = readContext()
+          const current = generateAdaptiveSiteVariant(context)
+          const nextQuestions = missingPersonaQuestions(context, getPersonaAnswers())
           return {
             path: window.location.pathname,
             openPageView: pageViewStore.getSnapshot().slug,
-            visitorContext: readContext(),
+            visitorContext: context,
             isPersonalized: current.isPersonalized,
             adaptationSummary: current.adaptationSummary,
             navigation: current.navigation,
             hero: current.hero,
             primaryCta: current.primaryCta,
             contactRegarding: getContactRegarding() || null,
+            personalization: {
+              complete: nextQuestions.length === 0,
+              nextQuestions: nextQuestions.slice(0, 2),
+              hint:
+                nextQuestions.length > 0
+                  ? 'The site can be tailored further: ask the visitor these questions, then call answer_personalization_questions.'
+                  : 'Persona is complete for this track.',
+            },
+          }
+        },
+      })
+
+      // THE entry point: an agent whose user asks "how can Newtuple help me?"
+      // calls this first. It returns the guided script - the WebMCP-protocol
+      // prompt for this site - that walks the agent through eliciting the
+      // persona, customizing the site, grounding answers in real experience,
+      // and (with consent) initiating contact.
+      void register({
+        name: 'how_can_newtuple_help',
+        title: 'How can Newtuple help me? (start here)',
+        description:
+          'START HERE when the visitor wants to know how Newtuple can help them. Returns the guided script for this site: the questions to ask the visitor (use case, industry, role), the tools that then customize the whole website for their persona, the tool that grounds your answers in Newtuple\'s real case studies and testimonials, and how to initiate contact with Newtuple on the visitor\'s behalf. Changes nothing by itself.',
+        annotations: { readOnlyHint: true },
+        execute: () => {
+          const context = readContext()
+          const questions = missingPersonaQuestions(context, getPersonaAnswers())
+          return {
+            prompt: [
+              'You are helping this visitor discover how Newtuple (production AI agents, apps, and accelerators) can help THEM. Follow these steps:',
+              '1. ASK the visitor the questions listed under "questions" (fixed options included). Start with their use case and industry in their own words too.',
+              '2. APPLY their answers with answer_personalization_questions (and/or set_visitor_context for details like industry, systems, goal). The whole website re-themes and reorders around their persona immediately.',
+              '3. SHOW the most relevant page in place with render_page_view (e.g. social-care-healthcare for a shelter or care provider, retail for a retailer). The visitor sees it on their screen.',
+              '4. GROUND your answers in get_page_details for that page: it returns what Newtuple can do, production case studies, and client testimonials. Quote this real experience - do not invent claims.',
+              '5. OFFER a clear next step: with the visitor\'s explicit consent, submit_contact_request sends their details and use case to the Newtuple team (or prepare_contact_request lets them confirm on screen).',
+            ].join('\n'),
+            questions,
+            currentPersonaComplete: questions.length === 0,
+            pagesYouCanRender: PAGE_CATALOG.filter((p) => p.slug !== 'home').map((p) => p.slug),
+          }
+        },
+      })
+
+      // Real page substance for grounded answers: what Newtuple can do on
+      // that page's topic, case-study proof, and the client testimonial -
+      // extracted from the page's own content, not invented.
+      void register({
+        name: 'get_page_details',
+        description:
+          'Read the full substance of one newtuple.com page: what Newtuple can do in that area, production case-study proof points, client testimonial, and the page\'s call to action. Use this to answer "what can you do for me?" and "do you have experience with X?" from real site content. Changes nothing.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            page: {
+              type: 'string',
+              enum: PAGE_CATALOG.filter((p) => p.slug !== 'home').map((p) => p.slug),
+              description: 'The page to read. Same slugs list_site_pages returns.',
+            },
+          },
+          required: ['page'],
+        },
+        annotations: { readOnlyHint: true },
+        execute: (input = {}) => {
+          const slug = String(input.page ?? '')
+          const catalogEntry = PAGE_CATALOG.find((p) => p.slug === slug)
+          const detail = pageDetailsRef.current[slug]
+          if (!catalogEntry) return { ok: false, error: `Unknown page: ${slug}. Call list_site_pages for valid slugs.` }
+          return { ok: true, page: catalogEntry, details: detail ?? null }
+        },
+      })
+
+      // Elicitation: information requests answered WITH questions when the
+      // persona is still unknown. The agent relays these to its user, then
+      // writes the answers back - the site reshapes and, for careers and
+      // product answers, the matching page comes up on screen too.
+      void register({
+        name: 'get_personalization_questions',
+        description:
+          'Get the questions that would let newtuple.com tailor its information to this visitor. Questions BRANCH by visitor type: a job seeker, a services buyer, and a product evaluator each get different questions, and the first question decides which track applies. Ask the visitor these (each has fixed answer options), then call answer_personalization_questions with their answers. Already-answered questions are not repeated. Changes nothing.',
+        annotations: { readOnlyHint: true },
+        execute: () => {
+          const context = readContext()
+          const questions = missingPersonaQuestions(context, getPersonaAnswers())
+          return {
+            track: personaTrack(context),
+            complete: questions.length === 0,
+            questions,
+            howToAnswer:
+              'Call answer_personalization_questions with {"answers": {"<question id>": "<option value>"}}. Batch several at once.',
+          }
+        },
+      })
+
+      void register({
+        name: 'answer_personalization_questions',
+        description:
+          'Apply the visitor\'s answers to the personalization questions from get_personalization_questions. The site rebuilds around the answers immediately: theme, navigation and hero adapt; a product-area answer also renders that product\'s page in place; career answers filter the careers page like a human using its controls. Returns the remaining questions (the track can add new ones after the first answer) - keep going until complete.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            answers: {
+              type: 'object',
+              description: 'Map of question id to chosen option value, e.g. {"intent": "careers", "career_focus": "business analyst"}.',
+            },
+          },
+          required: ['answers'],
+        },
+        annotations: { readOnlyHint: false },
+        execute: (input = {}) => {
+          const result = applyPersonaAnswers((input.answers ?? {}) as Record<string, unknown>)
+          if (Object.keys(result.applied).length === 0) {
+            return { ok: false, invalid: result.invalid, error: 'No valid answers. Use question ids and option values from get_personalization_questions.' }
+          }
+
+          recordPersonaAnswers(result.applied)
+          const context = Object.keys(result.patch).length > 0 ? updateContext(result.patch) : readContext()
+          if (result.pageViewSlug) openPageView(result.pageViewSlug)
+          if (result.careersFilters) {
+            applyCareersFilters(result.careersFilters)
+            if (window.location.pathname !== '/careers') goToSitePage('/careers')
+          }
+
+          const remaining = missingPersonaQuestions(context, getPersonaAnswers())
+          return {
+            ok: true,
+            applied: result.applied,
+            invalid: result.invalid,
+            renderedPageView: result.pageViewSlug,
+            careersFiltered: Boolean(result.careersFilters),
+            remainingQuestions: remaining,
+            complete: remaining.length === 0,
+            site: toolResult(context),
           }
         },
       })
@@ -176,8 +322,15 @@ export default function WebMCPProvider({ careersRoles = [] }: { careersRoles?: C
 
       void register({
         name: 'generate_page_variant',
-        description: 'Generate the complete current Newtuple.com page variant (navigation, hero, CTAs, relevant case studies) from the visible visitor context.',
-        execute: () => generateAdaptiveSiteVariant(readContext()),
+        description: 'Generate the complete current Newtuple.com page variant (navigation, hero, CTAs, relevant case studies) from the visible visitor context. When the persona is still incomplete, the result includes the questions that would sharpen it - ask the visitor, then call answer_personalization_questions.',
+        execute: () => {
+          const context = readContext()
+          const nextQuestions = missingPersonaQuestions(context, getPersonaAnswers())
+          return {
+            ...generateAdaptiveSiteVariant(context),
+            personalization: { complete: nextQuestions.length === 0, nextQuestions: nextQuestions.slice(0, 2) },
+          }
+        },
       })
 
       void register({
@@ -231,6 +384,9 @@ export default function WebMCPProvider({ careersRoles = [] }: { careersRoles?: C
           return {
             ok: true,
             rendered: { slug, title: page?.title, description: page?.description },
+            // The same substance the visitor now sees on screen, so answers
+            // can be grounded without a second call.
+            details: pageDetailsRef.current[slug] ?? null,
             note: 'Page rendered in place - the URL did not change. close_page_view restores the underlying page.',
             adaptedContext: context,
           }

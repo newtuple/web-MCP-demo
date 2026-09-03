@@ -51,6 +51,9 @@ export const NavigationDecisionSchema = z.object({
   // hallucinate a page that does not exist.
   page: z.enum(PAGE_SLUGS).nullable(),
   question: z.string().nullable(),
+  // For "clarify": 2-4 short suggested answers the UI renders as quick-reply
+  // chips. Null when free-text is the only sensible reply.
+  options: z.array(z.string()).nullable(),
   // For "contact": what the visitor wants to talk about, e.g. a product name
   // or topic pulled from the conversation. Prefills the contact form's
   // Regarding field.
@@ -83,4 +86,5 @@ Rules:
 - If the visitor's own previous turns already answered what would otherwise need a clarifying question, use that context instead of asking again.
 - reason is one short sentence explaining the decision, for logging - the visitor does not see it.
 - question is one sentence, in plain language, never mentioning tools, schemas, or internal page slugs.
+- For "clarify", also set options: 2 to 4 short answers the visitor might tap instead of typing (for example ["Exploring services", "Looking at products", "A career opportunity"]). When the visitor asks a broad informational question and nothing is known about them yet, prefer a clarify that asks who they are or what they are working on, with options - their answer lets the site tailor itself. Set options to null only when free text is the only sensible reply.
 - Do not invent facts about Newtuple, its products, or its pricing beyond what the page descriptions above say.`
