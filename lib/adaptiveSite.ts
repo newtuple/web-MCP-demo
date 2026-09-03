@@ -52,6 +52,10 @@ export const VISITOR_CONTEXT_EVENT = 'newtuple-visitor-context-change'
 
 const cleanUnique = (items: string[]) => Array.from(new Set(items.map((item) => item.trim()).filter(Boolean)))
 const includesAny = (value: string, keywords: string[]) => keywords.some((keyword) => value.includes(keyword))
+// Word-boundary prefix match for short stems where plain substring matching
+// misfires: 'voice' must not match "invoice", 'eval' must not match
+// "retrieval" - but 'eval' should still catch evals/evaluating/evaluation.
+const matchesWordPrefix = (value: string, stems: string[]) => stems.some((stem) => new RegExp(`\\b${stem}`).test(value))
 
 const validIntents: VisitorIntent[] = ['general', 'services', 'products', 'careers']
 const validRoles: VisitorRole[] = ['CIO', 'CTO', 'Data Leader', 'Operations Leader', 'Founder', 'Candidate', 'Unknown']
@@ -148,19 +152,28 @@ export function inferVisitorContext(statement: string): VisitorContext {
   }
   if (intent === 'careers') role = 'Candidate'
 
+  // Product mapping, most specific first. Order matters:
+  // - Dialogtuple owns conversation/multi-agent language.
+  // - Uttertuple owns anything voice.
+  // - Gaugetuple owns eval-language ('eval' also catches evals/evaluating/evaluation).
+  // - product-data phrases stay a retail-services goal and are checked BEFORE
+  //   Flowtuple so that "product-data automation" is not captured by the
+  //   generic 'automation' keyword.
   let goal = intent === 'careers' ? 'career opportunity' : 'AI transformation'
   if (intent === 'products') goal = 'Newtuple product discovery'
-  if (includesAny(text, ['dialogtuple', 'chatbot', 'conversation', 'support agent'])) {
+  if (includesAny(text, ['dialogtuple', 'chatbot', 'conversation', 'support agent', 'multi agent', 'multi-agent', 'agent architecture', 'agent platform', 'mcp'])) {
     goal = 'Dialogtuple product fit'
-  } else if (includesAny(text, ['flowtuple', 'workflow', 'approval', 'human in the loop'])) {
-    goal = 'Flowtuple workflow automation'
-  } else if (includesAny(text, ['gaugetuple', 'eval', 'evaluation', 'quality scoring', 'llm quality'])) {
+  } else if (matchesWordPrefix(text, ['uttertuple', 'voice', 'speech', 'stt\\b', 'tts\\b', 'call center'])) {
+    goal = 'Uttertuple voice AI'
+  } else if (matchesWordPrefix(text, ['gaugetuple', 'eval', 'quality scoring', 'llm quality', 'benchmark', 'llm testing'])) {
     goal = 'Gaugetuple evaluation readiness'
   } else if (includesAny(text, ['product data', 'product-data', 'pim', 'catalog', 'supplier onboarding', 'merchandising'])) {
     goal = 'product-data automation'
+  } else if (includesAny(text, ['flowtuple', 'workflow', 'approval', 'human in the loop', 'state machine', 'orchestration', 'automation'])) {
+    goal = 'Flowtuple workflow automation'
   } else if (includesAny(text, ['production', 'reliability', 'observability', 'secure', 'security'])) {
     goal = 'production AI readiness'
-  } else if (includesAny(text, ['agent', 'workflow', 'automation'])) {
+  } else if (includesAny(text, ['agent'])) {
     goal = 'AI agent workflow automation'
   }
 
@@ -183,6 +196,20 @@ export function inferVisitorContext(statement: string): VisitorContext {
   return normalizeVisitorContext({ intent, industry, role, systems, goal, technical_depth, buying_stage })
 }
 
+// Goals that mean "this visitor is really about one specific product". The
+// chatbot and navigate_site use this to also bring that product's view up on
+// screen (render_page_view mechanics), not just re-theme around it.
+const PRODUCT_GOAL_SLUGS: Record<string, string> = {
+  'Dialogtuple product fit': 'dialogtuple',
+  'Uttertuple voice AI': 'uttertuple',
+  'Gaugetuple evaluation readiness': 'gaugetuple',
+  'Flowtuple workflow automation': 'flowtuple',
+}
+
+export function productSlugForGoal(goal: string): string | null {
+  return PRODUCT_GOAL_SLUGS[goal] ?? null
+}
+
 const titleCase = (value: string) =>
   value.split(' ').filter(Boolean).map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(' ')
 
@@ -202,7 +229,7 @@ export function generateAdaptiveSiteVariant(context: VisitorContext): AdaptiveSi
       intent: 'general',
       isPersonalized: false,
       adaptationSummary: '',
-      reasonForVisitor: 'No visitor context set yet — this is the neutral entry screen.',
+      reasonForVisitor: 'No visitor context set yet. This is the neutral entry screen.',
       navigation: [
         { label: 'Services', href: '/newtuple-agents' },
         { label: 'Products', href: '/genai-accelerators' },
@@ -211,12 +238,13 @@ export function generateAdaptiveSiteVariant(context: VisitorContext): AdaptiveSi
         { label: 'Contact', href: '/contactus' },
       ],
       hero: {
-        eyebrow: 'A website that rebuilds itself for every visitor',
-        title: 'What are you trying to improve?',
-        description: 'Tell Newtuple what you need, and watch the page reshape itself around your goals in seconds.',
+        eyebrow: 'The AI-native website',
+        title: 'Build your agentic enterprise.',
+        description:
+          'Newtuple designs, ships, and operates production-grade AI. Tell us who you are and what you need - this site rebuilds itself around your goals in real time.',
       },
       primaryCta: { label: 'Talk to Newtuple', href: '/contactus' },
-      secondaryCta: { label: 'See open roles', href: '/careers' },
+      secondaryCta: { label: 'Explore our services', href: '/newtuple-agents' },
       caseStudySlugs: ['enterprise-saas-ai-agents', 'data-intelligence-platform', 'aviation-oem-agentic-data-access'],
       caseStudyHref: '/newtuple-agents',
       suggestedPrompts: [
@@ -243,7 +271,7 @@ export function generateAdaptiveSiteVariant(context: VisitorContext): AdaptiveSi
       hero: {
         eyebrow: 'Careers',
         title: 'Find your place on the Newtuple team.',
-        description: 'Candidate intent detected — open roles and team culture are the priority for this visit.',
+        description: 'Candidate intent detected. Open roles and team culture are the priority for this visit.',
       },
       primaryCta: { label: 'View open roles', href: '/careers' },
       secondaryCta: { label: 'See life at Newtuple', href: '/life-at-newtuple' },
@@ -274,7 +302,7 @@ export function generateAdaptiveSiteVariant(context: VisitorContext): AdaptiveSi
       hero: {
         eyebrow: `Products for ${audience}`,
         title: 'Explore Newtuple products for AI apps, agents, workflows, and evaluations.',
-        description: `Product interest detected${systemsLabel ? ` around ${systemsLabel}` : ''} — leading with accelerators and platforms that fit ${normalizedContext.goal}.`,
+        description: `Product interest detected${systemsLabel ? ` around ${systemsLabel}` : ''}, leading with accelerators and platforms that fit ${normalizedContext.goal}.`,
       },
       primaryCta: { label: 'Explore AI apps', href: '/newtuple-ai-apps' },
       secondaryCta: { label: 'Book a demo', href: '/contactus' },
@@ -314,7 +342,7 @@ export function generateAdaptiveSiteVariant(context: VisitorContext): AdaptiveSi
       ? {
           eyebrow: `Retail services${systemsLabel ? ` for ${systemsLabel}` : ''}`,
           title: 'Improve merchandising, supplier onboarding, and product-data operations with AI.',
-          description: `${roleName(normalizedContext.role)} context detected — prioritizing ${normalizedContext.goal}${systemsLabel ? ` and ${systemsLabel} integration` : ''}.`,
+          description: `${roleName(normalizedContext.role)} context detected, prioritizing ${normalizedContext.goal}${systemsLabel ? ` and ${systemsLabel} integration` : ''}.`,
         }
       : {
           eyebrow: `Services for ${audience}`,

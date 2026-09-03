@@ -95,7 +95,7 @@ partnerEcosystem:
       items:
         - name: "OpenAI Select"
           logo: "/images/partners/openai-select-approved.svg"
-          href: "/post/newtuple-openai-select-partner"
+          href: "https://www.newtuple.com/post/newtuple-openai-select-partner"
         - name: "Anthropic"
           logo: "/images/partners/anthropic.svg"
     - title: "Cloud Deployment Expertise"

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { useEffect, useRef } from 'react'
 import {
   generateAdaptiveSiteVariant,
   inferVisitorContext,
@@ -9,9 +9,14 @@ import {
   type VisitorContext,
   type VisitorIntent,
 } from '@/lib/adaptiveSite'
-import { demoAppStore } from '@/lib/demoApp/store'
-import DemoAppLauncher from './DemoAppLauncher'
-import { createDemoAppTools, createDemoBuilderTools } from './demoAppTools'
+import { type CareerRole } from '@/lib/careers/roles'
+import { getContactRegarding } from '@/lib/contactRegarding'
+import { PAGE_CATALOG } from '@/lib/navigate/schema'
+import { closePageView, contextPatchForSlug, openPageView, pageViewStore } from '@/lib/pageView/store'
+import SiteAssistant from './SiteAssistant'
+import { createCareersTools } from './careersTools'
+import { createContactTools } from './contactTools'
+import { createNavigateTools } from './navigateTools'
 import { useVisitorContext } from './useVisitorContext'
 
 const ACCENT_VARS: Record<VisitorIntent, Record<string, string>> = {
@@ -62,13 +67,11 @@ const toolResult = (context: VisitorContext) => {
   }
 }
 
-export default function WebMCPProvider() {
+export default function WebMCPProvider({ careersRoles = [] }: { careersRoles?: CareerRole[] }) {
   const { context, variant, replaceContext, updateContext, resetContext } = useVisitorContext()
   const contextRef = useRef(context)
-  // Held in state, not a ref, so the demo-app effect below re-runs the moment
-  // the browser hands us a modelContext.
-  const [modelContext, setModelContext] = useState<WebMCPModelContext | null>(null)
-  const demo = useSyncExternalStore(demoAppStore.subscribe, demoAppStore.getSnapshot, demoAppStore.getServerSnapshot)
+  const careersRolesRef = useRef(careersRoles)
+  careersRolesRef.current = careersRoles
 
   useEffect(() => {
     contextRef.current = context
@@ -92,7 +95,6 @@ export default function WebMCPProvider() {
 
       window.__newtupleWebMCPToolsRegistered = true
       controller = new AbortController()
-      setModelContext(modelContext)
 
       const register = async (tool: WebMCPToolDefinition) => {
         const signal = controller?.signal
@@ -106,6 +108,29 @@ export default function WebMCPProvider() {
 
       const readContext = () => contextRef.current
 
+      // Read-before-act entry point: one call tells an agent everything about
+      // the tab it is driving, so it never has to guess or "look" at pixels.
+      void register({
+        name: 'get_site_state',
+        description:
+          'Read the complete current state of newtuple.com in this tab: URL path, which in-place page view is open (if any), the visitor context, whether the site is personalized, the adaptive navigation and hero being rendered, and what a contact request would currently be regarding. Call this first to orient. Changes nothing.',
+        annotations: { readOnlyHint: true },
+        execute: () => {
+          const current = generateAdaptiveSiteVariant(readContext())
+          return {
+            path: window.location.pathname,
+            openPageView: pageViewStore.getSnapshot().slug,
+            visitorContext: readContext(),
+            isPersonalized: current.isPersonalized,
+            adaptationSummary: current.adaptationSummary,
+            navigation: current.navigation,
+            hero: current.hero,
+            primaryCta: current.primaryCta,
+            contactRegarding: getContactRegarding() || null,
+          }
+        },
+      })
+
       void register({
         name: 'infer_visitor_context',
         description:
@@ -115,7 +140,7 @@ export default function WebMCPProvider() {
           properties: {
             visitor_statement: {
               type: 'string',
-              description: 'What the visitor or their agent says they are trying to improve, for example "I run digital transformation for a large retailer using SAP."',
+              description: 'What brings the visitor (or the agent acting for them) to Newtuple, for example "I run digital transformation for a large retailer using SAP."',
             },
           },
           required: ['visitor_statement'],
@@ -176,8 +201,64 @@ export default function WebMCPProvider() {
         execute: () => toolResult(resetContext()),
       })
 
-      // Always possible: building a demo app needs nothing to be true first.
-      createDemoBuilderTools().forEach((tool) => void register(tool))
+      // In-place rendering: the WebMCP-native way to "go" somewhere. The
+      // current screen morphs into the requested page with CSS (the route's
+      // own content is hidden, the view renders in its place) and the
+      // visitor-context theme re-paints to match - no page load, no route
+      // change, all other tools stay registered.
+      void register({
+        name: 'render_page_view',
+        description:
+          'Render any real newtuple.com page IN PLACE on the current screen instead of navigating to it. The current route\'s content is swapped out with CSS, navigation and accent theme re-adapt to the requested page, and the URL does not change - so no page load and no lost state. Prefer this over sending the visitor to another URL. Use close_page_view to restore the underlying page.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            page: {
+              type: 'string',
+              enum: PAGE_CATALOG.filter((p) => p.slug !== 'home').map((p) => p.slug),
+              description: 'The catalog page to render in place. Same slugs list_site_pages returns.',
+            },
+          },
+          required: ['page'],
+        },
+        annotations: { readOnlyHint: false },
+        execute: (input = {}) => {
+          const slug = String(input.page ?? '')
+          const opened = openPageView(slug)
+          if (!opened) return { ok: false, error: `Unknown page: ${slug}. Call list_site_pages for valid slugs.` }
+          const context = updateContext(contextPatchForSlug(slug))
+          const page = PAGE_CATALOG.find((p) => p.slug === slug)
+          return {
+            ok: true,
+            rendered: { slug, title: page?.title, description: page?.description },
+            note: 'Page rendered in place - the URL did not change. close_page_view restores the underlying page.',
+            adaptedContext: context,
+          }
+        },
+      })
+
+      void register({
+        name: 'close_page_view',
+        description:
+          'Close the in-place page view opened by render_page_view and restore the underlying page\'s own content. Does nothing when no view is open.',
+        execute: () => {
+          const wasOpen = pageViewStore.getSnapshot().slug
+          closePageView()
+          return { ok: true, closed: wasOpen ?? null }
+        },
+      })
+
+      // Routing to a real page needs nothing to be true first. Its own
+      // session lives client-side only, see lib/navigate/session.ts.
+      createNavigateTools(replaceContext).forEach((tool) => void register(tool))
+
+      // Contact: prepare opens the on-page flow; submit sends a lead
+      // directly with the visitor's consent.
+      createContactTools().forEach((tool) => void register(tool))
+
+      // Careers: list roles, read JDs, and filter the careers page UI the
+      // way a human using the on-page controls would.
+      createCareersTools(careersRolesRef.current).forEach((tool) => void register(tool))
 
       return true
     }
@@ -209,41 +290,5 @@ export default function WebMCPProvider() {
     contextRef.current = mergeVisitorContext(contextRef.current, context)
   }, [context])
 
-  // Dynamic registration, per the WebMCP pattern: the demo_app_* tools exist
-  // only while a demo app is on screen, and their action_id enums are built
-  // from that app. Closing the app aborts the controller, so the tools leave
-  // the agent's menu instead of failing when called.
-  const demoAppId = demo.session?.app.id ?? ''
-  // The page's own tool names are the tool surface, so they are the registration
-  // key: a newly generated page brings a different set.
-  const demoActionKey = demo.session?.app.tools.map((tool) => tool.name).join(',') ?? ''
-
-  useEffect(() => {
-    const session = demoAppStore.getSnapshot().session
-    if (!modelContext || !session) return
-
-    const controller = new AbortController()
-    const tools = createDemoAppTools(session)
-    let cancelled = false
-
-    void (async () => {
-      for (const tool of tools) {
-        if (cancelled || controller.signal.aborted) return
-        try {
-          await modelContext.registerTool(tool, { signal: controller.signal })
-        } catch {
-          // a browser that rejects one tool should not lose the rest
-        }
-      }
-      if (!cancelled) window.__newtupleDemoAppToolCount = tools.length
-    })()
-
-    return () => {
-      cancelled = true
-      controller.abort()
-      window.__newtupleDemoAppToolCount = 0
-    }
-  }, [modelContext, demoAppId, demoActionKey])
-
-  return <DemoAppLauncher />
+  return <SiteAssistant />
 }

@@ -1,6 +1,5 @@
 import type { MetadataRoute } from 'next'
 import { SITE_URL } from '@/lib/constants'
-import { getAllBlogPosts } from '@/lib/content'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const pages = [
@@ -23,22 +22,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/agencies',
     '/careers',
     '/life-at-newtuple',
-    '/blog',
   ]
 
   const baseEntries = pages.map((path) => ({
     url: `${SITE_URL}${path}`,
     lastModified: new Date(),
-    changeFrequency: path === '/' ? 'weekly' : 'monthly',
+    changeFrequency: path === '/' ? ('weekly' as const) : ('monthly' as const),
     priority: path === '/' ? 1 : 0.8,
   }))
 
-  const blogEntries = getAllBlogPosts().map((post) => ({
-    url: `${SITE_URL}/post/${post.slug}`,
-    lastModified: new Date(post.updated ?? post.date),
-    changeFrequency: 'monthly' as const,
-    priority: 0.7,
-  }))
-
-  return [...baseEntries, ...blogEntries]
+  return baseEntries
 }

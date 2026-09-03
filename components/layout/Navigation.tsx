@@ -24,10 +24,13 @@ const STRIP_ACCENTS: Record<string, { bar: string; text: string; reset: string; 
   careers: { bar: 'border-emerald-100 bg-emerald-50', text: 'text-emerald-900', reset: 'text-emerald-700 hover:text-emerald-900', link: 'hover:text-emerald-700', underline: 'bg-emerald-700' },
 }
 
-const BLOG_PATH = '/blog'
 const BLOG_NAV_ITEM: DropdownItem =
-  NAV_COMPANY.find((item) => item.href === BLOG_PATH) ?? { label: 'Blog', href: BLOG_PATH }
-const NAV_COMPANY_DROPDOWN = NAV_COMPANY.filter((item) => item.href !== BLOG_PATH)
+  NAV_COMPANY.find((item) => item.label === 'Blog') ?? {
+    label: 'Blog',
+    href: 'https://www.newtuple.com/blog',
+    external: true,
+  }
+const NAV_COMPANY_DROPDOWN = NAV_COMPANY.filter((item) => item.label !== 'Blog')
 
 function NavDropdown({
   label,
@@ -174,13 +177,15 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
             <MobileSection title="Accelerators" items={NAV_ACCELERATORS} onClose={onClose} />
             <MobileSection title="Industries" items={NAV_INDUSTRIES} onClose={onClose} />
             <MobileSection title="Company" items={NAV_COMPANY_DROPDOWN} onClose={onClose} />
-            <Link
+            <a
               href={BLOG_NAV_ITEM.href}
+              target="_blank"
+              rel="noopener noreferrer"
               onClick={onClose}
               className="block rounded-xl border border-gray-200 bg-gradient-to-b from-white to-gray-50/70 px-4 py-3 text-sm font-semibold text-gray-900 uppercase tracking-wider hover:text-[var(--accent-900)] hover:bg-white transition-colors"
             >
               {BLOG_NAV_ITEM.label}
-            </Link>
+            </a>
           </nav>
         </div>
 
@@ -327,12 +332,14 @@ export default function Navigation() {
                 <NavDropdown label="Accelerators" items={NAV_ACCELERATORS} />
                 <NavDropdown label="Industries" items={NAV_INDUSTRIES} />
                 <NavDropdown label="Company" items={NAV_COMPANY_DROPDOWN} />
-                <Link
+                <a
                   href={BLOG_NAV_ITEM.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="text-sm font-medium text-gray-700 hover:text-[var(--accent-900)] transition-colors py-2"
                 >
                   {BLOG_NAV_ITEM.label}
-                </Link>
+                </a>
               </nav>
             )}
 

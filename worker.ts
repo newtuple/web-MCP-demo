@@ -10,7 +10,8 @@ interface WorkerEnv extends DemoAppEnv {
 
 export default {
   async fetch(request: Request, env: WorkerEnv): Promise<Response> {
-    const { pathname } = new URL(request.url)
+    const requestUrl = new URL(request.url)
+    const { pathname } = requestUrl
 
     if (pathname === '/api/demo-app') {
       return handleDemoAppRequest(request, env)

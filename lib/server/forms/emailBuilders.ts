@@ -19,6 +19,7 @@ export function buildContactLeadEmail(lead: ContactLead): { subject: string; tex
     `Phone: ${printable(lead.phone)}`,
     `Intent type: ${printable(lead.intentType)}`,
     `Intent: ${printable(lead.intent)}`,
+    `Regarding: ${printable(lead.regarding)}`,
     `Resume link: ${printable(lead.resumeLink)}`,
     `Message: ${printable(lead.message)}`,
     `Consent: ${printable(lead.consent)}`,
@@ -29,7 +30,9 @@ export function buildContactLeadEmail(lead: ContactLead): { subject: string; tex
   }
 
   return {
-    subject: `New contact lead: ${lead.name}`,
+    subject: lead.regarding
+      ? `New contact lead: ${lead.name} - regarding ${lead.regarding}`
+      : `New contact lead: ${lead.name}`,
     text: lines.join('\n'),
   }
 }

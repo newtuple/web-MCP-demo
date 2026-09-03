@@ -17,27 +17,16 @@ Markdown lives under `content/` and is parsed with `gray-matter` in `lib/content
 - `lib/content.ts` exposes helpers:
   - `getPageContent(slug)` for general pages
   - `getAllCaseStudies()` for case study summaries
-  - `getAllBlogPosts()` and `getBlogPost(slug)` for blog posts
 - Markdown is rendered via `react-markdown` with custom components for headings, paragraphs, lists, code, etc.
 
 ### Content Locations
 - General pages: `content/*.md`
 - Case studies: `content/case_studies/*.md`
-- Blog posts: `content/blog/*.md`
 
 ### Frontmatter Conventions
 Common fields used across content:
 - `title` (string)
 - `description` (string)
-
-Blog frontmatter additionally supports:
-- `date`, `updated`
-- `author`
-- `slug`
-- `tags` (array)
-- `heroImage`
-- `canonical`
-- `comments` (boolean)
 
 ### Rendering Usage
 - Some pages directly render Markdown (`privacy-policy`, `service-agreement`).
@@ -46,9 +35,7 @@ Blog frontmatter additionally supports:
 ## Routing & Page Patterns
 - Static routes live under `app/`.
 - Dynamic page routing uses `app/[slug]/page.tsx` with a registry in `app/_pageRegistry.ts`.
-- Blog routes:
-  - Index: `app/blog/page.tsx`
-  - Detail: `app/post/[slug]/page.tsx`
+- Blog links open the blog at `https://www.newtuple.com/blog`.
 
 ## Components & Layout
 - Shared layout: `app/layout.tsx`

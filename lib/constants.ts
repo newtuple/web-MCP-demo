@@ -42,5 +42,5 @@ export const NAV_COMPANY = [
   { label: 'About Us', href: '/about-us' },
   { label: 'Life at Newtuple', href: '/life-at-newtuple' },
   { label: 'Careers', href: '/careers' },
-  { label: 'Blog', href: '/blog' },
+  { label: 'Blog', href: 'https://www.newtuple.com/blog', external: true },
 ]
