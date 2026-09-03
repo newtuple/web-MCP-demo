@@ -10,6 +10,12 @@ type SendLeadEmailOptions = {
   env?: RuntimeEnv
 }
 
+// Delivery order: SMTP first (SMTP_HOST + SMTP_USER + SMTP_PASSWORD set),
+// falling back to the AWS SES HTTP API only when SMTP is not configured.
+// SMTP runs through nodemailer, imported dynamically so the Workers bundle
+// (Cloudflare Pages Functions) never loads Node-only modules unless the
+// SMTP branch is actually taken - on Workers, configure SES instead.
+
 function getRequiredEnv(name: string, env?: RuntimeEnv): string {
   const value = (env?.[name] ?? process.env[name])?.trim()
   if (!value) {
@@ -115,7 +121,53 @@ async function signRequest(
   }
 }
 
+function smtpConfigured(env?: RuntimeEnv): boolean {
+  return Boolean(getEnv('SMTP_HOST', env) && getEnv('SMTP_USER', env) && getEnv('SMTP_PASSWORD', env))
+}
+
+async function sendViaSmtp(
+  { to, subject, text, replyTo }: LeadEmailInput,
+  env?: RuntimeEnv,
+): Promise<void> {
+  const host = getRequiredEnv('SMTP_HOST', env)
+  const user = getRequiredEnv('SMTP_USER', env)
+  const pass = getRequiredEnv('SMTP_PASSWORD', env)
+  const from = getEnv('SMTP_MAIL_FROM', env) || getEnv('SES_FROM_EMAIL', env) || user
+  // STARTTLS on 587 by default; SMTP_SSL_PORT switches to implicit TLS (465).
+  const sslPort = Number(getEnv('SMTP_SSL_PORT', env))
+  const tlsPort = Number(getEnv('SMTP_TLS_PORT', env))
+  const useSsl = Number.isFinite(sslPort) && sslPort > 0 && !(Number.isFinite(tlsPort) && tlsPort > 0)
+  const port = useSsl ? sslPort : Number.isFinite(tlsPort) && tlsPort > 0 ? tlsPort : 587
+
+  const { default: nodemailer } = await import('nodemailer')
+  const transporter = nodemailer.createTransport({
+    host,
+    port,
+    secure: useSsl,
+    auth: { user, pass },
+  })
+
+  await transporter.sendMail({
+    from,
+    to,
+    subject,
+    text,
+    ...(replyTo ? { replyTo } : {}),
+  })
+}
+
 export async function sendLeadEmail(
+  input: LeadEmailInput,
+  options: SendLeadEmailOptions = {},
+): Promise<void> {
+  if (smtpConfigured(options.env)) {
+    await sendViaSmtp(input, options.env)
+    return
+  }
+  await sendViaSes(input, options)
+}
+
+async function sendViaSes(
   { to, subject, text, replyTo }: LeadEmailInput,
   options: SendLeadEmailOptions = {},
 ): Promise<void> {

@@ -83,7 +83,19 @@ const INDUSTRY_QUESTION: PersonaQuestionDef = {
   ],
   isAnswered: (context, answers) =>
     answered(answers, 'industry') || (context.industry !== 'general' && context.industry !== 'careers'),
-  apply: (value) => ({ patch: { industry: value } }),
+  apply: (value) => {
+    // Answering the industry question immediately shows that industry's page
+    // in place - no one should have to ask for it to be rendered.
+    const slugs: Record<string, string> = {
+      retail: 'retail',
+      'financial services': 'financial-services',
+      healthcare: 'social-care-healthcare',
+      aviation: 'aviation',
+      agencies: 'agencies',
+      'enterprise saas': 'newtuple-ai-apps',
+    }
+    return { patch: { industry: value }, pageViewSlug: slugs[value] }
+  },
 }
 
 const GOAL_QUESTION: PersonaQuestionDef = {

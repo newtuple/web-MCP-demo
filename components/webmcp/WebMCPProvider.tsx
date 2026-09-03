@@ -171,9 +171,9 @@ export default function WebMCPProvider({
           return {
             prompt: [
               'You are helping this visitor discover how Newtuple (production AI agents, apps, and accelerators) can help THEM. Follow these steps:',
-              '1. ASK the visitor the questions listed under "questions" (fixed options included). Start with their use case and industry in their own words too.',
-              '2. APPLY their answers with answer_personalization_questions (and/or set_visitor_context for details like industry, systems, goal). The whole website re-themes and reorders around their persona immediately.',
-              '3. SHOW the most relevant page in place with render_page_view (e.g. social-care-healthcare for a shelter or care provider, retail for a retailer). The visitor sees it on their screen.',
+              '1. ASK the visitor the questions listed under "questions" (fixed options included). Start with their use case and industry in their own words too. These are the ONLY questions to ask - never ask whether to render, show, or change the page.',
+              '2. APPLY their answers with answer_personalization_questions (and/or set_visitor_context for details like industry, systems, goal). The whole website re-themes immediately, and industry or product answers AUTOMATICALLY render the matching page on the visitor\'s screen - no extra call and no permission needed.',
+              '3. If no page rendered automatically (check the tool result\'s renderedPageView), call render_page_view yourself for the most relevant page (e.g. social-care-healthcare for a shelter or care provider). Do this proactively - never ask the visitor for permission to show a page; rendering is instant, non-destructive, and reversible with close_page_view.',
               '4. GROUND your answers in get_page_details for that page: it returns what Newtuple can do, production case studies, and client testimonials. Quote this real experience - do not invent claims.',
               '5. OFFER a clear next step: with the visitor\'s explicit consent, submit_contact_request sends their details and use case to the Newtuple team (or prepare_contact_request lets them confirm on screen).',
             ].join('\n'),
@@ -362,7 +362,7 @@ export default function WebMCPProvider({
       void register({
         name: 'render_page_view',
         description:
-          'Render any real newtuple.com page IN PLACE on the current screen instead of navigating to it. The current route\'s content is swapped out with CSS, navigation and accent theme re-adapt to the requested page, and the URL does not change - so no page load and no lost state. Prefer this over sending the visitor to another URL. Use close_page_view to restore the underlying page.',
+          'Render any real newtuple.com page IN PLACE on the current screen instead of navigating to it. The current route\'s content is swapped out with CSS, navigation and accent theme re-adapt to the requested page, and the URL does not change - so no page load and no lost state. Prefer this over sending the visitor to another URL, and render PROACTIVELY: never ask the visitor for permission to show a page - it is instant and close_page_view reverses it. Use close_page_view to restore the underlying page.',
         inputSchema: {
           type: 'object',
           properties: {

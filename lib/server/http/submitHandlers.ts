@@ -79,6 +79,30 @@ async function safeParseJson(request: Request) {
   }
 }
 
+/** True when delivery can actually work: a recipient plus either SMTP or SES credentials. */
+function emailConfigured(toVar: string, env?: RuntimeEnv): boolean {
+  if (!getEnvValue(toVar, env)) return false
+  const smtp =
+    getEnvValue('SMTP_HOST', env) && getEnvValue('SMTP_USER', env) && getEnvValue('SMTP_PASSWORD', env)
+  const ses =
+    getEnvValue('AWS_ACCESS_KEY_ID', env) &&
+    getEnvValue('AWS_SECRET_ACCESS_KEY', env) &&
+    getEnvValue('SES_FROM_EMAIL', env)
+  return Boolean(smtp || ses)
+}
+
+/**
+ * Local development without SES credentials: accept the lead and log it to
+ * the dev server console instead of failing with a 500, so the contact flow
+ * can be demoed end to end. Production (NODE_ENV !== 'development') still
+ * requires real configuration.
+ */
+function devLogFallback(kind: string, subject: string, text: string): Response | null {
+  if (process.env.NODE_ENV !== 'development') return null
+  console.warn(`[dev] ${kind} email not configured - logging lead instead of sending:\n${subject}\n${text}`)
+  return jsonResponse(200, { ok: true, delivered: false, note: 'Email not configured; lead logged to the dev server console.' })
+}
+
 export async function handleContactSubmitRequest(request: Request, env?: RuntimeEnv) {
   const clientIp = getClientIp(request)
   const identifier = `${clientIp}:contact-submit`
@@ -113,12 +137,14 @@ export async function handleContactSubmitRequest(request: Request, env?: Runtime
     return jsonResponse(400, { error: validated.error })
   }
 
+  const email = buildContactLeadEmail(validated.data)
+
   const to = getEnvValue('CONTACT_LEADS_EMAIL', env)
-  if (!to) {
+  if (!to || !emailConfigured('CONTACT_LEADS_EMAIL', env)) {
+    const fallback = devLogFallback('contact', email.subject, email.text)
+    if (fallback) return fallback
     return jsonResponse(500, { error: 'Email not configured.' })
   }
-
-  const email = buildContactLeadEmail(validated.data)
 
   try {
     await sendLeadWithOptionalEnv(
@@ -172,12 +198,14 @@ export async function handleCareersSubmitRequest(request: Request, env?: Runtime
     return jsonResponse(400, { error: validated.error })
   }
 
+  const email = buildCareersLeadEmail(validated.data)
+
   const to = getEnvValue('CAREERS_LEADS_EMAIL', env)
-  if (!to) {
+  if (!to || !emailConfigured('CAREERS_LEADS_EMAIL', env)) {
+    const fallback = devLogFallback('careers', email.subject, email.text)
+    if (fallback) return fallback
     return jsonResponse(500, { error: 'Email not configured.' })
   }
-
-  const email = buildCareersLeadEmail(validated.data)
 
   try {
     await sendLeadWithOptionalEnv(

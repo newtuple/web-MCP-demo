@@ -44,6 +44,11 @@ describe('applying persona answers', () => {
     expect(result.pageViewSlug).toBe('gaugetuple')
   })
 
+  it('an industry answer auto-renders that industry page - no extra ask needed', () => {
+    expect(applyPersonaAnswers({ industry: 'healthcare' }).pageViewSlug).toBe('social-care-healthcare')
+    expect(applyPersonaAnswers({ industry: 'retail' }).pageViewSlug).toBe('retail')
+  })
+
   it('career answers become careers-page filters', () => {
     const result = applyPersonaAnswers({ career_focus: 'business analyst', career_level: 'Mid-Level' })
     expect(result.careersFilters).toEqual({ query: 'business analyst', level: 'Mid-Level' })
